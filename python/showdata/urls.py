@@ -36,6 +36,9 @@ urlpatterns = [
 
     url(basepattern + r'/spatialseries/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<hour>\d{2})$', views.spatialseries,name="spatialserieshourly"),
     url(basepattern + r'/spatialseries/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})$', views.spatialseries,name="spatialseriesdaily"),
+    url(r'getbcode/(?P<var>B\d{5}|\*)', views.getbcode, name="getbcode"),
+
+    url(basepattern + r'/spatialseries2', views.spatialseries2,name="spatialseries2"),
 
     url(basepattern + r'/stationdata$', views.stationdata,name="stationdata"),
     url(basepattern + r'/stations$', views.stations,name="stations"),

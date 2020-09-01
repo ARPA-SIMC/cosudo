@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block extra_assets %}
+    <style>
+        .loader {
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            background-image: url("{% static "showdata/loading.gif" %}");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: auto;
+        }
+
+    </style>
+    <script src= {% static "showdata/jquery.preload.min.js" %}></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-9">
+
+                <h4>
+                    Ident: {{ ident }} Coords: {{ coords }} Network:<a
+                        href=/network/{{ network }}> {{ network }}</a><br>
+                    {{ bcode.description }} {{ bcode.userunit }}<br>
+                    {{ trangetxt }}<br>
+                    {{ leveltxt }}<br>
+                    {{ datefrom }} - {{ dateuntil }} GMT
+                </h4>
+
+            </div>
+
+            <div class="col-xs-3">
+                <div class=row>
+                    <div class="col-xs-1 col-xs-offset-2">
+                        {% if more %}
+                            <p class="text-center">
+                                <a class="btn btn-default" role="button" href="{{ more }}">{% trans "More" %}</a>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class=row>
+                    <div class="col-xs-1">
+                        <p class="text-center">
+                            <a class="btn btn-default" role="button" href="{{ previous }}">{% trans "Prev" %}</a>
+                        </p>
+                    </div>
+                    <div class="col-xs-1 col-xs-offset-3">
+                        <p class="text-center">
+                            <a class="btn btn-default" role="button" href="{{ next }}">{% trans "Next" %}</a>
+                        </p>
+                    </div>
+                </div>
+                <div class=row>
+                    <div class="col-xs-1 col-xs-offset-2">
+                        {% if less %}
+                            <p class="text-center">
+                                <a class="btn btn-default" role="button"
+                                   href="{{ less }}">{% trans "Less" %}</a>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="loadingChart" class="loader"></div>
+
+        <p>
+            <canvas id="chart"></canvas>
+        </p>
+
+        <div class="row">
+            <div class="col-xs-8">
+
+                <p><a class="btn btn-default"
+                      href="/graphite/composer/?target=offset(scale({{ dsn }}.{{ ident }}.{{ undescored_coords }}.{{ network }}.{{ undescored_trange }}.{{ undescored_level }}.{{ var }},{{ bcode.scale }}),{{ bcode.offset }})"
+                      role="button">Graphite composer &raquo;</a>
+                    <a disabled download="chart.png" id="printGraph" class="btn btn-default">Download grafico</a>
+                </p>
+            </div>
+
+            {% if hour or day %}
+                <div class="col-xs-4">
+                    <p style="text-align:left">
+                        <a href='
+                           {% if hour %}
+                           {% url 'showdata:spatialserieshourly' ident coords network trange level var year month day hour %}?{% if dsn %}dsn={{ dsn }}{% endif %}{% for key, value in spatialbox.items %}&{{ key }}={{ value }}{% endfor %}{% for key, value in timebox.items %}&{{ key }}={{ value }}{% endfor %}
+                           {% elif day %}
+                           {% url 'showdata:spatialseriesdaily'  ident coords network trange level var year month day %}?{% if dsn %}dsn={{ dsn }}{% endif %}{% for key, value in spatialbox.items %}&{{ key }}={{ value }}{% endfor %}{% for key, value in timebox.items %}&{{ key }}={{ value }}{% endfor %}
+                           {% endif %}
+                           '>{% trans "Show values on a map" %}
+                        </a>
+                    </p>
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="row">
+            <div class="col-xs-4 col-xs-offset-8">
+                <p style="text-align:left">
+                    <a href='
+	   {% if hour %}
+	   {% url 'api:v1:timeserieshourly' 'dbajson' ident coords network trange level var year month day hour %}?{% if dsn %}dsn={{ dsn }}{% endif %}{% for key, value in spatialbox.items %}&{{ key }}={{ value }}{% endfor %}{% for key, value in timebox.items %}&{{ key }}={{ value }}{% endfor %}
+	   {% elif day %}
+	   {% url 'api:v1:timeseriesdaily' 'dbajson' ident coords network trange level var year month day %}?{% if dsn %}dsn={{ dsn }}{% endif %}{% for key, value in spatialbox.items %}&{{ key }}={{ value }}{% endfor %}{% for key, value in timebox.items %}&{{ key }}={{ value }}{% endfor %}
+	   {% elif month %}
+	   {% url 'api:v1:timeseriesmonthly' 'dbajson' ident coords network trange level var year month %}?{% if dsn %}dsn={{ dsn }}{% endif %}{% for key, value in spatialbox.items %}&{{ key }}={{ value }}{% endfor %}{% for key, value in timebox.items %}&{{ key }}={{ value }}{% endfor %}
+	   {% elif year %}
+	   {% url 'api:v1:timeseriesyearly' 'dbajson' ident coords network trange level var year %}?{% if dsn %}dsn={{ dsn }}{% endif %}{% for key, value in spatialbox.items %}&{{ key }}={{ value }}{% endfor %}{% for key, value in timebox.items %}&{{ key }}={{ value }}{% endfor %}
+	   {% endif %}
+	   '>{% trans "Download data" %}
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script>
+        // get the canvas element
+        var ctx = document.getElementById('chart').getContext('2d');
+        // set background to canvas, needed to print the image
+        Chart.plugins.register({
+            beforeDraw: function (c) {
+                var ctx = c.chart.ctx;
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, c.chart.width, c.chart.height);
+            }
+        });
+        $.get("/graphite/render/2/?target=offset(scale({{dsn}}.{{ ident }}.{{ undescored_coords }}.{{ network }}.{{ undescored_trange }}.{{ undescored_level }}.{{var}},{{bcode.scale}}),{{bcode.offset}})&from={{ datefrom }}&until={{ dateuntil }}&hideLegend=true&tz=UTC&lineMode=connected&lineWidth=3&width=800&height=400",
+            function (data) {
+                if (data["error"]) {
+                    alert("Nessun dato")
+                }
+                // disable legend
+                Chart.defaults.global.legend.display = false;
+                var chart = new Chart(ctx, {
+                    legend: {
+                        display: false
+                    },
+                    // The type of chart we want to create
+                    type: 'line',
+                    // The data for our dataset
+                    data: {
+                        labels: data.labels,
+                        datasets: data.datasets,
+                    },
+                    options: {
+                        scales: {
+                            xAxes: [{
+                                type: "time",
+                                time: {
+                                    parser: "D/M/YYYY, H:mm:ss",
+                                    displayFormats: {
+                                        millisecond: 'DD/MM/YYYY HH:mm:ss',
+                                        second: 'DD/MM/YYYY HH:mm:ss',
+                                        minute: 'DD/MM/YYYY HH:mm:ss',
+                                        hour: 'DD/MM/YYYY HH:mm:ss',
+                                        day: 'DD/MM/YYYY HH:mm:ss',
+                                        week: 'DD/MM/YYYY HH:mm:ss',
+                                        month: 'DD/MM/YYYY HH:mm:ss',
+                                        quarter: 'DD/MM/YYYY HH:mm:ss',
+                                        year: 'DD/MM/YYYY HH:mm:ss'
+                                    },
+                                    tooltipFormat: 'DD/MM/YYYY HH:mm:ss'
+                                }
+                            }],
+                        },
+
+                        animation: {
+                            onComplete: function (e) {
+                                this.options.animation.onComplete = null;
+                                // remove loading spinner
+                                document.getElementById("loadingChart").remove();
+                                // create image from canvas
+                                let url = chart.toBase64Image();
+                                // set download link to button
+                                let button = document.getElementById("printGraph");
+                                button.href = url;
+                                // enable button download
+                                button.removeAttribute("disabled");
+
+                            }
+                        },
+                        plugins: {
+                            zoom: {
+                                // Container for pan options
+                                pan: {
+                                    // Boolean to enable panning
+                                    enabled: true,
+
+                                    // Panning directions. Remove the appropriate direction to disable
+                                    // Eg. 'y' would only allow panning in the y direction
+                                    mode: 'xy'
+                                },
+
+                                // Container for zoom options
+                                zoom: {
+                                    // Boolean to enable zooming
+                                    enabled: true,
+
+                                    // Zooming directions. Remove the appropriate direction to disable
+                                    // Eg. 'y' would only allow zooming in the y direction
+                                    mode: 'xy',
+                                }
+                            }
+                        }
+                    }
+                });
+
+            })
+
+    </script>
+{% endblock %}
