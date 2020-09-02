@@ -1,8 +1,0 @@
-Item,Reference(s),Value,Quantity,Riferimento,Valore 
-1,D1,LED,1,D,LED
-2,P3,CONN_01X01,1,P,CONN_01X01
-3,R1,8K2,1,,
-4,R2,15K,1,,
-5,R3,R,1,R,150
-6,U1,Microduino,1,,
-7,U2,ITEAD_HC-05,1,,

@@ -1,3 +1,0 @@
-#define I2C_BUS_CLOCK 400000
-#define I2C_MAX_DATA_LENGTH 32
-
