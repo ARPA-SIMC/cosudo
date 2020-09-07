@@ -621,18 +621,16 @@
             "Ident: " + null2_(feature.properties.ident) +
             "<br>Lon: " + feature.properties.lon / 100000 +
             "<br>Lat: " + feature.properties.lat / 100000 +
-            "<br>Network: " + "<a href=/network/" + feature.properties.network + ">" + feature.properties.network + "</a>" +
+            "<br>Network: " +  feature.properties.network +
             "<br>Trange: " + borinud.config.trange.describe(feature.properties.trange[0], feature.properties.trange[1], feature.properties.trange[2]) +
             "<br>Level: " + borinud.config.level.describe(feature.properties.level[0], feature.properties.level[1], feature.properties.level[2], feature.properties.level[3]) +
             "<br>Date: " + feature.properties.date +
-            "<br>Var: " + b.description + " " + feature.properties.val + " (" + b.unit + ")" +
-            "<br><a href='/showdata/" + null2_(feature.properties.ident) + "/" + feature.properties.lon + "," + feature.properties.lat + "/" +
-            null2_(feature.properties.network) + "/*/*/*/stations?dsn=" + selected_values.dsn + "'>Constant station data</a>";
+            "<br>Var: " + b.description + " " + feature.properties.val + " (" + b.unit + ")";
 
 
         if (selected_values.dsn === 'sample' || selected_values.dsn === 'report') {
             let {datefrom, dateuntil} = selectedDateFormat()
-            var urlGraph = `/borinud/api/v1/geojson/${null2_(feature.properties.ident)}/${feature.properties.lon + "," + feature.properties.lat}/` +
+            var urlGraph = `{{url_borinud}}/geojson/${null2_(feature.properties.ident)}/${feature.properties.lon + "," + feature.properties.lat}/` +
                 `${null2_(feature.properties.network)}/${feature.properties.trange[0] +
                 "," + feature.properties.trange[1] + "," + feature.properties.trange[2]}/${null2_(feature.properties.level[0]) + "," + null2_(feature.properties.level[1]) + "," +
                 null2_(feature.properties.level[2]) + "," + null2_(feature.properties.level[3])}/${feature.properties.var}/` +
@@ -646,6 +644,7 @@
 
             popupText += '<br><button onclick="showGraph(\'' + urlGraph + '\',\'' + headerModal + '\')" type="button" class="btn btn-primary open-graph" >Show graph</button>';
 
+            /*
 
             if (feature.properties.ident !== null) {
                 popupText += "<br><a href='/showdata/" + null2_(feature.properties.ident) + "/" + feature.properties.lon + "," +
@@ -656,8 +655,8 @@
                     `/timeseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
                     `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}_mobile'>` +
                     "Graph for mobile station</a>";
-            }
-        } else {
+            }*/
+        } /*else {
             popupText += "<br><a href='/showdata/" + null2_(feature.properties.ident) + "/" + feature.properties.lon +
                 "," + feature.properties.lat + "/" + null2_(feature.properties.network) + "/" + feature.properties.trange +
                 "/" + null2_(feature.properties.level[0]) + "," + null2_(feature.properties.level[1]) + "," +
@@ -667,7 +666,7 @@
                 `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}'>` +
                 "Graph data for station" +
                 "</a>";
-        }
+        }*/
         popupText += "</div>";
         return popupText;
     }
@@ -789,7 +788,7 @@
 
     function showAllGraph() {
         let headerModal = ""
-        let url = `/borinud/api/v1/geojson/${selected_values.ident}/${selected_values.lon_lat}/` +
+        let url = `{{url_borinud}}/geojson/${selected_values.ident}/${selected_values.lon_lat}/` +
             `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/${selected_values.vars}/` +
             `timeseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
             `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
@@ -812,7 +811,7 @@
         max = -Infinity;
 
         //create request url
-        var url = `/borinud/api/v1/geojson/${selected_values.ident}/${selected_values.lon_lat}/` +
+        var url = `{{url_borinud}}/geojson/${selected_values.ident}/${selected_values.lon_lat}/` +
             `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/${selected_values.vars}/` +
             `spatialseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
             `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
@@ -1022,7 +1021,7 @@
         config: {
             root_el: null,
             ajax: {
-                baseUrl: "/borinud/api/v1/jsonline",
+                baseUrl: "{{url_borinud}}/jsonline",
                 dataType: "text"
             },
         }

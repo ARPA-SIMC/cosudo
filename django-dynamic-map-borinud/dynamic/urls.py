@@ -1,6 +1,6 @@
 from django.urls import path
 from django.views.generic import TemplateView
-
+from dynamic import views
 urlpatterns = [
-    path('map/', TemplateView.as_view(template_name='map.html'))
-]
+    path('map/', views.render_map)
+    ]
