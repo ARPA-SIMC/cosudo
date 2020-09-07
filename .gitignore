@@ -1,4 +1,7 @@
 venv
 dynamic/migrations
 .idea
-db.sqlite3
+sample_project/db.sqlite3
+django-dynamic-map-borinud/build
+django-dynamic-map-borinud/dist
+django-dynamic-map-borinud/django_dynamic_map_borinud.egg-info
