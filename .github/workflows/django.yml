@@ -27,4 +27,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        python load_tests.py
+        python django-dynamic-map-borinud/load_tests.py
