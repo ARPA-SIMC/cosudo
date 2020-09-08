@@ -22,6 +22,10 @@ listing.
         'dynamic',
     ]
 
+Edit your `settings.py` file to add borinud web service path (the standard path is "/borinud/api/v1").
+
+
+    BORINUD_URL = "..."
 
 Edit your project `urls.py` file to import the URLs:
 
