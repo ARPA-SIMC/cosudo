@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd">
+<WMT_MS_Capabilities version="1.1.1" updateSequence="1">
+  <Service>
+    <Name>OGC:WMS</Name>
+    <Title>WMS</Title>
+
+    
+
+    
+
+    <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}"/>
+
+    
+
+    
+
+    
+
+  </Service>
+  <Capability>
+    <Request>
+      <GetCapabilities>
+        <Format>application/vnd.ogc.wms_xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <GetMap>
+        <Format>image/png</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetMap>
+    </Request>
+
+    <Exception>
+      <Format>application/vnd.ogc.se_xml</Format>
+    </Exception>
+
+    <Layer>
+      <Title>All layers</Title>
+
+      
+      <CRS>EPSG:4326</CRS>
+      
+      <CRS>EPSG:3857</CRS>
+      
+      <CRS>EPSG:32661</CRS>
+      
+
+      
+      <EX_GeographicBoundingBox>
+        <westBoundLongitude>-180.0</westBoundLongitude>
+        <eastBoundLongitude>180.0</eastBoundLongitude>
+        <southBoundLatitude>-90.0</southBoundLatitude>
+        <northBoundLatitude>90.0</northBoundLatitude>
+      </EX_GeographicBoundingBox>
+      
+
+      
+      <BoundingBox CRS="EPSG:4326" minx="" miny="" maxx="" maxy=""/>
+      
+      <BoundingBox CRS="EPSG:3857" minx="" miny="" maxx="" maxy=""/>
+      
+      <BoundingBox CRS="EPSG:32661" minx="" miny="" maxx="" maxy=""/>
+      
+
+
+      
+      <Layer queryable="">
+        <Name>background</Name>
+	
+        <Title>Background</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+
+        
+
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>10fg</Name>
+	
+        <Title>10 metre wind gust since previous post-processing</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+        <Dimension name="time" units="ISO8601"/>
+        
+
+        
+        <Extent name="time" default="2010-02-02T06:00:00Z" multipleValues="0" nearestValue="0">2010-02-02T06:00:00Z,2010-02-02T12:00:00Z</Extent>
+        
+
+        
+        <Style>
+          <Name>default</Name>
+          <Title>title to come</Title>
+          <Abstract>description to come</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=10fg&amp;style=default&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>kx</Name>
+	
+        <Title>K index</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+        <Dimension name="time" units="ISO8601"/>
+        
+
+        
+        <Extent name="time" default="2010-02-02T06:00:00Z" multipleValues="0" nearestValue="0">2010-02-02T06:00:00Z,2010-02-02T12:00:00Z</Extent>
+        
+
+        
+        <Style>
+          <Name>sh_red_f15t60</Name>
+          <Title>Contour shade (Range: 15/60)</Title>
+          <Abstract>Method : contour shade Level list from 15 to 60</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=kx&amp;style=sh_red_f15t60&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_green_f15t60</Name>
+          <Title>Contour shade (Range: 15/60)</Title>
+          <Abstract>Method : contour shade Level list from 15 to 60</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=kx&amp;style=sh_green_f15t60&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>ct_blk_f10_i10_t2</Name>
+          <Title>Contour (interval 10, minimum level 10, black)</Title>
+          <Abstract>Method : contour Interval : 10 Thickness : 2 Colour : Black Used for kindex</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=kx&amp;style=ct_blk_f10_i10_t2&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>mx2t</Name>
+	
+        <Title>Maximum temperature at 2 metres since previous post-processing</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+        <Dimension name="time" units="ISO8601"/>
+        
+
+        
+        <Extent name="time" default="2010-02-02T06:00:00Z" multipleValues="0" nearestValue="0">2010-02-02T06:00:00Z,2010-02-02T12:00:00Z</Extent>
+        
+
+        
+        <Style>
+          <Name>sh_all_fM48t56i4</Name>
+          <Title>Contour shade (Range: -48 / 56)</Title>
+          <Abstract>Method : Area fill Level range : -48 to 56 Interval : 4 Thickness : 3 Colour : All colours Used for temperature</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_all_fM48t56i4&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_all_fM64t52i4</Name>
+          <Title>Contour shade (Range: -64 / 52)</Title>
+          <Abstract>Method : Area fill Level range : -64 to 52 Interval : 4 Thickness : 3 Colour : All colours Used for temperature</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_all_fM64t52i4&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>ct_red_i2_dash</Name>
+          <Title>Contour (Interval 2, red, dash)</Title>
+          <Abstract>Method : contour Interval : 2 Colour : Red contour contour: Dash (solid for highlight) Used for temperature</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=ct_red_i2_dash&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_all_fM32t42i2</Name>
+          <Title>Contour shade (Range: -32 / 42, interval 2)</Title>
+          <Abstract>Method : Area fill Level range : -32 to 42 Interval : 2 Thickness : 3 Colour : All colours Used for temperature (850hPa)</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_all_fM32t42i2&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_all_fM48t56i4_ct_wh</Name>
+          <Title>Contour and shade (Range: -48 / 56, interval 2)</Title>
+          <Abstract>Method : Area fill &amp; grey contours Level range : -48 to 56 Interval : 2 Thickness : 1 Colour : All colours Used for temperature</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_all_fM48t56i4_ct_wh&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_all_fM52t48i4</Name>
+          <Title>Contour shade (Range: -52 / 48)</Title>
+          <Abstract>Method : Area fill Level range : -52 48 Interval : 4 Thickness : 3 Colour : All colours Used for temperature (850hPa)</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_all_fM52t48i4&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_all_fM52t48i4_light</Name>
+          <Title>Contour shade (Range: -52 / 48)</Title>
+          <Abstract>Method : Area fill Level range : -52 to 48 Interval : 4 Thickness : 3 Colour : All colours Used for temperature (850hPa)</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_all_fM52t48i4_light&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_gry_fM72t56lst</Name>
+          <Title>Contour shade (Range: -76 / 56)</Title>
+          <Abstract>Method : Area fill Level range : -76 to 56 Interval : 4 Thickness : 3 Colour : Grey Used for temperature</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_gry_fM72t56lst&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>ct_red_i4_t3</Name>
+          <Title>Contour (interval 4, thickness 3)</Title>
+          <Abstract>Method : contour interval 4, thickness 3, red</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=ct_red_i4_t3&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_all_fM80t56i4_v2</Name>
+          <Title>Additional 1 (Range: -80 / 56)</Title>
+          <Abstract>Method : Area fill Level range : -80 to 56 Interval : 4 Thickness : 3 Colour : All colours Used for temperature</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_all_fM80t56i4_v2&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_all_fM50t58i2</Name>
+          <Title>Additional 2 (Range: -50/58 by 2)</Title>
+          <Abstract>Method : Area fill Level range : -80 to 56 Interval : 4 Thickness : 3 Colour : All colours Used for temperature</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=sh_all_fM50t58i2&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>transparent_zero_blue</Name>
+          <Title>Temperature below 0 C</Title>
+          <Abstract>Method : Temperature below 0 C</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mx2t&amp;style=transparent_zero_blue&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>mwp</Name>
+	
+        <Title>Mean wave period</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+        <Dimension name="time" units="ISO8601"/>
+        
+
+        
+        <Extent name="time" default="2010-02-02T06:00:00Z" multipleValues="0" nearestValue="0">2010-02-02T06:00:00Z,2010-02-02T12:00:00Z</Extent>
+        
+
+        
+        <Style>
+          <Name>sh_all_f0t18i1_5</Name>
+          <Title>Contour shade (Range: 0.0 / 18.5)</Title>
+          <Abstract>Method : contour shade Level range : 0.0 to 18.5 Interval : 1.5 (except for the first interval) Colour : All colours Used for mean wave period</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mwp&amp;style=sh_all_f0t18i1_5&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_grn_f0t18i1_5</Name>
+          <Title>Contour shade (Range: 0.0 / 18.5)</Title>
+          <Abstract>Method : contour shade Level range : 0.0 to 18.5 Interval : 1.5 (except for the first interval) Colour : Green Used for mean wave period</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mwp&amp;style=sh_grn_f0t18i1_5&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>ct_vio_i1_t1</Name>
+          <Title>Contour (interval 1, thickness 1, violet)</Title>
+          <Abstract>Method : contour Interval : 1 Thickness : 1 Colour : Violet Used for waves</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=mwp&amp;style=ct_vio_i1_t1&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>sf</Name>
+	
+        <Title>Snowfall</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+        <Dimension name="time" units="ISO8601"/>
+        
+
+        
+        <Extent name="time" default="2010-02-02T06:00:00Z" multipleValues="0" nearestValue="0">2010-02-02T06:00:00Z,2010-02-02T12:00:00Z</Extent>
+        
+
+        
+        <Style>
+          <Name>sh_blured_f05t300lst</Name>
+          <Title>Contour shade (Range: 0.5 / 250, with isolines)</Title>
+          <Abstract>Method : contour shade, with contours Level list : (0.5/2/4/10/25/50/100/250) Colour : from blue to red Used for precipitation</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=sf&amp;style=sh_blured_f05t300lst&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_blured_f1t100lst</Name>
+          <Title>Contour shade (Range: 1.0 / 250, no isolines)</Title>
+          <Abstract>Method : contour shade, no contours Level list : (1/2.5/6/15/40/100/250) Colour : from blue to red Used for precipitation</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=sf&amp;style=sh_blured_f1t100lst&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_blured_f1t100lst_dark</Name>
+          <Title>Contour shade (Range: 1.0 / 250, no isolines)</Title>
+          <Abstract>Method : contour shade, no contours Level list : (1/2.5/6/15/40/100/250) Colour : from dark blue to dark red Used for precipitation</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=sf&amp;style=sh_blured_f1t100lst_dark&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_grnvio_f1t100lst</Name>
+          <Title>Contour shade (Range: 1.0 / 250, no isolines)</Title>
+          <Abstract>Method : contour shade, no contours Level list : (1/2.5/6/15/40/100/250) Colour : from green to violet Used for precipitation</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=sf&amp;style=sh_grnvio_f1t100lst&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_all_f05t300lst</Name>
+          <Title>Contour shade (Range: 0.5 / 300, no isolines)</Title>
+          <Abstract>Method : contour shade, with contours Level list : (0.5/1/2/3/4/5/6/8/10/15/20/25/30/40/50/75/100/200/300) Colour : All colours Used for precipitation</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=sf&amp;style=sh_all_f05t300lst&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_blured_f01t500lst</Name>
+          <Title>Contour shade (Range: 0.1 / 500)</Title>
+          <Abstract>Method : contour shade, with contours Level list ; (0.1 to 500) Colour : from blue to red Used for precipitation</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=sf&amp;style=sh_blured_f01t500lst&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>sh_blured_f0t300</Name>
+          <Title>Contour shade (Range: 0/300, with isolines)</Title>
+          <Abstract>Method : contour shade, with contours Level list : (0.5/2/4/10/25/50/100/250) Colour : from blue to red Used for precipitation</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=sf&amp;style=sh_blured_f0t300&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+        <Style>
+          <Name>ct_blumag_lst</Name>
+          <Title>Contour (Range: 1 / 250, thickness 2, blue)</Title>
+          <Abstract>Method : contour Level list : 1/5/15/40/100/250 Thickness : 2 Colour : Blue-magenta Used for precipitation</Abstract>
+          <LegendURL width="500" height="125">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="{{ service.url }}?request=GetLegendGraphic&amp;layer=sf&amp;style=ct_blumag_lst&amp;width=500&amp;height=125"/>
+          </LegendURL>
+        </Style>
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>foreground</Name>
+	
+        <Title>Foreground</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+
+        
+
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>grid</Name>
+	
+        <Title>Grid</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+
+        
+
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>boundaries</Name>
+	
+        <Title>Boundaries</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+
+        
+
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>oceans</Name>
+	
+        <Title>Oceans</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+
+        
+
+        
+
+      </Layer>
+      
+      <Layer queryable="">
+        <Name>us-states</Name>
+	
+        <Title>Us States</Title>
+	
+	
+        <KeywordList>
+          
+        </KeywordList>
+
+        
+
+        
+
+        
+
+      </Layer>
+      
+
+    </Layer>
+  </Capability>
+</WMT_MS_Capabilities>
