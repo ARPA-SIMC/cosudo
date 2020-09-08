@@ -5,3 +5,6 @@ django-dynamic-map-borinud/build
 django-dynamic-map-borinud/dist
 django-dynamic-map-borinud/django_dynamic_map_borinud.egg-info
 django-dynamic-map-borinud/dynamic/db.sqlite3
+__pycache__/
+*.py[cod]
+*$py.class
