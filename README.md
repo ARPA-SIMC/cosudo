@@ -2,7 +2,7 @@ django-dynamic-map-borinud
 ==========================
 
 Introduction
----------------
+----------------
 
 This app shows the borinud data, on a dynamic map.
 
