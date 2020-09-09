@@ -1,4 +1,4 @@
 #!/bin/bash
-python django-dynamic-map-borinud/load_tests.py
+python3 django-dynamic-map-borinud/load_tests.py
 
 
