@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/ARPA-SIMC/cosudo.svg?branch=master)](https://travis-ci.com/ARPA-SIMC/cosudo)
+
 django-dynamic-map-borinud
 ==========================
 
