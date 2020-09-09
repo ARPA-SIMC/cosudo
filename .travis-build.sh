@@ -9,7 +9,7 @@ if [[ $image =~ ^centos:8 ]]; then
   pip3 install -r requirements.txt
   python3 django-dynamic-map-borinud/load_tests.py
 elif [[ $image =~ ^fedora: ]]; then
-  dnf install python3
+  dnf install python3 python3-pip
   pip3 install -r requirements.txt
   python3 django-dynamic-map-borinud/load_tests.py
 fi
