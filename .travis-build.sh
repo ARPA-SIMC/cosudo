@@ -12,17 +12,11 @@ if [[ $image =~ ^centos:8 ]]; then
   dnf groupinstall -q -y "Development Tools"
   dnf install -q -y 'dnf-command(builddep)'
   dnf install -q -y rpmdevtools
-  dnf install -q -y pv
   dnf install -q -y git
   cd django-dynamic-map-borinud/
   set +x
-  $builddep -q -y django-dynamic-map-borinud.spec
-  mkdir -p /rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-  cp django-dynamic-map-borinud.spec /rpmbuild/SPECS/
-  spectool -g -R -S /rpmbuild/SPECS/django-dynamic-map-borinud.spec
-  cd ..
-  ls
-  rpmbuild -ba /rpmbuild/SPECS/django-dynamic-map-borinud.spec 2>&1 | pv -q -L 3k
+  spectool -g -R -S django-dynamic-map-borinud.spec
+  rpmbuild -ba django-dynamic-map-borinud.spec
 elif [[ $image =~ ^fedora: ]]; then
   dnf install q -y python3 python3-pip
   pip3 install -r requirements.txt
