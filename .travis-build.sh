@@ -15,7 +15,7 @@ if [[ $image =~ ^centos:8 ]]; then
   dnf install -q -y git
   set +x
   mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-  cp django-dynamic-map-borinud.spec ~/rpmbuild/SPECS/
+  cp django-dynamic-map-borinud/django-dynamic-map-borinud.spec ~/rpmbuild/SPECS/
   spectool -g -R -S ~/rpmbuild/SPECS/django-dynamic-map-borinud.spec
   rpmbuild -ba ~/rpmbuild/SPECS/django-dynamic-map-borinud.spec 2>&1 | pv -q -L 3k
 elif [[ $image =~ ^fedora: ]]; then
