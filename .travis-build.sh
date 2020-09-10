@@ -17,7 +17,7 @@ if [[ $image =~ ^centos:8 ]]; then
   mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
   cp django-dynamic-map-borinud/django-dynamic-map-borinud.spec ~/rpmbuild/SPECS/
   spectool -g -R -S ~/rpmbuild/SPECS/django-dynamic-map-borinud.spec
-  rpmbuild -ba ~/rpmbuild/SPECS/django-dynamic-map-borinud.spec 2>&1 | pv -q -L 3k
+  rpmbuild -ba ~/rpmbuild/SPECS/django-dynamic-map-borinud.spec
 elif [[ $image =~ ^fedora: ]]; then
   dnf install q -y python3 python3-pip
   pip3 install -r requirements.txt
