@@ -13,6 +13,7 @@ if [[ $image =~ ^centos:8 ]]; then
   dnf install -q -y 'dnf-command(builddep)'
   dnf install -q -y rpmdevtools
   dnf install -q -y pv
+  dnf install -q -y git
   cd django-dynamic-map-borinud/
   set +x
   $builddep -q -y django-dynamic-map-borinud.spec
