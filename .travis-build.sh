@@ -13,8 +13,8 @@ if [[ $image =~ ^centos:8 ]]; then
   dnf install -q -y 'dnf-command(builddep)'
   dnf install -q -y rpmdevtools
   dnf install -q -y pv
-  $builddep -q -y python-pysteps.spec
   cd django-dynamic-map-borinud/
+  $builddep -q -y django-dynamic-map-borinud.spec
   mkdir -p /rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
   cp django-dynamic-map-borinud.spec /rpmbuild/SPECS/
   spectool -g -R -S ~/rpmbuild/SPECS/django-dynamic-map-borinud.spec
