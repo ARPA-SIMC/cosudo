@@ -1,4 +1,4 @@
-%define name django-dynamic-map-borinud
+%define name cosudo
 %define version 1.0.0
 %define unmangled_version 1.0.0
 %define release 1
@@ -17,7 +17,7 @@ Vendor: UNKNOWN <UNKNOWN>
 Url: https://github.com/ARPA-SIMC/cosudo
 
 %description
-django-dynamic-map-borinud
+cosudo
 ==========================
 
 Introduction
