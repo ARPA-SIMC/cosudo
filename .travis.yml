@@ -24,3 +24,4 @@ deploy:
   script: docker run -v ${TRAVIS_BUILD_DIR}:/root/src/ -w /root/src/ fedora:latest /bin/sh -c "dnf install -y copr-cli && copr-cli --config .copr build --nowait simc/cosudo django-dynamic-map-borinud/django-dynamic-map-borinud.spec"
   on:
     tags: true
+    condition: $DOCKER_IMAGE = centos:8
