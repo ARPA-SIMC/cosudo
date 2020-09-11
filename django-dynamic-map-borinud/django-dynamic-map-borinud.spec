@@ -1,6 +1,6 @@
 %define name cosudo
-%define version 1.0.0
-%define unmangled_version 1.0.0
+%define version $TRAVIS_TAG
+%define unmangled_version $TRAVIS_TAG
 %define release 1
 
 Summary: This app shows borinud data on a dynamic map
