@@ -15,7 +15,9 @@ Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: UNKNOWN <UNKNOWN>
 Url: https://github.com/ARPA-SIMC/cosudo
-
+Requires: python3
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 %description
 cosudo
 ==========================
@@ -61,13 +63,13 @@ Edit your project `urls.py` file to import the URLs:
 %setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
 
 %build
-python3 setup.py build
+python3 django-dynamic-map-borinud/setup.py build
 
 %install
-python3 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+ls
+python3 django-dynamic-map-borinud/setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 
-%clean
-rm -rf $RPM_BUILD_ROOT
+
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
