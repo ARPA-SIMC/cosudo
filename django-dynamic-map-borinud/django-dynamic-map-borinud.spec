@@ -7,7 +7,7 @@ Summary: This app shows borinud data on a dynamic map
 Name: %{name}
 Version: %{version}
 Release: %{release}
-Source0: https://github.com/arpa-simc/cosudo/archive/cosudo-%{version}.tar.gz
+Source0: https://github.com/arpa-simc/cosudo/archive/%{version}.tar.gz
 License: MIT
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
