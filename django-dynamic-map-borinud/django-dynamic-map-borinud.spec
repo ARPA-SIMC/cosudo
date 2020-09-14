@@ -1,6 +1,6 @@
 %define python3_vers python3
 Name: cosudo
-Version: 1.0.3
+Version: 1.0.4
 Release: 1
 Summary: This app shows borinud data on a dynamic map
 
