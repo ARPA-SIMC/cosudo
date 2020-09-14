@@ -1,6 +1,7 @@
 %define python3_vers python3
-Name: cosudo
-Version: 1.0.5
+%define version 1.0.6
+Name: django-dynamic-map-borinud
+Version: %{version}
 Release: 1
 Summary: This app shows borinud data on a dynamic map
 
@@ -13,7 +14,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildArch:      noarch
 %description
-cosudo
+django-dynamic-map-borinud
 ==========================
 
 Introduction
@@ -97,7 +98,7 @@ Edit your project `urls.py` file to import the URLs:
 
 
 %prep
-%autosetup
+%autosetup -n cosudo-%{version}
 cd django-dynamic-map-borinud
 
 
