@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.conf import settings
+"""
 from borinud.utils.source import get_db
 from borinud.v1.views import dbajson
 import itertools
 import dballe
 from borinud.utils.source import MergeDB, SummaryCacheDB
 import random
-
+"""
 
 def get_db(dsn="report", last=True):
     from django.utils.module_loading import import_string
@@ -31,7 +32,7 @@ def render_map_validation(request):
     url = settings.BORINUD_URL if hasattr(settings, 'BORINUD_URL') else "/borinud/api/v1"
     return render(request, "map_validation.html", {"url_borinud": url})
 
-
+"""
 def pass_qc(attrs):
     attrs_dict = {v.code: v.get() for v in attrs}
 
@@ -77,3 +78,4 @@ def prova(request):
     with memdb.transaction() as tr:
         for rec in tr.query_data({"var": "B12101", "query": "attrs"}):
             print(rec["attrs"])
+"""
