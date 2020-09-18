@@ -7,7 +7,7 @@ import itertools
 import dballe
 from borinud.utils.source import MergeDB, SummaryCacheDB
 import random
-"""
+
 
 def get_db(dsn="report", last=True):
     from django.utils.module_loading import import_string
@@ -20,6 +20,8 @@ def get_db(dsn="report", last=True):
         for i in (BORINUDLAST[dsn]["SOURCES"] if last else BORINUD[dsn]["SOURCES"])
     ]
     return dbs
+    
+"""
 
 
 def render_map(request):
