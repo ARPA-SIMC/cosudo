@@ -8,7 +8,7 @@
 
 import datetime
 import logging
-from wms import errors
+import errors
 import weakref
 
 __all__ = [

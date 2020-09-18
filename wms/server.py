@@ -12,7 +12,7 @@ import tempfile
 import Magics.macro as magics
 import threading
 
-from wms import errors, protocol, datatypes
+import errors, protocol, datatypes
 
 from flask import send_file
 

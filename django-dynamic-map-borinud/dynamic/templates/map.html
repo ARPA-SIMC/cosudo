@@ -19,6 +19,10 @@
           crossorigin=""/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"/>
+    <link href="{% static "dynamic/css/L.Control.Opacity.css" %}" rel="stylesheet"/>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.control.min.css"/>
+
     <script
             src="https://code.jquery.com/jquery-3.5.1.min.js"
             integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
@@ -208,9 +212,29 @@
 <div id="sidebar" class="position-absolute bg-white">
     <!-- SEARCH BAR -->
     <div class="pt-3 px-4">
+        Type of object:
+        <div class="form-group">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" checked type="radio" name="objectToShow" id="inlineRadio2"
+                       value="data">
+                <label class="form-check-label" for="inlineRadio2">Data</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="objectToShow" id="inlineRadio1"
+                       value="stations">
+                <label class="form-check-label" for="inlineRadio1">Stations</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="objectToShow" id="inlineRadio3"
+                       value="constantStationData">
+                <label class="form-check-label" for="inlineRadio3">
+                    Constant station data</label>
+            </div>
+
+        </div>
         <div class="form-group">
             <label for="ident">Ident</label>
-            <select id="ident" class="form-control" name="ident" onchange="populateForm(this)">
+            <select id="ident" class="form-control " name="ident" onchange="populateForm(this)">
                 <option value="*">*</option>
             </select>
         </div>
@@ -218,7 +242,7 @@
 
         <div class="form-group">
             <label for="lon_lat" style="width: 100%">Lon lat</label>
-            <select id="lon_lat" class="form-control" name="lon_lat" onchange="populateForm(this)">
+            <select id="lon_lat" class="form-control " name="lon_lat" onchange="populateForm(this)">
                 <option value="*">*</option>
             </select>
         </div>
@@ -226,7 +250,7 @@
 
         <div class="form-group">
             <label for="network" style="width: 100%">Network</label>
-            <select id="network" class="form-control" name="network" onchange="populateForm(this)">
+            <select id="network" class="form-control to-disable" name="network" onchange="populateForm(this)">
                 <option value="*">*</option>
             </select>
         </div>
@@ -234,7 +258,7 @@
         <div hidden>
             <div class="form-group">
                 <label for="date" style="width: 100%">Date</label>
-                <select class="form-control" id="date" name="date" onchange="populateForm(this)">
+                <select class="form-control to-disable" id="date" name="date" onchange="populateForm(this)">
                     <option value="*">*</option>
                 </select>
             </div>
@@ -245,7 +269,7 @@
             <label for="datetimepicker">Date</label>
             <div class="input-group date" id="datetimepicker" data-target-input="nearest">
                 <input type="text"
-                       class="form-control datetimepicker-input col-xs-10"
+                       class="form-control datetimepicker-input col-xs-10 to-disable"
                        data-target="#datetimepicker"/>
                 <div class="input-group-append col-xs-2"
                      data-target="#datetimepicker" data-toggle="datetimepicker">
@@ -256,7 +280,7 @@
 
         <div class="form-group">
             <label for="hour">Hour</label>
-            <select class="form-control" id="hour" name="hour" onchange="populateHour(this)">
+            <select class="form-control to-disable" id="hour" name="hour" onchange="populateHour(this)">
                 <option value="*">*</option>
                 <option value="00">00</option>
                 <option value="01">01</option>
@@ -288,7 +312,7 @@
 
         <div class="form-group">
             <label for="vars" style="width: 100%">Vars</label>
-            <select class="form-control" id="vars" name="vars" onchange="populateForm(this)">
+            <select class="form-control to-disable" id="vars" name="vars" onchange="populateForm(this)">
                 <option value="*">*</option>
             </select>
         </div>
@@ -296,7 +320,7 @@
 
         <div class="form-group">
             <label for="timerange" style="width: 100%">Timerange</label>
-            <select class="form-control" id="timerange" name="timerange" onchange="populateForm(this)">
+            <select class="form-control to-disable" id="timerange" name="timerange" onchange="populateForm(this)">
                 <option value="*">*</option>
             </select>
         </div>
@@ -304,7 +328,7 @@
 
         <div class="form-group">
             <label for="level" style="width: 100%">Level</label>
-            <select class="form-control" id="level" name="level" onchange="populateForm(this)">
+            <select class="form-control to-disable" id="level" name="level" onchange="populateForm(this)">
                 <option value="*">*</option>
             </select>
         </div>
@@ -312,7 +336,7 @@
 
         <div class="form-group">
             <label for="dsn" style="width: 100%">DNS</label>
-            <select class="form-control" id="dsn" name="dsn" onchange="populateDSN(this)">
+            <select class="form-control " id="dsn" name="dsn" onchange="populateDSN(this)">
                 <option value="report">report</option>
                 <option value="sample">sample</option>
             </select>
@@ -388,6 +412,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
+<script src="{% static "dynamic/js/L.Control.Opacity.js" %}"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
+<script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.min.js"></script>
+<script src="{% static "dynamic/js/utils.js" %}"></script>
 <script>
 
     (function (L) {
@@ -501,6 +530,11 @@
             select.appendChild(opt);
 
             select.dispatchEvent(new Event('change'));
+            today_string = moment(selected_date).format('YYYY-MM-DD');
+            tomorrow_string = moment(selected_date).add(1, 'days').format('YYYY-MM-DD');
+            if(map.timeDimension) {
+                map.timeDimension.setAvailableTimes([today_string, tomorrow_string], "extremes")
+            }
         });
 
     }
@@ -614,59 +648,38 @@
         return color;
     }
 
-    function setpopup(feature) {
-        let b = borinud.config.B[feature.properties.var];
-
+    function setpopup(data) {
         let popupText = "<div>" +
-            "Ident: " + null2_(feature.properties.ident) +
-            "<br>Lon: " + feature.properties.lon / 100000 +
-            "<br>Lat: " + feature.properties.lat / 100000 +
-            "<br>Network: " +  feature.properties.network +
-            "<br>Trange: " + borinud.config.trange.describe(feature.properties.trange[0], feature.properties.trange[1], feature.properties.trange[2]) +
-            "<br>Level: " + borinud.config.level.describe(feature.properties.level[0], feature.properties.level[1], feature.properties.level[2], feature.properties.level[3]) +
-            "<br>Date: " + feature.properties.date +
-            "<br>Var: " + b.description + " " + feature.properties.val + " (" + b.unit + ")";
-
-
+            "Ident: " + null2_(data.ident) +
+            "<br>Lon: " + data.lon / 100000 +
+            "<br>Lat: " + data.lat / 100000 +
+            "<br>Network: " + data.network +
+            "<br>Trange: " + borinud.config.trange.describe(data.trange[0], data.trange[1], data.trange[2]) +
+            "<br>Level: " + borinud.config.level.describe(data.level[0], data.level[1], data.level[2], data.level[3]) +
+            "<br>Date: " + data.date
+        data.data.forEach((item) => {
+            for (let key in item.vars) {
+                let b = borinud.config.B[key];
+                popupText += "<br>Var: " + b.description + " " + item.vars[key].v + " (" + b.unit + ")";
+            }
+        })
         if (selected_values.dsn === 'sample' || selected_values.dsn === 'report') {
-            let {datefrom, dateuntil} = selectedDateFormat()
-            var urlGraph = `{{url_borinud}}/geojson/${null2_(feature.properties.ident)}/${feature.properties.lon + "," + feature.properties.lat}/` +
-                `${null2_(feature.properties.network)}/${feature.properties.trange[0] +
-                "," + feature.properties.trange[1] + "," + feature.properties.trange[2]}/${null2_(feature.properties.level[0]) + "," + null2_(feature.properties.level[1]) + "," +
-                null2_(feature.properties.level[2]) + "," + null2_(feature.properties.level[3])}/${feature.properties.var}/` +
+            let {dateFrom, dateUntil} = selectedDateFormat()
+            var urlGraph = `{{url_borinud}}/geojson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
+                `${null2_(data.network)}/${data.trange[0] +
+                "," + data.trange[1] + "," + data.trange[2]}/${null2_(data.level[0]) + "," + null2_(data.level[1]) + "," +
+                null2_(data.level[2]) + "," + null2_(data.level[3])}/${selected_values.vars}/` +
                 `timeseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
                 `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`
 
-            let headerModal = "Ident: " + null2_(feature.properties.ident) + "Coords: " + feature.properties.lat + "," + feature.properties.lon +
-                " Network:" + null2_(feature.properties.network)
-                + "<br>" + borinud.config.trange.describe(feature.properties.trange[0], feature.properties.trange[1], feature.properties.trange[2]) + "<br>"
-                + borinud.config.level.describe(feature.properties.level[0], feature.properties.level[1], feature.properties.level[2], feature.properties.level[3]) + "<br>" + datefrom + " - " + dateuntil + "GMT"
+            let headerModal = "Ident: " + null2_(data.ident) + " Coords: " + data.lat + "," + data.lon +
+                " Network:" + null2_(data.network)
+                + "<br>" + borinud.config.trange.describe(data.trange[0], data.trange[1], data.trange[2]) + "<br>"
+                + borinud.config.level.describe(data.level[0], data.level[1], data.level[2], data.level[3]) + "<br>" + dateFrom + " - " + dateUntil + "GMT"
 
             popupText += '<br><button onclick="showGraph(\'' + urlGraph + '\',\'' + headerModal + '\')" type="button" class="btn btn-primary open-graph" >Show graph</button>';
 
-            /*
-
-            if (feature.properties.ident !== null) {
-                popupText += "<br><a href='/showdata/" + null2_(feature.properties.ident) + "/" + feature.properties.lon + "," +
-                    feature.properties.lat + "/" + null2_(feature.properties.network) + "/" + feature.properties.trange + "/" +
-                    null2_(feature.properties.level[0]) + "," + null2_(feature.properties.level[1]) + "," +
-                    null2_(feature.properties.level[2]) + "," + null2_(feature.properties.level[3]) + "/" +
-                    null2_(feature.properties.var) +
-                    `/timeseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
-                    `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}_mobile'>` +
-                    "Graph for mobile station</a>";
-            }*/
-        } /*else {
-            popupText += "<br><a href='/showdata/" + null2_(feature.properties.ident) + "/" + feature.properties.lon +
-                "," + feature.properties.lat + "/" + null2_(feature.properties.network) + "/" + feature.properties.trange +
-                "/" + null2_(feature.properties.level[0]) + "," + null2_(feature.properties.level[1]) + "," +
-                null2_(feature.properties.level[2]) + "," + null2_(feature.properties.level[3]) + "/" +
-                null2_(feature.properties.var) +
-                `/timeseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
-                `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}'>` +
-                "Graph data for station" +
-                "</a>";
-        }*/
+        }
         popupText += "</div>";
         return popupText;
     }
@@ -797,202 +810,267 @@
 
     //update map markers
     function updateMap() {
-        $("#showGraphButton").attr("disabled", true)
-        //clear map  and  reset values
-        map.eachLayer(function (layer) {
-            map.removeLayer(layer);
-        });
-        // legend.remove();
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-        coords = [];
-        min = Infinity;
-        max = -Infinity;
 
-        //create request url
-        var url = `{{url_borinud}}/geojson/${selected_values.ident}/${selected_values.lon_lat}/` +
-            `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/${selected_values.vars}/` +
-            `spatialseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
-            `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
+        legend.remove();
+        pruneCluster.RemoveMarkers();
+        if ($("input[name='objectToShow']:checked").val() === "data") {
+            if (selected_values.vars !== "*") {
+                $("#showGraphButton").attr("disabled", true)
+                coords = [];
+                min = Infinity;
+                max = -Infinity;
 
-        //require map point
-        $.ajax({
+                //create request url
+                var url = `{{url_borinud}}/dbajson/${selected_values.ident}/${selected_values.lon_lat}/` +
+                    `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/${selected_values.vars}/` +
+                    `spatialseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
+                    `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
+
+                //require map point
+                $.ajax({
+                        url: url,
+                        dataType: "json",
+                        success: function (collection) {
+                            if (collection.length <= 0) {
+                                toastr.warning('Nessun risultato!')
+                            } else {
+                                $("#showGraphButton").attr("disabled", false)
+                                if (selected_values.vars !== "*") {
+                                    bcode = borinud.config.B[selected_values.vars];
+                                } else {
+                                    bcode = {
+                                        "bcode": "B00001",
+                                        "description": "Undefined",
+                                        "unit": "Undefined",
+                                        "offset": 0,
+                                        "scale": 1,
+                                        "userunit": ""
+                                    }
+                                }
+                                if (!bcode.scale)
+                                    bcode.scale = 1
+                                if (!bcode.offset)
+                                    bcode.offset = 0
+                                console.log(collection)
+                                for (let i = 0; i < collection.length; i++) {
+                                    min = Math.min(min, collection[i].data.map((item) => {
+                                        if (selected_values.vars in item.vars)
+                                            return item.vars[selected_values.vars].v
+                                    }));
+                                    max = Math.max(max, collection[i].data.map((item) => {
+                                        if (selected_values.vars in item.vars)
+                                            return item.vars[selected_values.vars].v
+                                    }));
+                                }
+                                //  Legend
+                                legend.onAdd = function (map) {
+                                    let div = L.DomUtil.create('div', 'info legend');
+                                    // loop through our density intervals and generate a label with a colored square for each interval
+                                    let halfdelta = ((max - min) / (colors.length * 2.));
+
+                                    for (let i = 0; i < colors.length; i++) {
+                                        let grade = min + halfdelta * (i * 2 + 1);
+                                        div.innerHTML +=
+                                            '<div style="background:white">' +
+                                            '<b style="background:' + getColor(grade, min, max) + '">&nbsp;&nbsp;&nbsp;</b>&nbsp;' +
+                                            (grade * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "") +
+                                            '<br>' +
+                                            '</div>';
+                                    }
+                                    return div;
+                                };
+
+                                legend.addTo(map);
+
+                                let pi2 = Math.PI * 2;
+                                L.Icon.MarkerCluster = L.Icon.extend({
+                                    options: {
+                                        iconSize: new L.Point(44, 44),
+                                        className: 'prunecluster leaflet-markercluster-icon'
+                                    },
+
+                                    createIcon: function () {
+                                        let e = document.createElement('canvas');
+                                        this._setIconStyles(e, 'icon');
+                                        let s = this.options.iconSize;
+                                        e.width = s.x;
+                                        e.height = s.y;
+                                        this.draw(e.getContext('2d'), s.x, s.y);
+                                        return e;
+                                    },
+
+                                    createShadow: function () {
+                                        return null;
+                                    },
+
+                                    draw: function (canvas, width, height) {
+                                        let start = 0;
+                                        let prevalent = 0;
+                                        let prevalentindex = 0;
+                                        for (let i = 0, l = colors.length; i < l; ++i) {
+                                            var size = this.stats[i] / this.population;
+                                            if (size > 0) {
+                                                if (this.stats[i] > prevalent) {
+                                                    prevalentindex = i;
+                                                    prevalent = this.stats[i];
+                                                }
+                                                canvas.beginPath();
+                                                canvas.moveTo(22, 22);
+                                                canvas.fillStyle = colors[i];
+                                                let from = start;
+                                                let to = start + size * pi2;
+                                                if (to < from) {
+                                                    from = start;
+                                                }
+                                                canvas.arc(22, 22, 22, from, to);
+                                                start = to;
+                                                canvas.lineTo(22, 22);
+                                                //canvas.stroke();
+                                                canvas.fill();
+                                                canvas.closePath();
+                                            }
+                                        }
+                                        canvas.beginPath();
+                                        canvas.fillStyle = "#fff";
+                                        canvas.arc(22, 22, 15, 0, Math.PI * 2);
+                                        canvas.stroke();
+                                        canvas.fill();
+                                        canvas.closePath();
+                                        canvas.fillStyle = '#111';
+                                        canvas.textAlign = 'center';
+                                        canvas.textBaseline = 'middle';
+                                        canvas.font = 'bold 10px sans-serif';
+                                        //canvas.fillText(this.population, 22, 22,28);
+                                        let halfdelta = ((max - min) / (colors.length * 2.));
+                                        let grade = min + halfdelta * (prevalentindex * 2 + 1);
+                                        grade = (grade * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "");
+                                        canvas.fillText(grade, 22, 22, 28);
+                                    }
+                                });
+
+                                pruneCluster.Cluster.Size = 15;
+
+                                pruneCluster.BuildLeafletClusterIcon = function (cluster) {
+                                    let e = new L.Icon.MarkerCluster();
+                                    e.stats = cluster.stats;
+                                    e.population = cluster.population;
+
+                                    //this try to make the little values more visible (no less of 5%)
+                                    for (let i = 0, l = e.stats.length; i < l; ++i) {
+                                        if ((e.stats[i] > 0) && ((e.stats[i] / e.population) < 0.1)) {
+                                            let inc = (e.population * 0.05) - e.stats[i];
+                                            e.stats[i] += inc;
+                                            e.population += inc;
+                                        }
+                                    }
+
+                                    return e;
+                                };
+
+                                pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
+                                    if (leafletMarker.getPopup()) {
+                                        leafletMarker.setPopupContent(setpopup(data));
+                                    } else {
+                                        leafletMarker.bindPopup(setpopup(data));
+                                    }
+                                    let val = (data.value * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "");
+                                    let vallen = val.length * 6 + 6;
+                                    leafletMarker.setIcon(
+                                        L.extendedDivIcon({
+                                            iconSize: new L.Point(vallen, 14),
+                                            labelAnchor: [vallen / 2, 0],
+                                            html: val,
+                                            className: 'myDivIcon',
+                                            style: {backgroundColor: getColor(data.value, min, max)}
+                                        })
+                                    );
+                                    leafletMarker.bindTooltip(data.date.toString());
+                                };
+
+                                $.each(collection, function (i, feature) {
+
+                                    coords.push([feature.lat / 100000, feature.lon / 100000]);
+
+                                    let marker = new PruneCluster.Marker(feature.lat / 100000, feature.lon / 100000);
+                                    marker.data = feature;
+                                    marker.data.value = 0
+                                    feature.data.forEach((item) => {
+                                        if (selected_values.vars in item.vars) {
+                                            marker.data.value = item.vars[selected_values.vars].v
+                                            marker.data.trange = item.timerange
+                                            marker.data.level = item.level
+                                        }
+                                    })
+                                    marker.category = getColorIndex(marker.data.value, min, max);
+
+                                    pruneCluster.RegisterMarker(marker);
+                                });
+
+                                map.addLayer(pruneCluster);
+
+                                try {
+                                    map.fitBounds(coords);
+                                } catch (err) {
+                                    toastr.error("Error setting bounds...");
+                                }
+
+                            }
+
+                        },
+                        beforeSend: function () {
+                            $("#overlay").fadeIn(300);
+                        },
+                        complete: function () {
+                            $("#overlay").fadeOut(300);
+                        },
+
+                    }
+                )
+            } else {
+                toastr.error("Select a var")
+            }
+        } else {
+            let url = ""
+            if ($("input[name='objectToShow']:checked").val() === "stations") {
+                url = `{{url_borinud}}/geojson/${selected_values.ident}/${selected_values.lon_lat}/` +
+                    `*/*/*/*/stations?dsn=${selected_values.dsn}`;
+            } else {
+                url = `{{url_borinud}}/geojson/${selected_values.ident}/${selected_values.lon_lat}/` +
+                    `*/*/*/*/stationdata?dsn=${selected_values.dsn}`
+            }
+            $.ajax({
                 url: url,
                 dataType: "json",
                 success: function (collection) {
                     if (collection.features.length <= 0) {
                         toastr.warning('Nessun risultato!')
                     } else {
-                        if (selected_values.vars !== "*") {
-                            bcode = borinud.config.B[selected_values.vars];
-                        } else {
-                            $("#showGraphButton").attr("disabled", false)
-
-                            bcode = {
-                                "bcode": "B00001",
-                                "description": "Undefined",
-                                "unit": "Undefined",
-                                "offset": 0,
-                                "scale": 1,
-                                "userunit": ""
-                            }
-                        }
-                        if (!bcode.scale)
-                            bcode.scale = 1
-                        if (!bcode.offset)
-                            bcode.offset = 0
-                        for (let i = 0; i < collection['features'].length; i++) {
-                            min = Math.min(min, collection['features'][i].properties.val);
-                            max = Math.max(max, collection['features'][i].properties.val);
-                        }
-                        //  Legend
-                        legend.onAdd = function (map) {
-                            let div = L.DomUtil.create('div', 'info legend');
-                            // loop through our density intervals and generate a label with a colored square for each interval
-                            let halfdelta = ((max - min) / (colors.length * 2.));
-
-                            for (let i = 0; i < colors.length; i++) {
-                                let grade = min + halfdelta * (i * 2 + 1);
-                                div.innerHTML +=
-                                    '<div style="background:white">' +
-                                    '<b style="background:' + getColor(grade, min, max) + '">&nbsp;&nbsp;&nbsp;</b>&nbsp;' +
-                                    (grade * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "") +
-                                    '<br>' +
-                                    '</div>';
-                            }
-                            return div;
-                        };
-
-                        legend.addTo(map);
-
-                        let pi2 = Math.PI * 2;
-                        L.Icon.MarkerCluster = L.Icon.extend({
-                            options: {
-                                iconSize: new L.Point(44, 44),
-                                className: 'prunecluster leaflet-markercluster-icon'
-                            },
-
-                            createIcon: function () {
-                                let e = document.createElement('canvas');
-                                this._setIconStyles(e, 'icon');
-                                let s = this.options.iconSize;
-                                e.width = s.x;
-                                e.height = s.y;
-                                this.draw(e.getContext('2d'), s.x, s.y);
-                                return e;
-                            },
-
-                            createShadow: function () {
-                                return null;
-                            },
-
-                            draw: function (canvas, width, height) {
-                                let start = 0;
-                                let prevalent = 0;
-                                let prevalentindex = 0;
-                                for (let i = 0, l = colors.length; i < l; ++i) {
-                                    var size = this.stats[i] / this.population;
-                                    if (size > 0) {
-                                        if (this.stats[i] > prevalent) {
-                                            prevalentindex = i;
-                                            prevalent = this.stats[i];
-                                        }
-                                        canvas.beginPath();
-                                        canvas.moveTo(22, 22);
-                                        canvas.fillStyle = colors[i];
-                                        let from = start;
-                                        let to = start + size * pi2;
-                                        if (to < from) {
-                                            from = start;
-                                        }
-                                        canvas.arc(22, 22, 22, from, to);
-                                        start = to;
-                                        canvas.lineTo(22, 22);
-                                        //canvas.stroke();
-                                        canvas.fill();
-                                        canvas.closePath();
-                                    }
-                                }
-                                canvas.beginPath();
-                                canvas.fillStyle = "#fff";
-                                canvas.arc(22, 22, 15, 0, Math.PI * 2);
-                                canvas.stroke();
-                                canvas.fill();
-                                canvas.closePath();
-                                canvas.fillStyle = '#111';
-                                canvas.textAlign = 'center';
-                                canvas.textBaseline = 'middle';
-                                canvas.font = 'bold 10px sans-serif';
-                                //canvas.fillText(this.population, 22, 22,28);
-                                let halfdelta = ((max - min) / (colors.length * 2.));
-                                let grade = min + halfdelta * (prevalentindex * 2 + 1);
-                                grade = (grade * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "");
-                                canvas.fillText(grade, 22, 22, 28);
-                            }
-                        });
-
-                        var pruneCluster = new PruneClusterForLeaflet();
-                        pruneCluster.Cluster.Size = 15;
-
-                        pruneCluster.BuildLeafletClusterIcon = function (cluster) {
-                            let e = new L.Icon.MarkerCluster();
-                            e.stats = cluster.stats;
-                            e.population = cluster.population;
-
-                            //this try to make the little values more visible (no less of 5%)
-                            for (let i = 0, l = e.stats.length; i < l; ++i) {
-                                if ((e.stats[i] > 0) && ((e.stats[i] / e.population) < 0.1)) {
-                                    let inc = (e.population * 0.05) - e.stats[i];
-                                    e.stats[i] += inc;
-                                    e.population += inc;
-                                }
-                            }
-
-                            return e;
-                        };
-
+                        console.log(collection.features)
+                        let coords = []
                         pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
-                            if (leafletMarker.getPopup()) {
-                                leafletMarker.setPopupContent(setpopup(data.feature));
-                            } else {
-                                leafletMarker.bindPopup(setpopup(data.feature));
+                            let text = "Ident: " + null2_(data.ident) +
+                                "<br>Lon: " + data.lon / 100000 +
+                                "<br>Lat: " + data.lat / 100000 +
+                                "<br>Network: " + data.network
+                            if ($("input[name='objectToShow']:checked").val() === "constantStationData") {
+                                text += "<br>" + borinud.config.B[data.var].description + " :" + data.val
+
                             }
-                            let val = (data.feature.properties.val * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "");
-                            let vallen = val.length * 6 + 6;
-                            leafletMarker.setIcon(
-                                L.extendedDivIcon({
-                                    iconSize: new L.Point(vallen, 14),
-                                    labelAnchor: [vallen / 2, 0],
-                                    html: val,
-                                    className: 'myDivIcon',
-                                    style: {backgroundColor: getColor(data.feature.properties.val, min, max)}
-                                })
-                            );
-                            leafletMarker.bindTooltip(data.feature.properties.date.toString());
+                            if (leafletMarker.getPopup()) {
+                                leafletMarker.setPopupContent(text);
+                            } else {
+                                leafletMarker.bindPopup(text);
+                            }
                         };
-
-                        $.each(collection.features, function (i, feature) {
-
-                            coords.push([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
-
-                            let marker = new PruneCluster.Marker(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                            marker.data.feature = feature;
-                            marker.category = getColorIndex(feature.properties.val, min, max);
-
+                        collection.features.forEach((station) => {
+                            coords.push([station.geometry.coordinates[1], station.geometry.coordinates[0]]);
+                            let marker = new PruneCluster.Marker(station.geometry.coordinates[1], station.geometry.coordinates[0])
+                            marker.data = station.properties
                             pruneCluster.RegisterMarker(marker);
-                        });
-
+                        })
                         map.addLayer(pruneCluster);
-
-                        try {
-                            map.fitBounds(coords);
-                        } catch (err) {
-                            toastr.error("Error setting bounds...");
-                        }
-
+                        map.fitBounds(coords)
                     }
-
                 },
                 beforeSend: function () {
                     $("#overlay").fadeIn(300);
@@ -1000,32 +1078,13 @@
                 complete: function () {
                     $("#overlay").fadeOut(300);
                 },
-
-            }
-        )
+            })
+        }
     }
 
-    Chart.plugins.register({
-        beforeDraw: function (c) {
-            var ctx = c.chart.ctx;
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, c.chart.width, c.chart.height);
-        }
-    });
-    Chart.defaults.global.legend.display = false;
 
-    // leaflet color utility
-    var colors = ['#8501af', '#3e01a3', '#2147fe', '#3192ce', '#65b032', '#cfea2d', '#fdfd47', '#f9bc00', '#f79904', '#f55306', '#f52613', '#a8184b'];
-    // global config for borinud request
-    var borinud = {
-        config: {
-            root_el: null,
-            ajax: {
-                baseUrl: "{{url_borinud}}/jsonline",
-                dataType: "text"
-            },
-        }
-    };
+    var pruneCluster = new PruneClusterForLeaflet();
+
     // list of identifiers for select, selected_values and corresponding summaries
     var id_select_list = ["ident", "lon_lat", "network", "date", "vars", "timerange", "level"];
     // list of possibible value for each summaries,
@@ -1042,6 +1101,8 @@
         dsn: ["report", "sample"]
     };
     var today = new Date()
+    var today_string = moment(today).format('YYYY-MM-DD');
+    var tomorrow_string = moment(today).add(1, 'days').format('YYYY-MM-DD');
 
     var selected_values = {
         ident: "*",
@@ -1062,8 +1123,8 @@
      *
      */
     $.ajax({
-        url: borinud.config.ajax.baseUrl + "/*/*/*/*/*/*/summaries",
-        dataType: borinud.config.ajax.dataType,
+        url: "{{ url_borinud }}/jsonline/*/*/*/*/*/*/summaries",
+        dataType: "text",
         success: function (resp) {
             resp = (JSON.parse("{\"j\":[" + resp.replace(/}\n{/g, "}, {") + "]}")).j;
 
@@ -1092,14 +1153,22 @@
             console.log(e.toString());
         }
     });
-    var map = L.map('map', {zoomControl: false}).setView([43, 11], 13);
-    L.control.zoom({
-        position: 'topright'
-    }).addTo(map);
+    var map = L.map('map', {
+        zoomControl: false,
+        timeDimension: true,
+        timeDimensionOptions: {
+            timeInterval: today_string + "/" + tomorrow_string,
+            period: "PT1H"
+        },
+        timeDimensionControl: true,
+        timeDimensionControlOptions: {position: "bottomright"}
+    }).setView([43, 11], 13);
+    L.control.zoom({position: 'topright'}).addTo(map);
     var coords = [];
     var legend = L.control({position: 'bottomright'});
     var min = Infinity;
     var max = -Infinity;
+
     var bcode = {
         "bcode": "B00001",
         "description": "Undefined",
@@ -1109,14 +1178,101 @@
         "userunit": ""
     }
 
-
     $("#sidebar").resizable({
         handles: 'e', stop: function (e, ui) {
             widthMenu = document.getElementById('sidebar').offsetWidth;
         }
     });
 
-    updateMap();
+    //updateMap();
+    $("input[name='objectToShow']").change(function () {
+        if ($("input[name='objectToShow']:checked").val() === "data") {
+            $(".to-disable").prop("disabled", false);
+        } else {
+            $(".to-disable").prop("disabled", true);
+        }
+
+    })
+
+    var layers = {};
+    var opacityControls = {};
+    fetch('{{ url_wms }}').then(function (response) {
+        return response.text();
+    }).then(function (text) {
+        let layerNames = [];
+        let $xml = $($.parseXML(text));
+        $xml.find('Layer > Name').each(function () {
+            if ($(this).text() != 'background' & $(this).text() != 'ol_background') {
+                layerNames.push($(this).text());
+            }
+        });
+        plotLayers(layerNames);
+    });
+
+    function createOpacityControl(layer_name) {
+        if (opacityControls[layer_name]) {
+            opacityControls[layer_name].addTo(map);
+        }
+
+    }
+
+    function removeOpacityControl(layer_name) {
+        if (opacityControls[layer_name]) {
+            opacityControls[layer_name].remove();
+        }
+    }
+
+    let plotLayers = function (layerNames) {
+
+        let ol_background = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
+
+
+        let background = L.tileLayer.wms('{{ url_wms }}?', {
+            layers: 'background',
+            format: 'image/png',
+            transparent: 'TRUE',
+            attribution: '',
+            version: '1.3.0'
+        }).addTo(map);
+
+        layerNames.forEach(function (layer_name) {
+            let l = L.timeDimension.layer.wms(L.tileLayer.wms('{{ url_wms }}?', {
+                layers: layer_name,
+                format: 'image/png',
+                transparent: 'TRUE',
+                attribution: '',
+                version: '1.3.0'
+            }));
+            layers[layer_name] = l;
+
+            let aa = {};
+            aa[layer_name] = l;
+            opacityControls[layer_name] = L.control.opacity(
+                aa,
+                {}
+            );
+        });
+
+        map.on('layeradd', function (l) {
+            createOpacityControl(l.layer.options.layers);
+        });
+
+        map.on('layerremove', function (l) {
+            removeOpacityControl(l.layer.options.layers);
+        });
+
+        let baseMaps = {
+            'background': background,
+            'ol_background': ol_background
+        };
+
+        L.control.layers(baseMaps, layers).addTo(map);
+
+        L.control.scale({position: 'bottomright'}).addTo(map);
+        updateMap()
+    };
 
 </script>
 <script type="text/javascript" src="{% static 'dynamic/js/borinud.trange.js' %}"></script>

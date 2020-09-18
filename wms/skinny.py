@@ -1,4 +1,4 @@
-from wms.wmssvr import application
+from wmssvr import application
 
 
 __all__ = [
@@ -7,7 +7,7 @@ __all__ = [
 
 
 def main():
-    application.run(debug=True, threaded=False)
+    application.run(host="0.0.0.0",debug=True, threaded=False)
 
 
 if __name__ == "__main__":
