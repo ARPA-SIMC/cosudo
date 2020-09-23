@@ -22,178 +22,12 @@
     <link href="{% static "dynamic/css/L.Control.Opacity.css" %}" rel="stylesheet"/>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.control.min.css"/>
-
+    <link href="{% static "dynamic/css/main.css" %}" rel="stylesheet"/>
     <script
             src="https://code.jquery.com/jquery-3.5.1.min.js"
             integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
             crossorigin="anonymous"></script>
     <title>Dynamic</title>
-    <style>
-        body {
-            padding: 0;
-            margin: 0;
-        }
-
-        html, body, #map {
-            height: 100%;
-            width: 100%;
-        }
-
-        .prunecluster {
-            font-size: 12px;
-            border-radius: 20px;
-            transition: all 0.3s linear;
-        }
-
-        .leaflet-marker-icon.prunecluster-anim,
-        .leaflet-marker-shadow.prunecluster-anim,
-        .leaflet-markercluster-icon.prunecluster-anim {
-            transition: all 0.3s linear;
-        }
-
-        .leaflet-zoom-anim .leaflet-zoom-animated.leaflet-marker-icon,
-        .leaflet-zoom-anim .leaflet-zoom-animated.leaflet-marker-shadow,
-        .leaflet-zoom-anim .leaflet-zoom-animated.leaflet-markercluster-icon {
-            transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1);
-        }
-
-        .prunecluster div {
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            margin-left: 5px;
-            margin-top: 5px;
-            border-radius: 50%;
-        }
-
-        .prunecluster div span {
-            line-height: 30px;
-        }
-
-        .prunecluster-small {
-            background-color: #b5e28c;
-            background-color: rgba(181, 226, 140, 0.6);
-        }
-
-        .prunecluster-small div {
-            width: 28px;
-            height: 28px;
-            background-color: #6ecc39;
-            background-color: rgba(110, 204, 57, 0.6);
-        }
-
-        .prunecluster-small div span {
-            line-height: 28px;
-        }
-
-        .prunecluster-medium {
-            background-color: #f1d357;
-            background-color: rgba(241, 211, 87, 0.6);
-        }
-
-        .prunecluster-medium div {
-            background-color: #f0c20c;
-            background-color: rgba(240, 194, 12, 0.6);
-        }
-
-        .prunecluster-large {
-            background-color: #fd9c73;
-            background-color: rgba(253, 156, 115, 0.6);
-        }
-
-        .prunecluster-large div {
-            width: 34px;
-            height: 34px;
-            background-color: #f18017;
-            background-color: rgba(241, 128, 23, 0.6);
-        }
-
-        .prunecluster-large div span {
-            line-height: 34px;
-        }
-
-        .myDivIcon {
-            /*opacity: .9; */
-            border: 1px solid #000;
-            font-family: "Lucida Grande", "Arial", sans-serif;
-            font-size: 11px;
-            font-weight: bold;
-            text-align: center;
-            width: 20px;
-            height: 14px;
-            vertical-align: middle;
-            border-radius: 3px;
-            -moz-border-radius: 3px;
-            -webkit-border-radius: 3px;
-            -khtml-border-radius: 3px;
-            color: #FFF;
-            background: #333;
-            line-height: 14px;
-        }
-
-        #overlay {
-            position: fixed;
-            top: 0;
-            z-index: 10000000000;
-            width: 100%;
-            height: 100%;
-            display: block;
-            background: rgba(0, 0, 0, 0.6);
-        }
-
-        .cv-spinner {
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px #ddd solid;
-            border-top: 4px #2e93e6 solid;
-            border-radius: 50%;
-            animation: sp-anime 0.8s infinite linear;
-        }
-
-        #sidebar {
-            z-index: 1000;
-            width: 264px;
-            height: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .legend {
-            line-height: 18px;
-            color: #555;
-        }
-
-        .legend i {
-            width: 18px;
-            height: 18px;
-            float: left;
-            margin-right: 8px;
-            opacity: 0.7;
-        }
-
-        .info {
-            padding: 6px 8px;
-            font: 14px/16px Arial, Helvetica, sans-serif;
-            background: white;
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-        }
-
-        @keyframes sp-anime {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-    </style>
     <script>
         $(window).on('load', function () {
             // Animate loader off screen
@@ -345,11 +179,6 @@
 
         <div class="row">
             <div class="col-12 text-center">
-                <!-- hide input used to copyurl to save query-->
-                <input id="newUrlClipboard" name="newUrlClipboard" type="text" style="display:none"/>
-                <button class="btn btn-outline-primary btn-block" onclick="copyUrl();">
-                    <div class="d-flex flex-row justify-content-between"><i class="fa fa-copy"></i> Copy url</div>
-                </button>
                 <button class="btn btn-outline-primary btn-block" disabled id="showGraphButton"
                         onclick="showAllGraph();">
                     <div class="d-flex flex-row justify-content-between"><i class="fa fa-line-chart"></i>
@@ -390,7 +219,6 @@
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://use.fontawesome.com/b1eabdd73a.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
         integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
         crossorigin="anonymous"></script>
@@ -410,7 +238,7 @@
 <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
 <script src="{% static "dynamic/js/L.Control.Opacity.js" %}"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
@@ -419,39 +247,13 @@
 <script src="{% static "dynamic/js/utils.js" %}"></script>
 <script>
 
-    (function (L) {
-        /*
-        * by tonekk. 2014, MIT License
-        */
-
-        L.ExtendedDivIcon = L.DivIcon.extend({
-            createIcon: function (oldIcon) {
-                let div = L.DivIcon.prototype.createIcon.call(this, oldIcon);
-
-                if (this.options.id) {
-                    div.id = this.options.id;
-                }
-
-                if (this.options.style) {
-                    for (var key in this.options.style) {
-                        div.style[key] = this.options.style[key];
-                    }
-                }
-                return div;
-            }
-        });
-
-        L.extendedDivIcon = function (options) {
-            return new L.ExtendedDivIcon(options);
-        }
-    })(window.L);
-
     /**
      * Handle the select system of the search form,
      * every time that a select change,
      * set in other select new possible values.
      */
     function populateForm(e) {
+        let id_select_list = ["ident", "lon_lat", "network", "date", "vars", "timerange", "level"];
         for (let id of id_select_list) {
             if (e && e.id === id) {
                 selected_values[id] = document.getElementById(id).selectedOptions[0].value;
@@ -506,7 +308,7 @@
         let options = [];
         for (let i = 0, len = select.options.length; i < len; i++) {
             if (select.options[i].value !== "*") {
-                options.push(select.options[i].value);
+                options.push(moment(select.options[i].value, "YYYY-MM-DD"));
             }
         }
         $('#datetimepicker').datetimepicker({
@@ -528,13 +330,7 @@
             opt.innerHTML = selected_date;
             opt.selected = true;
             select.appendChild(opt);
-
             select.dispatchEvent(new Event('change'));
-            today_string = moment(selected_date).format('YYYY-MM-DD');
-            tomorrow_string = moment(selected_date).add(1, 'days').format('YYYY-MM-DD');
-            if(map.timeDimension) {
-                map.timeDimension.setAvailableTimes([today_string, tomorrow_string], "extremes")
-            }
         });
 
     }
@@ -601,52 +397,13 @@
 
     }
 
-    /**
-     * Copy to clipboard the new url to repeat query with same params
-     */
-    function copyUrl() {
-        //create the new url
-        let newUrl = `${url_vars[0]}//${url_vars[2]}/${url_vars[3]}/${selected_values.ident}/${selected_values.lon_lat}/` +
-            `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/${selected_values.vars}/` +
-            `${url_vars[10]}/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
-            `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
-        /* Get the text field */
-        let copyText = document.getElementById("newUrlClipboard");
-        copyText.style.display = 'block';
-        copyText.value = newUrl;
-
-        /* Select the text field */
-        copyText.select();
-
-        /* Copy the text inside the text field */
-        document.execCommand("copy");
-        copyText.style.display = 'none';
-        alert("New url copy to clipboard.")
-    }
-
-    function getColorIndex(d, min, max) {
-        var delta = (max - min) / (colors.length);
-        return Math.max(0, Math.min(colors.length - 1, Math.floor((d - min) / delta)));
-    }
-
-
-    function getColor(d, min, max) {
-        return colors[getColorIndex(d, min, max)];
-    }
-
-
-    function null2_(i) {
-        return (i === null) ? "-" : i;
-    }
-
-    function getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
+    $("input[name='objectToShow']").change(function () {
+        if ($("input[name='objectToShow']:checked").val() === "data") {
+            $(".to-disable").prop("disabled", false);
+        } else {
+            $(".to-disable").prop("disabled", true);
         }
-        return color;
-    }
+    })
 
     function setpopup(data) {
         let popupText = "<div>" +
@@ -1085,8 +842,6 @@
 
     var pruneCluster = new PruneClusterForLeaflet();
 
-    // list of identifiers for select, selected_values and corresponding summaries
-    var id_select_list = ["ident", "lon_lat", "network", "date", "vars", "timerange", "level"];
     // list of possibible value for each summaries,
     var select_values_lists = {
         ident: [],
@@ -1156,14 +911,12 @@
     var map = L.map('map', {
         zoomControl: false,
         timeDimension: true,
-        timeDimensionOptions: {
-            timeInterval: today_string + "/" + tomorrow_string,
-            period: "PT1H"
-        },
         timeDimensionControl: true,
         timeDimensionControlOptions: {position: "bottomright"}
     }).setView([43, 11], 13);
+
     L.control.zoom({position: 'topright'}).addTo(map);
+
     var coords = [];
     var legend = L.control({position: 'bottomright'});
     var min = Infinity;
@@ -1178,22 +931,6 @@
         "userunit": ""
     }
 
-    $("#sidebar").resizable({
-        handles: 'e', stop: function (e, ui) {
-            widthMenu = document.getElementById('sidebar').offsetWidth;
-        }
-    });
-
-    //updateMap();
-    $("input[name='objectToShow']").change(function () {
-        if ($("input[name='objectToShow']:checked").val() === "data") {
-            $(".to-disable").prop("disabled", false);
-        } else {
-            $(".to-disable").prop("disabled", true);
-        }
-
-    })
-
     var layers = {};
     var opacityControls = {};
     fetch('{{ url_wms }}').then(function (response) {
@@ -1201,29 +938,13 @@
     }).then(function (text) {
         let layerNames = [];
         let $xml = $($.parseXML(text));
-        $xml.find('Layer > Name').each(function () {
-            if ($(this).text() != 'background' & $(this).text() != 'ol_background') {
-                layerNames.push($(this).text());
+        $xml.find('Layer').each(function () {
+            let title = $(this).find('Title').first().text()
+            let name = $(this).find('Name').first().text()
+            if (name != 'background' & name != 'ol_background') {
+                layerNames.push([name,title]);
             }
         });
-        plotLayers(layerNames);
-    });
-
-    function createOpacityControl(layer_name) {
-        if (opacityControls[layer_name]) {
-            opacityControls[layer_name].addTo(map);
-        }
-
-    }
-
-    function removeOpacityControl(layer_name) {
-        if (opacityControls[layer_name]) {
-            opacityControls[layer_name].remove();
-        }
-    }
-
-    let plotLayers = function (layerNames) {
-
         let ol_background = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
@@ -1238,29 +959,36 @@
         }).addTo(map);
 
         layerNames.forEach(function (layer_name) {
-            let l = L.timeDimension.layer.wms(L.tileLayer.wms('{{ url_wms }}?', {
-                layers: layer_name,
+            let layer = L.tileLayer.wms('{{ url_wms }}?', {
+                layers: layer_name[0],
                 format: 'image/png',
                 transparent: 'TRUE',
                 attribution: '',
-                version: '1.3.0'
-            }));
-            layers[layer_name] = l;
-
+                version: '1.3.0',
+                errorTileUrl: "{% static 'dynamic/images/map-not-found.png' %}"
+            })
+            let l = L.timeDimension.layer.wms(layer,{
+                updateTimeDimension: true,
+            });
+            layers[layer_name[1]] = l;
             let aa = {};
-            aa[layer_name] = l;
-            opacityControls[layer_name] = L.control.opacity(
+            aa[layer_name[0]] = l;
+            opacityControls[layer_name[0]] = L.control.opacity(
                 aa,
                 {}
             );
         });
 
         map.on('layeradd', function (l) {
-            createOpacityControl(l.layer.options.layers);
+            if (opacityControls[l.layer.options.layers]) {
+                opacityControls[l.layer.options.layers].addTo(map);
+            }
         });
 
         map.on('layerremove', function (l) {
-            removeOpacityControl(l.layer.options.layers);
+            if (opacityControls[l.layer.options.layers]) {
+                opacityControls[l.layer.options.layers].remove();
+            }
         });
 
         let baseMaps = {
@@ -1269,10 +997,10 @@
         };
 
         L.control.layers(baseMaps, layers).addTo(map);
-
         L.control.scale({position: 'bottomright'}).addTo(map);
-        updateMap()
-    };
+        //updateMap()
+    });
+
 
 </script>
 <script type="text/javascript" src="{% static 'dynamic/js/borinud.trange.js' %}"></script>
