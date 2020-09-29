@@ -10,12 +10,14 @@ import os
 import argparse
 
 from flask import Flask, request, Response, render_template, send_file, jsonify
-
-from .server import WMSServer
+from flask_cors import CORS, cross_origin
+from server import WMSServer
 
 
 application = Flask(__name__, static_url_path='', static_folder="templates")
-
+cors = CORS(application)
+application.config['CORS_ORIGINS'] = ['http://localhost:8888']
+application.config['CORS_HEADERS'] = 'Content-Type'
 demo = os.path.join(os.path.dirname(__file__), "testdata", "sfc.grib")
 
 demo = os.environ.get("SKINNYWMS_DATA_PATH", demo)
