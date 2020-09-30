@@ -185,12 +185,17 @@
                         Show graph
                     </div>
                 </button>
+                <button class="btn btn-outline-primary btn-block" style="display: none" id="showWindRose">
+                    <div class="d-flex flex-row justify-content-between"><i class="fa fa-pie-chart"></i> WIND ROSE GRAPH
+                    </div>
+                </button>
                 <button class="btn btn-outline-success btn-block" id="searchButton" onclick="updateMap();">
                     <div class="d-flex flex-row justify-content-between"><i class="fa fa-search"></i> SEARCH</div>
                 </button>
 
 
             </div>
+
 
         </div>
     </div>
@@ -205,11 +210,25 @@
                 <div id="loadingChart" class="loader"></div>
                 <div id="chart-container">
                     <canvas id="chart"></canvas>
+
                 </div>
             </div>
             <div class="modal-footer">
                 <a disabled download="chart.png" id="printGraph" role="button" class="btn btn-primary">Download
                     grafico</a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="modalWindRose" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="windRoseContainer">
+                </div>
+            </div>
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -241,10 +260,14 @@
 <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
 <script src="{% static "dynamic/js/L.Control.Opacity.js" %}"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
-<script type="text/javascript"
+<script
+        type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
+<script
+        type="text/javascript"
         src="https://cdn.jsdelivr.net/npm/leaflet-timedimension@1.1.1/dist/leaflet.timedimension.min.js"></script>
-<script src="{% static "dynamic/js/utils.js" %}"></script>
+<script src="{% static 'dynamic/js/utils.js' %}"></script>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 <script>
 
     /**
@@ -942,7 +965,7 @@
             let title = $(this).find('Title').first().text()
             let name = $(this).find('Name').first().text()
             if (name != 'background' & name != 'ol_background') {
-                layerNames.push([name,title]);
+                layerNames.push([name, title]);
             }
         });
         let ol_background = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -967,7 +990,7 @@
                 version: '1.3.0',
                 errorTileUrl: "{% static 'dynamic/images/map-not-found.png' %}"
             })
-            let l = L.timeDimension.layer.wms(layer,{
+            let l = L.timeDimension.layer.wms(layer, {
                 updateTimeDimension: true,
             });
             layers[layer_name[1]] = l;
@@ -1000,7 +1023,107 @@
         L.control.scale({position: 'bottomright'}).addTo(map);
         //updateMap()
     });
+    $('select[name="vars"]').change(function () {
+        console.log(this.value)
+        if (this.value === "B11001" || this.value === "B11002") {
+            $("#showWindRose").show();
+        } else {
+            $("#showWindRose").hide();
+        }
+    })
 
+
+    $(document.body).on("click", "#showWindRose", function () {
+        let selected_var = $("select[name='vars']").val()
+        if (selected_var === "B11001" || selected_var === "B11002") {
+
+            //create request url
+            let url = `{{url_borinud}}/dbajson/${selected_values.ident}/${selected_values.lon_lat}/` +
+                `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/B11001/` +
+                `spatialseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
+                `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
+
+            //require map point
+            $.ajax({
+                    url: url,
+                    dataType: "json",
+                    success: function (windDirectionData) {
+                        let url = `{{url_borinud}}/dbajson/${selected_values.ident}/${selected_values.lon_lat}/` +
+                            `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/B11002/` +
+                            `spatialseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
+                            `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
+                        $.ajax({
+                                url: url,
+                                dataType: "json",
+                                success: function (windSpeedData) {
+                                    let speedValues = windSpeedData.map((item) => {
+                                        return item.data[0].vars["B11002"].v
+                                    })
+                                    let dataDict = {
+                                        "N": 0,
+                                        "NNE": 0,
+                                        "NE": 0,
+                                        "ENE": 0,
+                                        "E": 0,
+                                        "ESE": 0,
+                                        "SE": 0,
+                                        "SSE": 0,
+                                        "S": 0,
+                                        "SSW": 0,
+                                        "SW": 0,
+                                        "WSW": 0,
+                                        "W": 0,
+                                        "WNW": 0,
+                                        "NW": 0,
+                                        "NNW": 0
+                                    }
+                                    windDirectionData.forEach((data) => {
+                                        dataDict[degToCompass(data.data[0].vars["B11001"].v)] += 1;
+                                    })
+                                    $("#modalWindRose").modal("show");
+                                    var data = [{
+                                        r: Object.keys(dataDict).map(function (key) {
+                                            return dataDict[key];
+                                        }),
+                                        theta: Object.keys(dataDict),
+                                        name: "11-14 m/s",
+                                        marker: {color: "rgb(106,81,163)"},
+                                        type: "barpolar"
+                                    }
+                                    ]
+                                    var layout = {
+                                        title: "Wind Direction Distribution",
+                                        font: {size: 16},
+                                        legend: {font: {size: 16}},
+                                        polar: {
+                                            radialaxis: {angle: 90,},
+                                            angularaxis: {direction: "clockwise"}
+                                        }
+                                    }
+                                    Plotly.newPlot(document.getElementById("windRoseContainer"), data, layout)
+
+                                },
+                                beforeSend: function () {
+                                    $("#overlay").fadeIn(300);
+                                },
+                                complete: function () {
+                                    $("#overlay").fadeOut(300);
+                                },
+
+                            }
+                        )
+                    },
+                    beforeSend: function () {
+                        $("#overlay").fadeIn(300);
+                    },
+                    complete: function () {
+                        $("#overlay").fadeOut(300);
+                    },
+
+                }
+            )
+        }
+    })
 
 </script>
 <script type="text/javascript" src="{% static 'dynamic/js/borinud.trange.js' %}"></script>

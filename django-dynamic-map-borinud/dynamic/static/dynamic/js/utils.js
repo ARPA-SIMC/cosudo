@@ -1,6 +1,6 @@
 Chart.plugins.register({
     beforeDraw: function (c) {
-        var ctx = c.chart.ctx;
+        let ctx = c.chart.ctx;
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, c.chart.width, c.chart.height);
     }
@@ -19,7 +19,7 @@ Chart.plugins.register({
             }
 
             if (this.options.style) {
-                for (var key in this.options.style) {
+                for (let key in this.options.style) {
                     div.style[key] = this.options.style[key];
                 }
             }
@@ -32,10 +32,10 @@ Chart.plugins.register({
     }
 })(window.L);
 Chart.defaults.global.legend.display = false;
-var colors = ['#8501af', '#3e01a3', '#2147fe', '#3192ce', '#65b032', '#cfea2d', '#fdfd47', '#f9bc00', '#f79904', '#f55306', '#f52613', '#a8184b'];
+let colors = ['#8501af', '#3e01a3', '#2147fe', '#3192ce', '#65b032', '#cfea2d', '#fdfd47', '#f9bc00', '#f79904', '#f55306', '#f52613', '#a8184b'];
 
 function getColorIndex(d, min, max) {
-    var delta = (max - min) / (colors.length);
+    let delta = (max - min) / (colors.length);
     return Math.max(0, Math.min(colors.length - 1, Math.floor((d - min) / delta)));
 }
 
@@ -49,13 +49,20 @@ function null2_(i) {
 }
 
 function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
+    let letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
 }
+
+function degToCompass(num) {
+    let val = Math.floor((num / 22.5) + 0.5);
+    let arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+    return arr[(val % 16)];
+}
+
 /*
     $("#sidebar").resizable({
         handles: 'e', stop: function (e, ui) {
