@@ -222,11 +222,21 @@
     </div>
 </div>
 <div class="modal" id="modalWindRose" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document" style="max-width: 900px;">
+    <div class="modal-dialog" role="document" style="max-width: 1000px;">
         <div class="modal-content">
             <div class="modal-body">
-                <div id="windRoseContainer">
+                <div class="row">
+                    <!-- for plotly bug in modal -->
+                    <div class="col-1"></div>
+                    <div class="col-md-5 " id="windRoseContainer">
+                    </div>
+                    <div class="col-md-5 " id="windRoseSpeedContainer">
+                    </div>
+                    <!-- for plotly bug in modal -->
+
+                    <div class="col-1"></div>
                 </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -445,7 +455,7 @@
         })
         if (selected_values.dsn === 'sample' || selected_values.dsn === 'report') {
             let {dateFrom, dateUntil} = selectedDateFormat()
-            var urlGraph = `{{url_borinud}}/geojson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
+            let urlGraph = `{{url_borinud}}/geojson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
                 `${null2_(data.network)}/${data.trange[0] +
                 "," + data.trange[1] + "," + data.trange[2]}/${null2_(data.level[0]) + "," + null2_(data.level[1]) + "," +
                 null2_(data.level[2]) + "," + null2_(data.level[3])}/${selected_values.vars}/` +
@@ -456,8 +466,25 @@
                 " Network:" + null2_(data.network)
                 + "<br>" + borinud.config.trange.describe(data.trange[0], data.trange[1], data.trange[2]) + "<br>"
                 + borinud.config.level.describe(data.level[0], data.level[1], data.level[2], data.level[3]) + "<br>" + dateFrom + " - " + dateUntil + "GMT"
+            popupText += '<br><button onclick="showGraph(\'' + urlGraph + '\',\'' + headerModal + '\')" type="button" class="btn btn-primary btn-block open-graph" >Show graph</button>';
 
-            popupText += '<br><button onclick="showGraph(\'' + urlGraph + '\',\'' + headerModal + '\')" type="button" class="btn btn-primary open-graph" >Show graph</button>';
+            if (selected_values.vars === "B11001" || selected_values.vars === "B11002") {
+                let urlDirWind = `{{url_borinud}}/dbajson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
+                    `${null2_(data.network)}/${data.trange[0] +
+                    "," + data.trange[1] + "," + data.trange[2]}/${null2_(data.level[0]) + "," + null2_(data.level[1]) + "," +
+                    null2_(data.level[2]) + "," + null2_(data.level[3])}/B11001/` +
+                    `timeseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
+                    `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`
+                let urlSpeedWind = `{{url_borinud}}/dbajson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
+                    `${null2_(data.network)}/${data.trange[0] +
+                    "," + data.trange[1] + "," + data.trange[2]}/${null2_(data.level[0]) + "," + null2_(data.level[1]) + "," +
+                    null2_(data.level[2]) + "," + null2_(data.level[3])}/B11002/` +
+                    `timeseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
+                    `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`
+                popupText += '<button onclick="showGraphWindRose(\'' + urlDirWind + '\',\'' + urlSpeedWind + '\')" type="button" class="btn btn-primary btn-block " >Show wind rose graph</button>';
+
+            }
+
 
         }
         popupText += "</div>";
@@ -1038,92 +1065,169 @@
         if (selected_var === "B11001" || selected_var === "B11002") {
 
             //create request url
-            let url = `{{url_borinud}}/dbajson/${selected_values.ident}/${selected_values.lon_lat}/` +
+            let urlDir = `{{url_borinud}}/dbajson/${selected_values.ident}/${selected_values.lon_lat}/` +
                 `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/B11001/` +
                 `spatialseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
                 `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
+            let urlSpeed = `{{url_borinud}}/dbajson/${selected_values.ident}/${selected_values.lon_lat}/` +
+                `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/B11002/` +
+                `spatialseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
+                `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
 
-            //require map point
-            $.ajax({
-                    url: url,
-                    dataType: "json",
-                    success: function (windDirectionData) {
-                        let url = `{{url_borinud}}/dbajson/${selected_values.ident}/${selected_values.lon_lat}/` +
-                            `${selected_values.network}/${selected_values.timerange}/${selected_values.level}/B11002/` +
-                            `spatialseries/${selected_values.date.split("-")[0]}/${selected_values.date.split("-")[1]}/${selected_values.date.split("-")[2]}` +
-                            `${selected_values.hour !== "*" ? "/" + selected_values.hour : ""}?dsn=${selected_values.dsn}`;
-                        $.ajax({
-                                url: url,
-                                dataType: "json",
-                                success: function (windSpeedData) {
-                                    let speedValues = windSpeedData.map((item) => {
-                                        return item.data[0].vars["B11002"].v
-                                    })
-                                    let dataDict = {
-                                        "N": 0,
-                                        "NNE": 0,
-                                        "NE": 0,
-                                        "ENE": 0,
-                                        "E": 0,
-                                        "ESE": 0,
-                                        "SE": 0,
-                                        "SSE": 0,
-                                        "S": 0,
-                                        "SSW": 0,
-                                        "SW": 0,
-                                        "WSW": 0,
-                                        "W": 0,
-                                        "WNW": 0,
-                                        "NW": 0,
-                                        "NNW": 0
-                                    }
-                                    windDirectionData.forEach((data) => {
-                                        dataDict[degToCompass(data.data[0].vars["B11001"].v)] += 1;
-                                    })
-                                    $("#modalWindRose").modal("show");
-                                    var data = [{
-                                        r: Object.keys(dataDict).map(function (key) {
-                                            return dataDict[key];
-                                        }),
-                                        theta: Object.keys(dataDict),
-                                        name: "11-14 m/s",
-                                        marker: {color: "rgb(106,81,163)"},
-                                        type: "barpolar"
-                                    }
-                                    ]
-                                    var layout = {
-                                        title: "Wind Direction Distribution",
-                                        font: {size: 16},
-                                        legend: {font: {size: 16}},
-                                        polar: {
-                                            radialaxis: {angle: 90,},
-                                            angularaxis: {direction: "clockwise"}
-                                        }
-                                    }
-                                    Plotly.newPlot(document.getElementById("windRoseContainer"), data, layout)
-
-                                },
-                                beforeSend: function () {
-                                    $("#overlay").fadeIn(300);
-                                },
-                                complete: function () {
-                                    $("#overlay").fadeOut(300);
-                                },
-
-                            }
-                        )
-                    },
-                    beforeSend: function () {
-                        $("#overlay").fadeIn(300);
-                    },
-                    complete: function () {
-                        $("#overlay").fadeOut(300);
-                    },
-
-                }
-            )
+            showGraphWindRose(urlDir, urlSpeed)
         }
     })
+
+    function showGraphWindRose(urlWind, urlSpeed) {
+        $.ajax({
+                url: urlWind,
+                dataType: "json",
+                success: function (windDirectionData) {
+
+                    $.ajax({
+                            url: urlSpeed,
+                            dataType: "json",
+                            success: function (windSpeedData) {
+                                let dataWindSpeedDByDir = {}
+                                windSpeedData.forEach((speedValue) => {
+
+                                    windDirectionData.forEach((directionValue) => {
+                                        if (speedValue.date === directionValue.date
+                                            && speedValue.ident === directionValue.ident
+                                            && speedValue.lon === directionValue.lon
+                                            && speedValue.lat === directionValue.lat
+                                            && speedValue.network === directionValue.network) {
+                                            let speed = speedValue.data[0].vars["B11002"].v
+                                            let key = windClassification(speed)
+                                            if (!(key in dataWindSpeedDByDir)) {
+                                                dataWindSpeedDByDir[key] = {
+                                                    "dir": {
+                                                        "N": {total: 0},
+                                                        "NNE": {total: 0},
+                                                        "NE": {total: 0},
+                                                        "ENE": {total: 0},
+                                                        "E": {total: 0},
+                                                        "ESE": {total: 0},
+                                                        "SE": {total: 0},
+                                                        "SSE": {total: 0},
+                                                        "S": {total: 0},
+                                                        "SSW": {total: 0},
+                                                        "SW": {total: 0},
+                                                        "WSW": {total: 0},
+                                                        "W": {total: 0},
+                                                        "WNW": {total: 0},
+                                                        "NW": {total: 0},
+                                                        "NNW": {total: 0}
+                                                    },
+                                                    "total": 0
+
+                                                }
+                                            }
+                                            let direction = degToCompass(directionValue.data[0].vars["B11001"].v)
+                                            dataWindSpeedDByDir[key].dir[direction].total += 1
+                                            dataWindSpeedDByDir[key].total += 1
+                                        }
+                                    })
+                                })
+                                console.log(dataWindSpeedDByDir)
+                                let dataSpeedAverage = []
+                                let i = 0
+                                for (let key in dataWindSpeedDByDir) {
+                                    dataSpeedAverage.push({
+                                        r: Object.keys(dataWindSpeedDByDir[key].dir).map(function (keyDir) {
+                                            console.log((dataWindSpeedDByDir[key].dir[keyDir].total / dataWindSpeedDByDir[key].total) * 100)
+                                            return (dataWindSpeedDByDir[key].dir[keyDir].total / dataWindSpeedDByDir[key].total) * 100;
+                                        }),
+                                        theta: Object.keys(dataWindSpeedDByDir[key].dir),
+                                        name: key,
+                                        marker: {color: windColors[i]},
+                                        type: "barpolar"
+                                    })
+                                    i++
+                                }
+                                console.log(dataSpeedAverage)
+                                let dataDict = {
+                                    "N": 0,
+                                    "NNE": 0,
+                                    "NE": 0,
+                                    "ENE": 0,
+                                    "E": 0,
+                                    "ESE": 0,
+                                    "SE": 0,
+                                    "SSE": 0,
+                                    "S": 0,
+                                    "SSW": 0,
+                                    "SW": 0,
+                                    "WSW": 0,
+                                    "W": 0,
+                                    "WNW": 0,
+                                    "NW": 0,
+                                    "NNW": 0
+                                }
+                                windDirectionData.forEach((data) => {
+                                    dataDict[degToCompass(data.data[0].vars["B11001"].v)] += 1;
+                                })
+                                $("#modalWindRose").modal("show");
+                                let data = [{
+                                    r: Object.keys(dataDict).map(function (key) {
+                                        return dataDict[key];
+                                    }),
+                                    theta: Object.keys(dataDict),
+                                    name: "11-14 m/s",
+                                    marker: {color: getRandomColor()},
+                                    type: "barpolar"
+                                }
+                                ]
+                                let layout = {
+                                    title: "Wind Direction Distribution",
+                                    font: {size: 16},
+                                    legend: {font: {size: 16}},
+                                    polar: {
+                                        radialaxis: {angle: 90,},
+                                        angularaxis: {direction: "clockwise"}
+                                    },
+                                    autosize: true,
+                                }
+                                let layoutSpeed = {
+                                    title: "Wind Speed Distribution",
+                                    font: {size: 16},
+                                    legend: {font: {size: 16}},
+                                    showlegend: true,
+                                    polar: {
+                                        barmode: "overlay",
+                                        bargap: 0,
+                                        radialaxis: {ticksuffix: "%", angle: 90, dtick: 20},
+                                        angularaxis: {direction: "clockwise"}
+                                    },
+                                    autosize: true,
+                                }
+                                Plotly.newPlot(document.getElementById("windRoseContainer"), data, layout)
+                                Plotly.newPlot(document.getElementById("windRoseSpeedContainer"), dataSpeedAverage, layoutSpeed)
+
+                            },
+                            beforeSend: function () {
+                                $("#overlay").fadeIn(300);
+                            },
+                            complete: function () {
+                                $("#overlay").fadeOut(300);
+                            },
+
+                        }
+                    )
+                }
+                ,
+                beforeSend: function () {
+                    $("#overlay").fadeIn(300);
+                }
+                ,
+                complete: function () {
+                    $("#overlay").fadeOut(300);
+                }
+                ,
+
+            }
+        )
+    }
 
 </script>
 <script type="text/javascript" src="{% static 'dynamic/js/borinud.trange.js' %}"></script>

@@ -63,6 +63,17 @@ function degToCompass(num) {
     return arr[(val % 16)];
 }
 
+function windClassification(speedValue) {
+    if (speedValue <= 5) {
+        return "0-5 m/s"
+    } else if (speedValue > 5 && speedValue <= 20) {
+        return "6-20 m/s"
+    } else if (speedValue > 20 ) {
+        return ">20 m/s"
+    }
+}
+let windColors = ["rgb(203,201,226)", "rgb(158,154,200)", "rgb(106,81,163)"]
+
 /*
     $("#sidebar").resizable({
         handles: 'e', stop: function (e, ui) {
