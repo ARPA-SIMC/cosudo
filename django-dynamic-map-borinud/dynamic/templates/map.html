@@ -658,7 +658,6 @@
                                     bcode.scale = 1
                                 if (!bcode.offset)
                                     bcode.offset = 0
-                                console.log(collection)
                                 for (let i = 0; i < collection.length; i++) {
                                     min = Math.min(min, collection[i].data.map((item) => {
                                         if (selected_values.vars in item.vars)
@@ -852,7 +851,6 @@
                     if (collection.features.length <= 0) {
                         toastr.warning('Nessun risultato!')
                     } else {
-                        console.log(collection.features)
                         let coords = []
                         pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
                             let text = "Ident: " + null2_(data.ident) +
@@ -983,73 +981,81 @@
 
     var layers = {};
     var opacityControls = {};
-    fetch('{{ url_wms }}').then(function (response) {
-        return response.text();
-    }).then(function (text) {
-        let layerNames = [];
-        let $xml = $($.parseXML(text));
-        $xml.find('Layer').each(function () {
-            let title = $(this).find('Title').first().text()
-            let name = $(this).find('Name').first().text()
-            if (name != 'background' & name != 'ol_background') {
-                layerNames.push([name, title]);
-            }
-        });
-        let ol_background = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(map);
+    fetch('{{ url_wms }}').then(
+        function (response) {
+            return response.text();
+        }).then(
+        function (text) {
+            let layerNames = [];
+            let $xml = $($.parseXML(text));
+            $xml.find('Layer').each(function () {
+                let title = $(this).find('Title').first().text()
+                let name = $(this).find('Name').first().text()
+                if (name != 'background' & name != 'ol_background') {
+                    layerNames.push([name, title]);
+                }
+            });
+            let ol_background = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(map);
 
 
-        let background = L.tileLayer.wms('{{ url_wms }}?', {
-            layers: 'background',
-            format: 'image/png',
-            transparent: 'TRUE',
-            attribution: '',
-            version: '1.3.0'
-        }).addTo(map);
-
-        layerNames.forEach(function (layer_name) {
-            let layer = L.tileLayer.wms('{{ url_wms }}?', {
-                layers: layer_name[0],
+            let background = L.tileLayer.wms('{{ url_wms }}?', {
+                layers: 'background',
                 format: 'image/png',
                 transparent: 'TRUE',
                 attribution: '',
-                version: '1.3.0',
-                errorTileUrl: "{% static 'dynamic/images/map-not-found.png' %}"
-            })
-            let l = L.timeDimension.layer.wms(layer, {
-                updateTimeDimension: true,
+                version: '1.3.0'
+            }).addTo(map);
+
+            layerNames.forEach(function (layer_name) {
+                let layer = L.tileLayer.wms('{{ url_wms }}?', {
+                    layers: layer_name[0],
+                    format: 'image/png',
+                    transparent: 'TRUE',
+                    attribution: '',
+                    version: '1.3.0',
+                    errorTileUrl: "{% static 'dynamic/images/map-not-found.png' %}"
+                })
+                let l = L.timeDimension.layer.wms(layer, {
+                    updateTimeDimension: true,
+                });
+                layers[layer_name[1]] = l;
+                let aa = {};
+                aa[layer_name[0]] = l;
+                opacityControls[layer_name[0]] = L.control.opacity(
+                    aa,
+                    {}
+                );
             });
-            layers[layer_name[1]] = l;
-            let aa = {};
-            aa[layer_name[0]] = l;
-            opacityControls[layer_name[0]] = L.control.opacity(
-                aa,
-                {}
-            );
-        });
 
-        map.on('layeradd', function (l) {
-            if (opacityControls[l.layer.options.layers]) {
-                opacityControls[l.layer.options.layers].addTo(map);
-            }
-        });
+            map.on('layeradd', function (l) {
+                if (opacityControls[l.layer.options.layers]) {
+                    opacityControls[l.layer.options.layers].addTo(map);
+                }
+            });
 
-        map.on('layerremove', function (l) {
-            if (opacityControls[l.layer.options.layers]) {
-                opacityControls[l.layer.options.layers].remove();
-            }
-        });
+            map.on('layerremove', function (l) {
+                if (opacityControls[l.layer.options.layers]) {
+                    opacityControls[l.layer.options.layers].remove();
+                }
+            });
 
-        let baseMaps = {
-            'background': background,
-            'ol_background': ol_background
-        };
+            let baseMaps = {
+                'background': background,
+                'ol_background': ol_background
+            };
 
-        L.control.layers(baseMaps, layers).addTo(map);
-        L.control.scale({position: 'bottomright'}).addTo(map);
-        //updateMap()
-    });
+            L.control.layers(baseMaps, layers).addTo(map);
+            L.control.scale({position: 'bottomright'}).addTo(map);
+            //updateMap()
+        }).catch((error) => {
+            console.log("error")
+            let ol_background = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(map);
+        }
+    );
     $('select[name="vars"]').change(function () {
         console.log(this.value)
         if (this.value === "B11001" || this.value === "B11002") {
@@ -1129,13 +1135,11 @@
                                         }
                                     })
                                 })
-                                console.log(dataWindSpeedDByDir)
                                 let dataSpeedAverage = []
                                 let i = 0
                                 for (let key in dataWindSpeedDByDir) {
                                     dataSpeedAverage.push({
                                         r: Object.keys(dataWindSpeedDByDir[key].dir).map(function (keyDir) {
-                                            console.log((dataWindSpeedDByDir[key].dir[keyDir].total / dataWindSpeedDByDir[key].total) * 100)
                                             return (dataWindSpeedDByDir[key].dir[keyDir].total / dataWindSpeedDByDir[key].total) * 100;
                                         }),
                                         theta: Object.keys(dataWindSpeedDByDir[key].dir),
@@ -1145,7 +1149,6 @@
                                     })
                                     i++
                                 }
-                                console.log(dataSpeedAverage)
                                 let dataDict = {
                                     "N": 0,
                                     "NNE": 0,
