@@ -23,6 +23,12 @@ Edit your `settings.py` file to add borinud web service path (the standard path 
 
     BORINUD_URL = "..."
 
+Edit your `settings.py` file to add the wms service path (the standard path is  "http://0.0.0.0:5000/wms").
+
+.. code-block:: python
+
+    WMS_URL = "..."
+
 
 Edit your project `urls.py` file to import the URLs:
 
