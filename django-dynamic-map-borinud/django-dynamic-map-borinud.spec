@@ -1,5 +1,5 @@
 %define python3_vers python3
-%define version 1.0.6
+%define version 1.0.7
 Name: django-dynamic-map-borinud
 Version: %{version}
 Release: 1
