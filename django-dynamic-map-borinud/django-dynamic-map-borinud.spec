@@ -10,9 +10,11 @@ License: BSD 3-Clause
 Url: https://github.com/ARPA-SIMC/cosudo
 Source0: https://github.com/arpa-simc/cosudo/archive/v%{version}.tar.gz
 
-Requires: python3
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+Requires: %{python3_vers}
+Requires: %{python3_vers}-requests
+Requires: %{python3_vers}-django
+BuildRequires:  %{python3_vers}-devel
+BuildRequires:  %{python3_vers}-setuptools
 BuildArch:      noarch
 %description
 django-dynamic-map-borinud
@@ -110,7 +112,6 @@ Edit your project `urls.py` file to import the URLs:
 %prep
 %autosetup -n cosudo-%{version}
 cd django-dynamic-map-borinud
-
 
 %build
 cd django-dynamic-map-borinud
