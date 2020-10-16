@@ -24,6 +24,23 @@ Edit your `settings.py` file to add borinud web service path (the standard path 
 
 
     BORINUD_URL = "..."
+    
+Edit your `settings.py` file to add the wms service path (the standard path is  "http://0.0.0.0:5000/wms").
+
+
+    WMS_URL = "..."
+
+Edit your `settings.py` file to add the repository directory path (the standard path is  "/testgrib").
+
+
+    REPOSITORY_DIR = "..."
+    
+Edit your `settings.py` file to add the credentials for arkiweb and the url for arkiweb (standard is https://simc.arpae.it/services/arkiweb/data).
+
+
+    USERNAME_ARKIWEB = "..."
+    PASSWORD_ARKIWEB = "..."
+    ARKIWEB_URL = "..." 
 
 Edit your project `urls.py` file to import the URLs:
 
