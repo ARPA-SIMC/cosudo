@@ -1,12 +1,12 @@
-%define __debug_package %{nil}
+%global debug_package %{nil}
 %define python3_vers python3
-%define version 1.1.1
+%define version 1.1.2
 Name: django-dynamic-map-borinud
 Version: %{version}
 Release: 1
 Summary: This app shows borinud data on a dynamic map
 
-License: BSD 3-Clause
+License: GNU GPL
 Url: https://github.com/ARPA-SIMC/cosudo
 Source0: https://github.com/arpa-simc/cosudo/archive/v%{version}.tar.gz
 
