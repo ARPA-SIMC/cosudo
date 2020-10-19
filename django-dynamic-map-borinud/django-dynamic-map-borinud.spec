@@ -1,10 +1,6 @@
 %global debug_package %{nil}
 %global __python %{__python3}
-%if 0%{?rhel} == 7
-%define python3_vers python36
-%else
 %define python3_vers python3
-%endif
 %define version 1.1.6
 
 Name: django-dynamic-map-borinud
