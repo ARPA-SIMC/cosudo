@@ -126,13 +126,13 @@ html, body, #map {
     animation: sp-anime 0.8s infinite linear;
 }
 
-#sidebar {
-    z-index: 1000;
-    width: 264px;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
+.slider-control {
+    width: 300px;
+    background: white;
+    padding: 10px;
+    font-size: 16px;
 }
+
 
 .legend {
     line-height: 18px;
@@ -154,6 +154,40 @@ html, body, #map {
     background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
+}
+
+.bootstrap-datetimepicker-widget table td.day {
+    font-size: 80%;
+}
+
+.ui-slider-pips .ui-slider-pip {
+
+    font-weight: bold;
+
+}
+
+.pulsing {
+    border: 3px solid #999;
+    -webkit-border-radius: 30px;
+    height: 100px;
+    width: 100px;
+    -webkit-animation: pulsate 1s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    /*opacity: 0.0*/
+}
+
+@-webkit-keyframes pulsate {
+    0% {
+        -webkit-transform: scale(0.1, 0.1);
+        opacity: 0.0;
+    }
+    50% {
+        opacity: 1.0;
+    }
+    100% {
+        -webkit-transform: scale(1.2, 1.2);
+        opacity: 0.0;
+    }
 }
 
 @keyframes sp-anime {
