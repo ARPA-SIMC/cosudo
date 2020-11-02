@@ -31,8 +31,29 @@ Chart.plugins.register({
         return new L.ExtendedDivIcon(options);
     }
 })(window.L);
+
+L.Control.Layers.include({
+    getActiveOverlays: function () {
+
+        // Create array for holding active layers
+        let active = [];
+        let control = this;
+
+        // Iterate all layers in control
+        control._layers.forEach(function (obj) {
+            // Check if it's an overlay and added to the map
+            if (obj.overlay && control._map.hasLayer(obj.layer)) {
+                // Push layer to active array
+                active.push(obj.layer);
+            }
+        });
+
+        // Return array
+        return active;
+    }
+});
 Chart.defaults.global.legend.display = false;
-let colors = ['#8501af', '#3e01a3', '#2147fe', '#3192ce', '#65b032', '#cfea2d', '#fdfd47', '#f9bc00', '#f79904', '#f55306', '#f52613', '#a8184b'];
+let colors = ['#3030ff', '#007885', '#00855D', '#0D8500', '#478500', '#788500', '#853C00', '#850000'];
 
 function getColorIndex(d, min, max) {
     let delta = (max - min) / (colors.length);
@@ -63,15 +84,20 @@ function degToCompass(num) {
     return arr[(val % 16)];
 }
 
+function getIndexCompass(num) {
+    return Math.round(num / 45) % 8;
+}
+
 function windClassification(speedValue) {
     if (speedValue <= 5) {
         return "0-5 m/s"
     } else if (speedValue > 5 && speedValue <= 20) {
         return "6-20 m/s"
-    } else if (speedValue > 20 ) {
+    } else if (speedValue > 20) {
         return ">20 m/s"
     }
 }
+
 let windColors = ["rgb(203,201,226)", "rgb(158,154,200)", "rgb(106,81,163)"]
 
 /*

@@ -5,7 +5,8 @@ from base64 import b64encode
 import requests
 from django.http import HttpResponse
 import os
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+#import dballe
 
 
 def render_map(request):
@@ -20,20 +21,23 @@ def render_map_validation(request):
 
 
 @login_required
+@permission_required('dynamic.can_extract')
 def render_extract_page(request):
     if request.method == 'POST':
         repository = settings.REPOSITORY_DIR if hasattr(settings, 'REPOSITORY_DIR') else "./testgrib/"
-        if not (hasattr(settings, 'USERNAME_ARKIWEB') and hasattr(settings, 'PASSWORD_ARKIWEB')):
-            print("arkiweb credentials not in settings")
-            return HttpResponse(status=500)
-        if not os.path.exists(repository):
-            print("repository path does not exists")
+        url = settings.ARKIWEB_URL if hasattr(settings,
+                                              'ARKIWEB_URL') else "https://simc.arpae.it/services/arkiweb/data"
+        if not (hasattr(settings, 'USERNAME_ARKIWEB')
+                and hasattr(settings, 'PASSWORD_ARKIWEB')
+                and os.path.exists(repository)
+                and "startTime" in request.POST
+                and "product" in request.POST
+                and "level" in request.POST
+                and "endTime" in request.POST
+                and "dataset" in request.POST):
             return HttpResponse(status=500)
         username = settings.USERNAME_ARKIWEB
         password = settings.PASSWORD_ARKIWEB
-        print(request.POST)
-        url = settings.ARKIWEB_URL if hasattr(settings,
-                                              'ARKIWEB_URL') else "https://simc.arpae.it/services/arkiweb/data"
         product = " or ".join(request.POST.getlist("product"))
         level = " or ".join(request.POST.getlist("level"))
         query = "reftime: >= " + request.POST["startTime"] + ",<=" + \
@@ -50,3 +54,27 @@ def render_extract_page(request):
             return HttpResponse(status=204)
         return HttpResponse(status=404)
     return render(request, "extract_page.html")
+
+""""
+def get_db(dsn="report", last=True):
+    from django.utils.module_loading import import_string
+    BORINUD = getattr(settings, 'BORINUD', {})
+    BORINUDLAST = getattr(settings, 'BORINUDLAST', {})
+    dbs = [
+        import_string(i["class"])(**{
+            k: v for k, v in list(i.items()) if k != "class"
+        })
+        for i in (BORINUDLAST[dsn]["SOURCES"] if last else BORINUD[dsn]["SOURCES"])
+    ]
+    return dbs
+
+
+def prova(request):
+    memdb = dballe.DB.connect("sqlite://test.sqlite")
+
+    with memdb.transaction() as tr:
+        for rec in tr.query_data({"var": "B12101", "query": "attrs"}):
+            rec.insert_attrs({"B33196": 1})
+            # rec.remove_attrs(["B33196"])
+    return HttpResponse("success")
+"""
