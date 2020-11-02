@@ -14,7 +14,7 @@ Configuration
 ==================================
 django-dynamic-map-borinud is a reusable django application, so the app needs a django project to run.
 After setting up, your django project, edit your `settings.py` file to include `'dynamic'` in the `INSTALLED_APPS`
-listing.::
+listing::
 
 
     INSTALLED_APPS = [
@@ -23,22 +23,22 @@ listing.::
         'dynamic',
     ]
 
-Edit your `settings.py` file to add borinud web service path (the standard path is "/borinud/api/v1").::
+Edit your `settings.py` file to add borinud web service path (the standard path is "/borinud/api/v1")::
 
 
     BORINUD_URL = "..."
     
-Edit your `settings.py` file to add the wms service path (the standard path is  "http://0.0.0.0:5000/wms").::
+Edit your `settings.py` file to add the wms service path (the standard path is  "http://0.0.0.0:5000/wms")::
 
 
     WMS_URL = "..."
 
-Edit your `settings.py` file to add the repository directory path (the standard path is  "/testgrib").::
+Edit your `settings.py` file to add the repository directory path (the standard path is  "/testgrib")::
 
 
     REPOSITORY_DIR = "..."
     
-Edit your `settings.py` file to add the credentials for arkiweb and the url for arkiweb (standard is 'https://simc.arpae.it/services/arkiweb/data').::
+Edit your `settings.py` file to add the credentials for arkiweb and the url for arkiweb (standard is 'https://simc.arpae.it/services/arkiweb/data')::
 
 
     USERNAME_ARKIWEB = "..."
