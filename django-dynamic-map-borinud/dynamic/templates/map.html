@@ -546,6 +546,14 @@
             return activeFilters
         }
 
+        function clusterCheckInvalid(cluster, bcodeKey) {
+            for (let item in cluster) {
+                if (bcodeKey in cluster[item].data.data[0].vars && "B33196" in cluster[item].data.data[0].vars[bcodeKey].a)
+                    return true
+            }
+            return false
+        }
+
         function itemCheckInvalid(item, bcodeKey) {
             let radioB33196val = parseInt($("input[name='invalidData']:checked").val())
             switch (radioB33196val) {
@@ -647,99 +655,104 @@
 
             let pi2 = Math.PI * 2;
             if ($("#vars").val() === "B11001") {
-                L.Icon.MarkerCluster = L.Icon.extend({
-                    options: {
-                        iconSize: new L.Point(100, 100),
-                        className: 'prunecluster leaflet-markercluster-icon'
-                    },
+                pruneCluster.Cluster.Size = 15;
+                pruneCluster.BuildLeafletClusterIcon = function (cluster) {
+                    let markersCluster = cluster.GetClusterMarkers()
+                    let bcodeKey = $("#vars").val()
+                    L.Icon.MarkerCluster = L.Icon.extend({
+                        options: {
+                            iconSize: new L.Point(100, 100),
+                            className: 'prunecluster leaflet-markercluster-icon'
+                        },
 
-                    createIcon: function () {
-                        let e = document.createElement('canvas');
-                        this._setIconStyles(e, 'icon');
-                        let s = this.options.iconSize;
-                        e.width = s.x;
-                        e.height = s.y;
-                        this.draw(e.getContext('2d'), s.x, s.y);
-                        return e;
-                    },
+                        createIcon: function () {
+                            let e = document.createElement('canvas');
+                            this._setIconStyles(e, 'icon');
+                            let s = this.options.iconSize;
+                            e.width = s.x;
+                            e.height = s.y;
+                            this.draw(e.getContext('2d'), s.x, s.y);
+                            return e;
+                        },
 
-                    createShadow: function () {
-                        return null;
-                    },
+                        createShadow: function () {
+                            return null;
+                        },
 
-                    draw: function (canvas, width, height) {
-                        let windDirections = ["N", "NE", "E", "SE", "S", "SW", "W", "NW",]
-                        canvas.textAlign = 'center';
-                        canvas.textBaseline = 'top';
-                        canvas.font = 'bold 10px sans-serif';
-                        canvas.strokeStyle = "grey";
-                        canvas.lineWidth = 0.5;
-                        canvas.moveTo(50, 5)
-                        canvas.lineTo(50, 95);
-                        canvas.moveTo(5, 50)
-                        canvas.lineTo(95, 50);
-                        canvas.stroke();
-                        canvas.fillStyle = "grey"
-                        canvas.fillText("N", 50, 0, 20);
-                        canvas.textBaseline = 'middle';
-                        canvas.fillText("E", 96, 50, 20);
-                        canvas.textBaseline = 'bottom';
-                        canvas.fillText("S", 50, 100, 20);
-                        canvas.textBaseline = 'middle';
-                        canvas.fillText("W", 4, 50, 20);
-                        for (let i = 0, l = windDirections.length; i < l; ++i) {
-                            let maxHeight = 36
-                            var size = (this.stats[i] * maxHeight) / this.population;
-                            let radiusSize = size < 0 || isNaN(size) ? 0 : size
-                            canvas.beginPath();
-                            canvas.moveTo(50, 50);
-                            canvas.fillStyle = "#58e";
-                            canvas.lineWidth = 1;
-                            canvas.strokeStyle = "black";
-                            switch (i) {
-                                case 0:
-                                    canvas.arc(50, 50, radiusSize + 4, 1.375 * Math.PI, 1.625 * Math.PI);
-                                    break
-                                case 1:
-                                    canvas.arc(50, 50, radiusSize + 4, 1.625 * Math.PI, 1.875 * Math.PI);
-                                    break
-                                case 2:
-                                    canvas.arc(50, 50, radiusSize + 4, 1.875 * Math.PI, 0.125 * Math.PI);
-                                    break
-                                case 3:
-                                    canvas.arc(50, 50, radiusSize + 4, 0.125 * Math.PI, 0.375 * Math.PI);
-                                    break
-                                case 4:
-                                    canvas.arc(50, 50, radiusSize + 4, 0.375 * Math.PI, 0.625 * Math.PI);
-                                    break
-                                case 5:
-                                    canvas.arc(50, 50, radiusSize + 4, 0.625 * Math.PI, 0.875 * Math.PI);
-                                    break
-                                case 6:
-                                    canvas.arc(50, 50, radiusSize + 4, 0.875 * Math.PI, 1.125 * Math.PI);
-                                    break
-                                case 7:
-                                    canvas.arc(50, 50, radiusSize + 4, 1.125 * Math.PI, 1.375 * Math.PI);
-                                    break
+                        draw: function (canvas, width, height) {
+
+                            let windDirections = ["N", "NE", "E", "SE", "S", "SW", "W", "NW",]
+                            canvas.textAlign = 'center';
+                            canvas.textBaseline = 'top';
+                            canvas.font = 'bold 10px sans-serif';
+                            canvas.strokeStyle = "grey";
+                            canvas.lineWidth = 0.5;
+                            canvas.moveTo(50, 5)
+                            canvas.lineTo(50, 95);
+                            canvas.moveTo(5, 50)
+                            canvas.lineTo(95, 50);
+                            canvas.stroke();
+                            canvas.fillStyle = "grey"
+                            canvas.fillText("N", 50, 0, 20);
+                            canvas.textBaseline = 'middle';
+                            canvas.fillText("E", 96, 50, 20);
+                            canvas.textBaseline = 'bottom';
+                            canvas.fillText("S", 50, 100, 20);
+                            canvas.textBaseline = 'middle';
+                            canvas.fillText("W", 4, 50, 20);
+                            for (let i = 0, l = windDirections.length; i < l; ++i) {
+                                let maxHeight = 36
+                                var size = (this.stats[i] * maxHeight) / this.population;
+                                let radiusSize = size < 0 || isNaN(size) ? 0 : size
+                                canvas.beginPath();
+                                canvas.moveTo(50, 50);
+
+                                canvas.fillStyle = "#58e";
+                                if (clusterCheckInvalid(markersCluster, bcodeKey)) {
+                                    canvas.fillStyle = "red";
+                                }
+                                canvas.lineWidth = 1;
+                                canvas.strokeStyle = "black";
+                                switch (i) {
+                                    case 0:
+                                        canvas.arc(50, 50, radiusSize + 4, 1.375 * Math.PI, 1.625 * Math.PI);
+                                        break
+                                    case 1:
+                                        canvas.arc(50, 50, radiusSize + 4, 1.625 * Math.PI, 1.875 * Math.PI);
+                                        break
+                                    case 2:
+                                        canvas.arc(50, 50, radiusSize + 4, 1.875 * Math.PI, 0.125 * Math.PI);
+                                        break
+                                    case 3:
+                                        canvas.arc(50, 50, radiusSize + 4, 0.125 * Math.PI, 0.375 * Math.PI);
+                                        break
+                                    case 4:
+                                        canvas.arc(50, 50, radiusSize + 4, 0.375 * Math.PI, 0.625 * Math.PI);
+                                        break
+                                    case 5:
+                                        canvas.arc(50, 50, radiusSize + 4, 0.625 * Math.PI, 0.875 * Math.PI);
+                                        break
+                                    case 6:
+                                        canvas.arc(50, 50, radiusSize + 4, 0.875 * Math.PI, 1.125 * Math.PI);
+                                        break
+                                    case 7:
+                                        canvas.arc(50, 50, radiusSize + 4, 1.125 * Math.PI, 1.375 * Math.PI);
+                                        break
+                                }
+                                canvas.lineTo(50, 50);
+                                canvas.stroke();
+                                canvas.fill();
+                                canvas.closePath();
+
                             }
-                            canvas.lineTo(50, 50);
+                            canvas.beginPath();
+                            canvas.fillStyle = "#fff";
+                            canvas.arc(50, 50, 4, 0, Math.PI * 2);
                             canvas.stroke();
                             canvas.fill();
                             canvas.closePath();
-
                         }
-                        canvas.beginPath();
-                        canvas.fillStyle = "#fff";
-                        canvas.arc(50, 50, 4, 0, Math.PI * 2);
-                        canvas.stroke();
-                        canvas.fill();
-                        canvas.closePath();
-                    }
-                });
-
-                pruneCluster.Cluster.Size = 15;
-
-                pruneCluster.BuildLeafletClusterIcon = function (cluster) {
+                    });
                     let e = new L.Icon.MarkerCluster();
                     e.stats = cluster.stats;
                     e.population = cluster.population;
@@ -814,8 +827,8 @@
                 pruneCluster.Cluster.Size = 15;
 
                 pruneCluster.BuildLeafletClusterIcon = function (cluster) {
-                    //let markersCluster = cluster.GetClusterMarkers()
-                    //let bcodeKey = $("#vars").val()
+                    let markersCluster = cluster.GetClusterMarkers()
+                    let bcodeKey = $("#vars").val()
                     //let summaryFlag = getQualityFlagSummary(markersCluster, bcodeKey)
                     //let checkInvalid = clusterCheckInvalid(markersCluster, bcodeKey)
                     L.Icon.MarkerCluster = L.Icon.extend({
@@ -839,16 +852,17 @@
                         },
 
                         draw: function (canvas, width, height) {
+                            if (clusterCheckInvalid(markersCluster, bcodeKey)) {
+                                canvas.beginPath();
+                                canvas.arc(50, 50, 30, 0, 2 * Math.PI);
+                                canvas.fillStyle = "rgba(255, 51, 51, 0.5)";
+                                canvas.fill()
+                                canvas.strokeStyle = "rgba(255, 51, 51, 1)";
+                                canvas.stroke();
+                            }
 
                             /*
-                                                        if (summaryFlag.B33196 > 0) {
-                                                            canvas.beginPath();
-                                                            canvas.arc(50, 50, 30, 0, 2 * Math.PI);
-                                                            canvas.fillStyle = "rgba(255, 51, 51, 0.5)";
-                                                            canvas.fill()
-                                                            canvas.strokeStyle = "rgba(255, 51, 51, 1)";
-                                                            canvas.stroke();
-                                                        }
+
                                                         //if (summaryFlag.B33192 !== -Infinity) {
                                                         canvas.beginPath();
                                                         canvas.arc(50, 22, 18, 0, 2 * Math.PI);
@@ -904,6 +918,7 @@
                                     canvas.arc(50, 50, 22, from, to);
                                     start = to;
                                     canvas.lineTo(50, 50);
+                                    canvas.strokeStyle = "black";
                                     canvas.stroke();
                                     canvas.fill();
                                     canvas.closePath();
