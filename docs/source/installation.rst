@@ -53,3 +53,5 @@ Edit your project `urls.py` file to import the URLs::
 
         path('dynamic/', include('dynamic.urls')),
     ]
+
+Add "dynamic.can_extract" permission to the accounts that can download the gribs from the extract-page.
