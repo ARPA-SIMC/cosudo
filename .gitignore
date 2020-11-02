@@ -8,3 +8,4 @@ django-dynamic-map-borinud/dynamic/db.sqlite3
 __pycache__/
 *.py[cod]
 *$py.class
+/docs/build/

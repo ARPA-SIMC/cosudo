@@ -1,0 +1,2 @@
+# Additional requeriments related to the documentation build only
+sphinx
