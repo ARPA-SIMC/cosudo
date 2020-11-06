@@ -33,41 +33,51 @@
                 </h1>
                 <div class="pt-2">
                     Select date and hour:
-                    <div class="d-flex flex-row justify-content-between my-1">
-                        <button id="lessTime" class="btn btn-link"><i class="fa fa-arrow-left"></i></button>
-                        <div class="position-relative mr-2">
-                            <input type="text" id="datetimepicker"
-                                   class="form-control form-control-sm datetimepicker-input col-xs-10 to-disable"
-                                   data-target="#datetimepicker" data-toggle="datetimepicker"/>
+                    <div class="d-flex flex-row justify-content-center my-1">
+
+                        <div class="d-flex flex-column justify-content-between">
+                            <button id="lessTime" class="btn btn-link"><i class="fa fa-arrow-up"></i></button>
+                            <div class="position-relative mr-2">
+                                <input type="text" id="datetimepicker"
+                                       class="form-control form-control-sm datetimepicker-input col-xs-10 to-disable "
+                                       data-target="#datetimepicker" data-toggle="datetimepicker"/>
+                            </div>
+                            <button id="moreTime" class="btn btn-link"><i class="fa fa-arrow-down"></i></button>
+
                         </div>
-                        <select class="form-control form-control-sm to-disable w-auto" id="hour" name="hour">
-                            <option value="*">*</option>
-                            <option value="00">00</option>
-                            <option value="01">01</option>
-                            <option value="02">02</option>
-                            <option value="03">03</option>
-                            <option value="04">04</option>
-                            <option value="05">05</option>
-                            <option value="06">06</option>
-                            <option value="07">07</option>
-                            <option value="08">08</option>
-                            <option value="09">09</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
-                            <option value="15">15</option>
-                            <option value="16">16</option>
-                            <option value="17">17</option>
-                            <option value="18">18</option>
-                            <option value="19">19</option>
-                            <option value="20">20</option>
-                            <option value="21">21</option>
-                            <option value="22">22</option>
-                            <option value="23">23</option>
-                        </select>
-                        <button id="moreTime" class="btn btn-link"><i class="fa fa-arrow-right"></i></button>
+                        <div class="d-flex flex-column justify-content-between">
+                            <button id="lessHour" class="btn btn-link"><i class="fa fa-arrow-up"></i></button>
+                            <select class="form-control form-control-sm to-disable w-auto updateOnClick" id="hour"
+                                    name="hour">
+                                <option value="*">*</option>
+                                <option value="00">00</option>
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                            </select>
+                            <button id="moreHour" class="btn btn-link"><i class="fa fa-arrow-down"></i></button>
+                        </div>
+
                     </div>
 
                     <div class="form-group">
@@ -92,7 +102,7 @@
                     </div>
                     <div class="form-group">
                         <label for="ident">Ident</label>
-                        <select id="ident" class="form-control form-control-sm " name="ident">
+                        <select id="ident" class="form-control form-control-sm updateOnClick" name="ident">
                             <option value="*">*</option>
                         </select>
                     </div>
@@ -100,7 +110,7 @@
 
                     <div class="form-group">
                         <label for="lon_lat" style="width: 100%">Lon lat</label>
-                        <select id="lon_lat" class="form-control form-control-sm " name="lon_lat">
+                        <select id="lon_lat" class="form-control form-control-sm updateOnClick" name="lon_lat">
                             <option value="*">*</option>
                         </select>
                     </div>
@@ -108,7 +118,8 @@
 
                     <div class="form-group">
                         <label for="network" style="width: 100%">Network</label>
-                        <select id="network" class="form-control form-control-sm to-disable" name="network">
+                        <select id="network" class="form-control form-control-sm to-disable updateOnClick"
+                                name="network">
                             <option value="*">*</option>
                         </select>
                     </div>
@@ -116,7 +127,7 @@
                     <div hidden>
                         <div class="form-group">
                             <label for="date" style="width: 100%">Date</label>
-                            <select class="form-control form-control-sm to-disable" id="date" name="date">
+                            <select class="form-control form-control-sm to-disable updateOnClick" id="date" name="date">
                                 <option value="*">*</option>
                             </select>
                         </div>
@@ -125,7 +136,7 @@
 
                     <div class="form-group">
                         <label for="vars" style="width: 100%">Vars</label>
-                        <select class="form-control form-control-sm to-disable" id="vars" name="vars">
+                        <select class="form-control form-control-sm to-disable updateOnClick" id="vars" name="vars">
                             <option value="*">*</option>
                         </select>
                     </div>
@@ -133,7 +144,8 @@
 
                     <div class="form-group">
                         <label for="timerange" style="width: 100%">Timerange</label>
-                        <select class="form-control form-control-sm to-disable" id="timerange" name="timerange">
+                        <select class="form-control form-control-sm to-disable updateOnClick" id="timerange"
+                                name="timerange">
                             <option value="*">*</option>
                         </select>
                     </div>
@@ -141,7 +153,7 @@
 
                     <div class="form-group">
                         <label for="level" style="width: 100%">Level</label>
-                        <select class="form-control form-control-sm to-disable" id="level" name="level">
+                        <select class="form-control form-control-sm to-disable updateOnClick" id="level" name="level">
                             <option value="*">*</option>
                         </select>
                     </div>
@@ -149,18 +161,11 @@
 
                     <div class="form-group">
                         <label for="dsn" style="width: 100%">DSN</label>
-                        <select class="form-control form-control-sm " id="dsn" name="dsn">
-                            <option value="report_fixed">report</option>
-                            <option value="sample_fixed">sample</option>
+                        <select class="form-control form-control-sm updateOnClick" id="dsn" name="dsn">
+                            <option value="report_fixed">report_fixed</option>
+                            <option value="sample_fixed">sample_fixed</option>
                         </select>
                     </div>
-                    <div class="form-group" hidden>
-                        <label for="hours" style="width: 100%">Hours</label>
-                        <select class="form-control form-control-sm to-disable" id="hours" name="hours">
-                            <option value="*">*</option>
-                        </select>
-                    </div>
-
 
                     <div class="row">
                         <div class="col-12 text-center">
@@ -640,7 +645,7 @@
 
         function filterData() {
             overlay.fadeIn(300);
-            let date = $("select[name='hours']").val()
+            let date = selectedHour
             let vSliderB33192 = [sliderB33192.slider("values", 0), sliderB33192.slider("values", 1)];
             let vSliderB33193 = [sliderB33193.slider("values", 0), sliderB33193.slider("values", 1)];
             let vSliderB33194 = [sliderB33194.slider("values", 0), sliderB33194.slider("values", 1)];
@@ -883,6 +888,23 @@
                             style: {backgroundColor: getColor(data.value, min, max)}
                         })
                     );
+                    let bcodeKey = $("#vars").val()
+                    if (bcodeKey in data.data[0].vars && "B33196" in data.data[0].vars[bcodeKey].a) {
+                        vallen += 4
+                        leafletMarker.setIcon(
+                            L.extendedDivIcon({
+                                iconSize: new L.Point(vallen, 18),
+                                labelAnchor: [vallen / 2, 0],
+                                html: val,
+                                className: 'myDivIcon',
+                                style: {
+                                    backgroundColor: getColor(data.value, min, max),
+                                    borderColor: "rgba(255, 51, 51, 1)",
+                                    borderWidth: "2px"
+                                }
+                            })
+                        );
+                    }
                     leafletMarker.bindTooltip(data.date.toString());
                 };
 
@@ -1071,6 +1093,24 @@
                             style: {backgroundColor: getColor(data.value, min, max)}
                         })
                     );
+                    let bcodeKey = $("#vars").val()
+
+                    if (bcodeKey in data.data[0].vars && "B33196" in data.data[0].vars[bcodeKey].a) {
+                        vallen += 4
+                        leafletMarker.setIcon(
+                            L.extendedDivIcon({
+                                iconSize: new L.Point(vallen, 18),
+                                labelAnchor: [vallen / 2, 0],
+                                html: val,
+                                className: 'myDivIcon',
+                                style: {
+                                    backgroundColor: getColor(data.value, min, max),
+                                    borderColor: "rgba(255, 51, 51, 1)",
+                                    borderWidth: "2px"
+                                }
+                            })
+                        );
+                    }
                     leafletMarker.bindTooltip(data.date.toString());
                     {% if perms.dynamic.can_edit_attributes %}
                         leafletMarker.on("contextmenu", function () {
@@ -1282,6 +1322,7 @@
                             url: url,
                             dataType: "json",
                             success: function (collection) {
+                                hours = ["*"]
                                 lastResults = collection
                                 legend.remove();
                                 pruneCluster.RemoveMarkers();
@@ -1301,6 +1342,36 @@
                                             "userunit": ""
                                         }
                                     }
+                                    collection.forEach((item) => {
+                                        if (hours.indexOf(item.date) === -1)
+                                            hours.push(item.date);
+                                    })
+
+                                    hours.sort(function (a, b) {
+                                        return new Date(a) - new Date(b);
+                                    });
+                                    let sliderLabels = [...hours].map((item) => {
+                                        if (item !== "*")
+                                            return moment(item).format("HH:mm:ss")
+                                        return item
+                                    })
+                                    $("#sliderTime").slider("option", "max", sliderLabels.length - 1).slider('pips', {
+                                        first: 'label',
+                                        last: 'label',
+                                        rest: 'pip',
+                                        labels: sliderLabels,
+                                        step: 1,
+                                        prefix: "",
+                                        suffix: ""
+                                    }).slider('float', {
+                                        handle: true,
+                                        pips: true,
+                                        labels: sliderLabels,
+                                        prefix: "",
+                                        suffix: ""
+                                    }).slider("value", 0);
+
+
                                     populateMap(collection)
 
                                 }
@@ -1404,6 +1475,8 @@
         var radioB33196 = $("input[name='invalidData']")
         var lastResults = []
         var selectedMarkers = []
+        var hours = []
+        var selectedHour = "*"
         createSliderFilter(sliderB33192)
         switchFilter(sliderB33192, checkFilterB33192)
         createSliderFilter(sliderB33193)
@@ -1467,6 +1540,7 @@
                 },
                 locale: 'it'
             });
+
             $(document.body).on("click", ".validateButton", function () {
                 let id = this.id
                 let initialDate = $('#inputStartDateI').val()
@@ -1578,6 +1652,62 @@
         $(document.body).on("mouseout", ".slider-control", function () {
             map.dragging.enable();
         });
+        $(document.body).on("change", ".updateOnClick", function () {
+            updateMap()
+        });
+        $("#moreTime").on("click", function () {
+            let date = $('#datetimepicker').datetimepicker('viewDate')
+            let nextDate = date.add(+1, 'days')
+            let enabledDates = [...new Set(dynamicFormPopulation.select_values_lists.date)]
+            if (enabledDates.includes(moment(nextDate).format("YYYY-MM-DD"))) {
+                $('#datetimepicker').datetimepicker('date', nextDate)
+
+            }
+        })
+        $("#lessTime").on("click", function () {
+            let date = $('#datetimepicker').datetimepicker('viewDate')
+            let nextDate = date.add(-1, 'days')
+            let enabledDates = [...new Set(dynamicFormPopulation.select_values_lists.date)]
+            if (enabledDates.includes(moment(nextDate).format("YYYY-MM-DD"))) {
+                $('#datetimepicker').datetimepicker('date', nextDate)
+
+            }
+        })
+        $("#moreHour").on("click", function () {
+            let length = $("#hour > option").length
+            if ($("#hour")[0].selectedIndex + 1 < length)
+                $("#hour")[0].selectedIndex += 1
+            else
+                $("#hour")[0].selectedIndex = 0
+            updateMap()
+
+        })
+        $("#lessHour").on("click", function () {
+            let length = $("#hour > option").length
+            if ($("#hour")[0].selectedIndex - 1 > 0)
+                $("#hour")[0].selectedIndex -= 1
+            else
+                $("#hour")[0].selectedIndex = length - 1
+            updateMap()
+        })
+        $('#datetimepicker').on('change.datetimepicker', function (e) {
+            let selected_date = e.date.toDate();
+            selected_date = moment(selected_date).format("YYYY-MM-DD")
+            if (selected_date !== dynamicFormPopulation.selected_values.date) {
+                $(`#date >option[value="${selected_date}"]`).prop("selected", "selected").change()
+            }
+        });
+
+
+        $("#sliderTime").slider({
+            value: 0,
+            min: 0,
+            max: 1,
+            slide: function (event, ui) {
+                selectedHour = hours[ui.value]
+            },
+            step: 1,
+        })
 
 
         $.ajax({
@@ -1590,7 +1720,7 @@
                     dynamicFormPopulation.select_values_lists.lon_lat.push(r.lon + "," + r.lat);
                     dynamicFormPopulation.select_values_lists.network.push(r.network + "");
                     dynamicFormPopulation.select_values_lists.date.push(r.date[0].substring(0, 10) + "")
-                    dynamicFormPopulation.select_values_lists.hours.push(r.date[0])
+                    //dynamicFormPopulation.select_values_lists.hours.push(r.date[0])
                     let d = r.data[0];
                     dynamicFormPopulation.select_values_lists.vars.push(Object.keys(d.vars)[0] + "");
                     dynamicFormPopulation.select_values_lists.timerange.push(d.timerange + "");
@@ -1603,6 +1733,10 @@
                     dynamicFormPopulation.select_values_lists.level.push(level + "");
                 }
                 dynamicFormPopulation.populateForm(undefined);
+                let enabledDates = Object.keys($('#datetimepicker').datetimepicker('enabledDates')).sort((a, b) => new Date(b) - new Date(a))
+                let lastDate = enabledDates[0]
+                $('#datetimepicker').datetimepicker('date', new Date(lastDate))
+
             },
             beforeSend: function () {
                 overlay.fadeIn(300);

@@ -6,14 +6,12 @@ class DynamicFormPopulation {
             ident: "*",
             lon_lat: "*",
             network: "*",
-            date: today.getFullYear() + "-" +
-                ((today.getMonth() + 1 < 10) ? '0' + (today.getMonth() + 1) : '' + (today.getMonth() + 1)) + "-" +
-                ((today.getDate() < 10) ? '0' + (today.getDate()) : '' + (today.getDate())),
+            date: "1999-01-01",
             hour: "*",
             vars: "*",
             timerange: "*",
             level: "*",
-            dsn: "report_fixed"
+            dsn: "report_fixed",
         };
         this.select_values_lists = {
             ident: [],
@@ -26,23 +24,14 @@ class DynamicFormPopulation {
             timerange: [],
             level: [],
             dsn: ["report_fixed", "sample_fixed"],
-            hours: []
         };
-        let id_select_list = ["ident", "lon_lat", "network", "date", "vars", "timerange", "level", "hours"];
+        let id_select_list = ["ident", "lon_lat", "network", "date", "vars", "timerange", "level"];
         for (let id of id_select_list) {
             $("select[name=" + id + "]").on("change", function () {
                 self.populateForm(this)
             })
         }
-        $("#sliderTime").slider({
-            value: 0,
-            min: 0,
-            max: 1,
-            slide: function (event, ui) {
-                $("select[name='hours']")[0].selectedIndex = ui.value
-            },
-            step: 1,
-        })
+
         $("select[name='dsn']").on("change", function () {
             if (this && this.id === "dsn") {
                 self.selected_values["dsn"] = this.value;
@@ -60,35 +49,15 @@ class DynamicFormPopulation {
                 vertical: 'bottom'
             },
             format: 'L',
-            defaultDate: moment(this.selected_values.date, "YYYY/MM/DD"), //this.selected_values.date,
+            //defaultDate: moment(this.selected_values.date, "YYYY/MM/DD"), //this.selected_values.date,
             locale: 'it'
         });
-        $('#datetimepicker').on('change.datetimepicker datetimepicker.change', function (e) {
-            // set on hidden field the selected date  and call function that update all filed using onchenge vent
-            let selected_date = e.date.toDate();
-            selected_date = selected_date.getFullYear() + "-" +
-                ((selected_date.getMonth() + 1 < 10) ? '0' + (selected_date.getMonth() + 1) : '' + (selected_date.getMonth() + 1)) + "-" +
-                ((selected_date.getDate() < 10) ? '0' + (selected_date.getDate()) : '' + (selected_date.getDate()))
-            let select = document.getElementById("date");
-            let opt = document.createElement('option');
-            opt.value = selected_date;
-            opt.innerHTML = selected_date;
-            opt.selected = true;
-            select.appendChild(opt);
-            select.dispatchEvent(new Event('change'));
-        });
-        $("#moreTime").on("click", function () {
-            let date = $('#datetimepicker').datetimepicker('viewDate')
-            $('#datetimepicker').datetimepicker('date', date.add(1, 'days'))
-        })
-        $("#lessTime").on("click", function () {
-            let date = $('#datetimepicker').datetimepicker('viewDate')
-            $('#datetimepicker').datetimepicker('date', date.add(-1, 'days'))
-        })
+
+
     }
 
     populateForm(e) {
-        let id_select_list = ["ident", "lon_lat", "network", "date", "vars", "timerange", "level", "hours"];
+        let id_select_list = ["ident", "lon_lat", "network", "date", "vars", "timerange", "level"];
         for (let id of id_select_list) {
             if (e && e.id === id) {
                 this.selected_values[id] = document.getElementById(id).selectedOptions[0].value;
@@ -127,35 +96,6 @@ class DynamicFormPopulation {
                 }
                 select.appendChild(opt);
 
-                //append distinct option to select
-              //  console.log(unique)
-                if (id === "hours") {
-                    unique.sort(function (a, b) {
-                        return new Date(a) - new Date(b);
-                    });
-                    let sliderLabels = ["*", ...unique].map((item) => {
-                        if (item !== "*")
-                            return moment(item).format("HH:mm:ss")
-                        return item
-                    })
-                    $("#sliderTime").slider("option", "max", sliderLabels.length - 1).slider('pips', {
-                        first: 'label',
-                        last: 'label',
-                        rest: 'pip',
-                        labels: sliderLabels,
-                        step: 1,
-                        prefix: "",
-                        suffix: ""
-                    }).slider('float', {
-                        handle: true,
-                        pips: true,
-                        labels: sliderLabels,
-                        prefix: "",
-                        suffix: ""
-                    }).slider("value",0);
-
-
-                }
                 for (var i = 0; i < unique.length; i++) {
                     let opt = document.createElement('option');
                     opt.value = unique[i];
