@@ -6,8 +6,10 @@ import requests
 from django.http import HttpResponse
 import os
 from django.contrib.auth.decorators import login_required, permission_required
-#import dballe
-
+from django.views.decorators.csrf import csrf_exempt
+import json
+import dballe
+import datetime
 
 def render_map(request):
     url = settings.BORINUD_URL if hasattr(settings, 'BORINUD_URL') else "/borinud/api/v1"
@@ -55,7 +57,46 @@ def render_extract_page(request):
         return HttpResponse(status=404)
     return render(request, "extract_page.html")
 
-""""
+
+@csrf_exempt
+@login_required
+@permission_required('dynamic.can_extract')
+def manual_edit_attributes(request):
+    if request.method == 'POST':
+        try:
+            json_str = request.body.decode('utf-8')
+            data = json.loads(json_str)
+        except ValueError:
+            return JsonResponse({"error": "Error decoding json"})
+        startDate = datetime.datetime.strptime(data["initialDate"], '%Y-%m-%dT%H:%M:%S.%fZ')
+        endDate = datetime.datetime.strptime(data["finalDate"], '%Y-%m-%dT%H:%M:%S.%fZ')
+        dataObj = data["data"]
+        type = data["type"]
+        memdb = dballe.DB.connect("sqlite://test.sqlite")
+        with memdb.transaction() as tr:
+            for row in dataObj:
+                query_params = {"var": row["var"],
+                                "datetimemin": startDate,
+                                "ident": row["ident"],
+                                # "network": row["network"],
+                                "lon": int(row["lon"]),
+                                "lat": int(row["lat"]),
+                                #"level": tuple(map(int, row["level"].replace("(", "").replace(")", "").split(','))),
+                                "trange": tuple(map(int, row["trange"].replace("(", "").replace(")", "").split(','))),
+                                "query": "attrs"
+                                }
+                if endDate != "":
+                    query_params["datetimemax"] = endDate
+                for rec in tr.query_data(query_params):
+                    print(rec)
+                    if type == "invalidate":
+                        rec.insert_attrs({"B33196": 1})
+                    else:
+                        rec.remove_attrs(["B33196"])
+        return HttpResponse("success")
+    return HttpResponse(status=404)
+
+
 def get_db(dsn="report", last=True):
     from django.utils.module_loading import import_string
     BORINUD = getattr(settings, 'BORINUD', {})
@@ -69,6 +110,7 @@ def get_db(dsn="report", last=True):
     return dbs
 
 
+""""
 def prova(request):
     memdb = dballe.DB.connect("sqlite://test.sqlite")
 

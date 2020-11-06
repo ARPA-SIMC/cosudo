@@ -13,7 +13,7 @@ class DynamicFormPopulation {
             vars: "*",
             timerange: "*",
             level: "*",
-            dsn: "report"
+            dsn: "report_fixed"
         };
         this.select_values_lists = {
             ident: [],
@@ -25,7 +25,7 @@ class DynamicFormPopulation {
             vars: [],
             timerange: [],
             level: [],
-            dsn: ["report", "sample"],
+            dsn: ["report_fixed", "sample_fixed"],
             hours: []
         };
         let id_select_list = ["ident", "lon_lat", "network", "date", "vars", "timerange", "level", "hours"];

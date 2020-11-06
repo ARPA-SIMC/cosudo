@@ -17,6 +17,9 @@
             <ul role="tablist">
                 <li class="active"><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
                 <li><a href="#filter" role="tab"><i class="fa fa-filter"></i></a></li>
+                {% if perms.dynamic.can_edit_attributes %}
+                    <li><a href="#attributes" role="tab"><i class="fa fa-pencil"></i></a></li>
+                {% endif %}
             </ul>
 
         </div>
@@ -145,10 +148,10 @@
 
 
                     <div class="form-group">
-                        <label for="dsn" style="width: 100%">DNS</label>
+                        <label for="dsn" style="width: 100%">DSN</label>
                         <select class="form-control form-control-sm " id="dsn" name="dsn">
-                            <option value="report">report</option>
-                            <option value="sample">sample</option>
+                            <option value="report_fixed">report</option>
+                            <option value="sample_fixed">sample</option>
                         </select>
                     </div>
                     <div class="form-group" hidden>
@@ -268,6 +271,70 @@
 
                 </div>
             </div>
+            {% if perms.dynamic.can_edit_attributes %}
+                <div class="sidebar-pane" id="attributes">
+                    <h1 class="sidebar-header">
+                        Edit attributes
+                        <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                    </h1>
+                    <div class="pt-2">
+                        <div class="form-group">
+                            <label for="startDateI">Initial date</label>
+                            <div class="input-group date" id="startDateI" data-target-input="nearest">
+                                <input type="text" id="inputStartDateI" class="form-control datetimepicker-input"
+                                       data-target="#startDateI"/>
+                                <div class="input-group-append" data-target="#startDateI"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="startDateI">Final date</label>
+                            <div class="input-group date" id="finalDateI" data-target-input="nearest">
+                                <input type="text" id="inputFinalDateI" class="form-control datetimepicker-input"
+                                       data-target="#finalDateI"/>
+                                <div class="input-group-append" data-target="#finalDateI"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="my-2 d-flex flex-row justify-content-between">
+                            <button id="validate" class="btn btn-outline-success w-100 mr-1 validateButton">Validate
+                            </button>
+
+                            <button id="invalidate" class="btn btn-outline-danger w-100 ml-1 validateButton">
+                                Invalidate
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered table-hover table-striped" id="selectedData">
+                                <caption>Selected data</caption>
+                                <thead>
+                                <tr>
+                                    <th>
+                                        <button class="btn btn-sm btn-danger" id="removeAll"><i
+                                                class="fa fa-trash"></i></button>
+                                    </th>
+                                    <th>Ident</th>
+                                    <th>Longitudine</th>
+                                    <th>Latitudine</th>
+                                    <th>network</th>
+                                    <th>Timerange</th>
+                                    <th>Level</th>
+                                    <th>Var</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -363,7 +430,7 @@
 
                 }
             })
-            if (dynamicFormPopulation.selected_values.dsn === 'sample' || dynamicFormPopulation.selected_values.dsn === 'report') {
+            if (dynamicFormPopulation.selected_values.dsn === 'sample_fixed' || dynamicFormPopulation.selected_values.dsn === 'report_fixed') {
                 let {dateFrom, dateUntil} = selectedDateFormat()
                 let urlGraph = `{{url_borinud}}/geojson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
                     `${null2_(data.network)}/${data.trange[0] +
@@ -633,6 +700,36 @@
 
         }
 
+        function normalizeString(val) {
+            if (val === null)
+                return "0"
+            return val.toString()
+        }
+
+        function checkIfInTable(data) {
+            let trElements = [data.ident === null ? "null" : data.ident, normalizeString(data.lon), normalizeString(data.lat), data.network, `(${normalizeString(data.trange[0])},${normalizeString(data.trange[1])},${normalizeString(data.trange[2])})`, `(${normalizeString(data.level[0])},${normalizeString(data.level[1])},${normalizeString(data.level[2])},${normalizeString(data.level[3])})`, Object.keys(data.data[0].vars)[0]]
+            let trSelector = $("#selectedData > tbody > tr")
+            let returnValue = false
+            trSelector.each((index, element) => {
+                let equal = true
+                for (let i = 1; i < trElements.length; i++) {
+                    let cellText = $(element).find(`td:eq(${i})`).text()
+                    if (cellText !== trElements[i - 1])
+                        equal = false
+                }
+                if (equal)
+                    return returnValue = true
+            })
+            return returnValue
+        }
+
+        function addToTable(data) {
+            let trSelector = $("#selectedData > tbody > tr")
+            let newTr = `<tr><td><button class="btn btn-sm btn-danger removeFromTable"><i class="fa fa-trash"></i></button></td><td>${data.ident}</td><td>${normalizeString(data.lon)}</td><td>${normalizeString(data.lat)}</td><td>${data.network}</td><td>(${normalizeString(data.trange[0])},${normalizeString(data.trange[1])},${normalizeString(data.trange[2])})</td><td>(${normalizeString(data.level[0])},${normalizeString(data.level[1])},${normalizeString(data.level[2])},${normalizeString(data.level[3])})</td><td>${Object.keys(data.data[0].vars)[0]}</td></tr>`
+            if (!checkIfInTable(data) || trSelector.length === 0) {
+                $("#selectedData tbody").prepend(newTr)
+            }
+        }
 
         function populateMap(collection) {
             legend.remove();
@@ -975,6 +1072,11 @@
                         })
                     );
                     leafletMarker.bindTooltip(data.date.toString());
+                    {% if perms.dynamic.can_edit_attributes %}
+                        leafletMarker.on("contextmenu", function () {
+                            addToTable(data)
+                        })
+                    {% endif %}
                 };
 
                 $.each(collection, function (i, feature) {
@@ -989,10 +1091,10 @@
                             marker.data.value = item.vars[dynamicFormPopulation.selected_values.vars].v
                             marker.data.trange = item.timerange
                             marker.data.level = item.level
+                            marker.data.selected = false
                         }
                     })
                     marker.category = getColorIndex(marker.data.value, min, max);
-
                     pruneCluster.RegisterMarker(marker);
                 });
             }
@@ -1181,7 +1283,10 @@
                             dataType: "json",
                             success: function (collection) {
                                 lastResults = collection
+                                legend.remove();
+                                pruneCluster.RemoveMarkers();
                                 if (collection.length <= 0) {
+                                    pruneCluster.RedrawIcons();
                                     toastr.warning('Nessun risultato!')
                                 } else {
                                     if (dynamicFormPopulation.selected_values.vars !== "*") {
@@ -1270,6 +1375,22 @@
             }
         }
 
+        function isMarkerInsidePolygon(marker, poly) {
+            let polyPoints = poly.getLatLngs()[0];
+            let x = marker.position.lat, y = marker.position.lng;
+
+            let inside = false;
+            for (let i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+                let xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+                let xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+                let intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+
+            return inside;
+        };
+
 
         var pruneCluster = new PruneClusterForLeaflet();
         PruneCluster.Cluster.ENABLE_MARKERS_LIST = true
@@ -1282,6 +1403,7 @@
         var checkFilterB33194 = $("#checkFilterB33194")
         var radioB33196 = $("input[name='invalidData']")
         var lastResults = []
+        var selectedMarkers = []
         createSliderFilter(sliderB33192)
         switchFilter(sliderB33192, checkFilterB33192)
         createSliderFilter(sliderB33193)
@@ -1295,7 +1417,119 @@
             //timeDimensionControlOptions: {position: "bottomright"}
             times: [$("#hours").val() ? $("#hours").val() !== "*" : new Date()]
         }).setView([43, 11], 13);
+        {% if perms.dynamic.can_edit_attributes %}
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            var drawControl = new L.Control.Draw({
+                draw: {
+                    marker: false,
+                    circlemarker: false,
+                    polyline: false,
+                    circle: false,
+                    rectangle: false
+                },
+                edit: {
+                    featureGroup: drawnItems,
+                    edit: false,
+                    remove: false
+                }
+            });
+            map.addControl(drawControl);
+            map.on(L.Draw.Event.CREATED, function (e) {
+                    overlay.fadeIn(300);
+                    pruneCluster.Cluster._markers.forEach((marker) => {
+                        if (isMarkerInsidePolygon(marker, e.layer)) {
+                            addToTable(marker.data)
+                        }
+                    })
+                    overlay.fadeOut(300)
+                }
+            );
+            $(document.body).on("click", ".removeFromTable", function () {
+                $(this).closest("tr").remove()
+            })
+            $(document.body).on("click", "#removeAll", function () {
+                let r = confirm("Do you want to deselect everything")
+                if (r)
+                    $("#selectedData > tbody").html("")
+            })
+            $('#startDateI').datetimepicker({
+                widgetPositioning: {
+                    horizontal: 'left',
+                    vertical: 'bottom'
+                },
+                locale: 'it'
+            });
+            $('#finalDateI').datetimepicker({
+                widgetPositioning: {
+                    horizontal: 'left',
+                    vertical: 'bottom'
+                },
+                locale: 'it'
+            });
+            $(document.body).on("click", ".validateButton", function () {
+                let id = this.id
+                let initialDate = $('#inputStartDateI').val()
+                let finalDate = $("#inputFinalDateI").val()
+                let table = $("#selectedData > tbody > tr")
+                let check = true
+                if (table.length <= 0) {
+                    toastr.warning("Select data to validate/invalidate")
+                } else {
+                    if (initialDate !== "") {
+                        let payload = {
+                            initialDate: moment.utc(initialDate, "DD-MM-YYYY HH:mm").toDate(),
+                            finalDate: "",
+                            data: [],
+                            type: id
+                        }
+                        if (finalDate !== "") {
+                            payload.finalDate = moment.utc(finalDate, "DD-MM-YYYY HH:mm").toDate()
+                            if (payload.finalDate.getTime() <= payload.initialDate.getTime())
+                                check = false
+                        }
+                        if (check) {
+                            table.each((index, tr) => {
+                                payload.data.push({
+                                    ident: $(tr).find('td:eq(1)').text(),
+                                    lon: $(tr).find('td:eq(2)').text(),
+                                    lat: $(tr).find('td:eq(3)').text(),
+                                    network: $(tr).find('td:eq(4)').text(),
+                                    trange: $(tr).find('td:eq(5)').text(),
+                                    level: $(tr).find('td:eq(6)').text(),
+                                    "var": $(tr).find('td:eq(7)').text(),
+                                })
+                            })
+                            console.log(payload)
+                            $.ajax({
+                                type: "POST",
+                                url: "{% url "manual-edit-attrs" %}",
+                                data: JSON.stringify(payload),
+                                contentType: "application/json; charset=utf-8",
+                                headers: {
+                                    "X-CSRFToken": "{{csrftoken}}"
+                                },
+                                dataType: "json",
+                                success: function (data) {
+                                    alert(data);
+                                    $("#searchButton").trigger("click")
+                                },
+                                error: function (errMsg) {
+                                    console.log(errMsg);
+                                }
+                            });
+                            table.remove()
+                        } else {
+                            toastr.warning("Final date has to be smaller than initial date")
+                        }
+                    } else {
+                        toastr.warning("Set the initial date")
+                    }
+                }
 
+                console.log(finalDate, initialDate)
+            })
+        {% endif %}
         L.control.zoom({position: 'topright'}).addTo(map);
         L.control.sidebar('sidebar').addTo(map);
         var sliderTimeControl = L.Control.extend({
@@ -1367,11 +1601,6 @@
                         return level
                     })
                     dynamicFormPopulation.select_values_lists.level.push(level + "");
-                }
-                for (let key in dynamicFormPopulation.select_values_lists.day_hour) {
-                    dynamicFormPopulation.select_values_lists.day_hour[key].sort(function (a, b) {
-                        return new Date(a) - new Date(b);
-                    });
                 }
                 dynamicFormPopulation.populateForm(undefined);
             },
