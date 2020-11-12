@@ -3,7 +3,7 @@ from django.conf import settings
 from http.client import HTTPSConnection
 from base64 import b64encode
 import requests
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import os
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.csrf import csrf_exempt
@@ -11,10 +11,17 @@ import json
 import dballe
 import datetime
 
+
 def render_map(request):
     url = settings.BORINUD_URL if hasattr(settings, 'BORINUD_URL') else "/borinud/api/v1"
     url_wms = settings.WMS_URL if hasattr(settings, 'WMS_URL') else "http://0.0.0.0:5000/wms"
     return render(request, "map.html", {"url_borinud": url, "url_wms": url_wms})
+
+
+def render_map2(request):
+    url = settings.BORINUD_URL if hasattr(settings, 'BORINUD_URL') else "/borinud/api/v1"
+    url_wms = settings.WMS_URL if hasattr(settings, 'WMS_URL') else "http://0.0.0.0:5000/wms"
+    return render(request, "map2.html", {"url_borinud": url, "url_wms": url_wms})
 
 
 def render_map_validation(request):
@@ -68,33 +75,72 @@ def manual_edit_attributes(request):
             data = json.loads(json_str)
         except ValueError:
             return JsonResponse({"error": "Error decoding json"})
-        startDate = datetime.datetime.strptime(data["initialDate"], '%Y-%m-%dT%H:%M:%S.%fZ')
-        endDate = datetime.datetime.strptime(data["finalDate"], '%Y-%m-%dT%H:%M:%S.%fZ')
         dataObj = data["data"]
         type = data["type"]
         memdb = dballe.DB.connect("sqlite://test.sqlite")
         with memdb.transaction() as tr:
             for row in dataObj:
-                query_params = {"var": row["var"],
-                                "datetimemin": startDate,
-                                "ident": row["ident"],
-                                # "network": row["network"],
+                query_params = {"var": list(row["data"][0]["vars"].keys())[0],
+                                "ident": row["ident"] if row["ident"] != "null" else "-",
+                                "rep_memo": row["network"],
                                 "lon": int(row["lon"]),
                                 "lat": int(row["lat"]),
-                                #"level": tuple(map(int, row["level"].replace("(", "").replace(")", "").split(','))),
-                                "trange": tuple(map(int, row["trange"].replace("(", "").replace(")", "").split(','))),
-                                "query": "attrs"
+                                "level": dballe.Level(row["level"][0], row["level"][1], row["level"][2],
+                                                      row["level"][3]),
+                                "trange": dballe.Trange(row["trange"][0], row["trange"][1], row["trange"][2]),
+                                "query": "attrs",
+                                "datetime": datetime.datetime.strptime(row["date"], '%Y-%m-%dT%H:%M:%S')
                                 }
-                if endDate != "":
-                    query_params["datetimemax"] = endDate
                 for rec in tr.query_data(query_params):
                     print(rec)
                     if type == "invalidate":
                         rec.insert_attrs({"B33196": 1})
                     else:
                         rec.remove_attrs(["B33196"])
-        return HttpResponse("success")
-    return HttpResponse(status=404)
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False})
+
+
+@csrf_exempt
+@login_required
+@permission_required('dynamic.can_extract')
+def manual_edit_attributes_station(request):
+    if request.method == 'POST':
+        try:
+            json_str = request.body.decode('utf-8')
+            data = json.loads(json_str)
+        except ValueError:
+            return JsonResponse({"error": "Error decoding json"})
+        dataObj = data["data"]
+        type = data["type"]
+        print(type)
+        startDate = datetime.datetime.strptime(data["initialDate"], '%Y-%m-%dT%H:%M:%S.%fZ')
+        endDate =data["finalDate"]
+        memdb = dballe.DB.connect("sqlite://test.sqlite")
+        with memdb.transaction() as tr:
+            for row in dataObj:
+                query_params = {"var": row["var"],
+                                "ident": row["ident"] if row["ident"] != "null" else "-",
+                                "rep_memo": row["network"],
+                                "lon": int(row["lon"]),
+                                "lat": int(row["lat"]),
+                                "level": dballe.Level(row["level"][0], row["level"][1], row["level"][2],
+                                                      row["level"][3]),
+                                "trange": dballe.Trange(row["trange"][0], row["trange"][1], row["trange"][2]),
+                                "query": "attrs",
+                                "datetimemin": startDate
+                                }
+                if endDate!="":
+                    query_params["datetimemax"] = datetime.datetime.strptime(endDate, '%Y-%m-%dT%H:%M:%S.%fZ')
+                    print(query_params)
+                for rec in tr.query_data(query_params):
+                    print(rec)
+                    if type == "invalidate":
+                        rec.insert_attrs({"B33196": 1})
+                    else:
+                        rec.remove_attrs(["B33196"])
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False})
 
 
 def get_db(dsn="report", last=True):
