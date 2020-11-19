@@ -28,7 +28,7 @@ EditStationView.prototype.initEvents = function () {
         let initialDate = $('#inputStartDateI').val()
         let finalDate = $("#inputFinalDateI").val()
         let check = true
-        let id = this.id === "validateStations"? "validate"  : "invalidate"
+        let id = this.id === "validateStations" ? "validate" : "invalidate"
         let data = self.data.getAll()
         if (data.length <= 0) {
             toastr.warning("Select stations to validate/invalidate")
@@ -63,7 +63,7 @@ EditStationView.prototype.initEvents = function () {
                                                         return null
                                                     return parseInt(level)
                                                 }),
-                                            "trange": trange.split(",").map((tr)=>parseInt(tr)),
+                                            "trange": trange.split(",").map((tr) => parseInt(tr)),
                                             "var": vars
                                         })
                                     })
@@ -83,6 +83,8 @@ EditStationView.prototype.initEvents = function () {
                                 if (data.success) {
                                     $.Topic("station-remove-all").publish();
                                     toastr.success("Done!")
+                                    $.Topic("edit-station-history-reload").publish();
+
                                 } else {
                                     toastr.error("Something went wrong!")
                                     console.log(data);

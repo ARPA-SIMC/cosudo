@@ -57,6 +57,7 @@ EditDataView.prototype.publishers = function () {
                 success: function (data) {
                     if (data.success) {
                         $.Topic("data-remove-all").publish();
+                         $.Topic("edit-data-history-reload").publish();
                         toastr.success("Done!")
                     } else {
                         toastr.error("Something went wrong!")

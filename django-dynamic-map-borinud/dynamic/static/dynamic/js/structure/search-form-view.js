@@ -29,7 +29,6 @@ SearchFormView.prototype.initEvents = function () {
     });
 
     function populateForm(e) {
-        console.log(e)
         let date = moment(dateTimePickerSel.datetimepicker("viewDate")).format("YYYY-MM-DD")
         let index_list = []
         values["date"].forEach((item, index) => {
@@ -128,15 +127,15 @@ SearchFormView.prototype.initEvents = function () {
 
 }
 SearchFormView.prototype.render = function (filteredValues, eId) {
+    console.log(filteredValues)
     const self = this
     $(".search-form").each((index, select) => {
         let id = select.id
-        console.log(id,eId)
-        if (id !== eId) {
-            let selectedValue = $(select).val()
-            selectedValue = selectedValue === undefined ? "*" : selectedValue
+        let selectedValue = $(select).val()
+        selectedValue = selectedValue === undefined ? "*" : selectedValue
+        console.log(id, eId)
+        if (id !== eId || selectedValue ==="*") {
             $(select).find('option').remove()
-
             $(select).append(`<option value="*">*</option>`)
             if (selectedValue === "*")
                 $(select).find("option[value='*']").prop("selected", "selected")

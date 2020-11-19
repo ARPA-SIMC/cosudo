@@ -1,16 +1,3 @@
-function normalizeString(val) {
-    if (val === null)
-        return "0"
-    return val.toString()
-}
-
-function getArrayStrings(data) {
-    return [data.ident,
-        normalizeString(data.lon),
-        normalizeString(data.lat),
-        data.network]
-}
-
 let EditStationCollection = function () {
     // Here we store the Wish objects
     this.data = [];
@@ -18,6 +5,14 @@ let EditStationCollection = function () {
 
 
 EditStationCollection.prototype.add = function (data, vars, trange, level) {
+
+    function getArrayStrings(data) {
+        return [data.ident,
+            normalizeString(data.lon),
+            normalizeString(data.lat),
+            data.network]
+    }
+
     if (!(this.data.map((item) => JSON.stringify(getArrayStrings(item))).includes(JSON.stringify(getArrayStrings(data)))))
         this.data.push(data);
 };
