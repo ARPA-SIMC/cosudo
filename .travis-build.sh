@@ -10,6 +10,7 @@ then
 elif [[ $image =~ ^fedora: ]]
 then
     dnf update -q -y
+    dnf install -q -y dnf-plugin-copr
     dnf install -q -y 'dnf-command(copr)'
     dnf copr enable -q -y simc/stable
 fi
