@@ -65,3 +65,13 @@ Add the following configuration for django-rest-framework ::
         'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
         'PAGE_SIZE': 15
         }
+
+Skinny-wms installation
+==================================
+
+To install skinny-wms, download the following repo "https://github.com/gianpieropa/skinnywms".
+Follow the instructions listed in the readme.md of the project.
+Then to run skinny-wms use the following command (using the same path you used for the REPOSITORY_DIR of django-dynamic-map-borinud::
+
+    python demo.py --path REPOSITORY_DIR
+
