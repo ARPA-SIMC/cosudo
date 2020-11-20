@@ -15,6 +15,8 @@ Source0: https://github.com/arpa-simc/cosudo/archive/v%{version}.tar.gz
 Requires: %{python3_vers}
 Requires: %{python3_vers}-requests
 Requires: %{python3_vers}-django
+Requires: %{python3_vers}-django-rest-framework
+Requires: dballe
 BuildRequires:  %{python3_vers}-devel
 BuildRequires:  %{python3_vers}-setuptools
 BuildArch:      noarch

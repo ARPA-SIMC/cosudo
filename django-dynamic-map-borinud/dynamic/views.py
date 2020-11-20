@@ -3,16 +3,25 @@ from django.conf import settings
 from http.client import HTTPSConnection
 from base64 import b64encode
 import requests
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import os
 from django.contrib.auth.decorators import login_required, permission_required
-#import dballe
+from django.views.decorators.csrf import csrf_exempt
+import json
+import dballe
+import datetime
+from dynamic.models import StationEdit, DataEdit, Edit
+from rest_framework import viewsets
+from rest_framework import permissions
+from dynamic.serializers import EditSerializer
 
 
 def render_map(request):
     url = settings.BORINUD_URL if hasattr(settings, 'BORINUD_URL') else "/borinud/api/v1"
     url_wms = settings.WMS_URL if hasattr(settings, 'WMS_URL') else "http://0.0.0.0:5000/wms"
     return render(request, "map.html", {"url_borinud": url, "url_wms": url_wms})
+
+
 
 
 def render_map_validation(request):
@@ -55,26 +64,109 @@ def render_extract_page(request):
         return HttpResponse(status=404)
     return render(request, "extract_page.html")
 
-""""
-def get_db(dsn="report", last=True):
-    from django.utils.module_loading import import_string
-    BORINUD = getattr(settings, 'BORINUD', {})
-    BORINUDLAST = getattr(settings, 'BORINUDLAST', {})
-    dbs = [
-        import_string(i["class"])(**{
-            k: v for k, v in list(i.items()) if k != "class"
-        })
-        for i in (BORINUDLAST[dsn]["SOURCES"] if last else BORINUD[dsn]["SOURCES"])
-    ]
-    return dbs
+
+@csrf_exempt
+@login_required
+@permission_required('dynamic.can_extract')
+def manual_edit_attributes(request):
+    if request.method == 'POST':
+        try:
+            json_str = request.body.decode('utf-8')
+            data = json.loads(json_str)
+        except ValueError:
+            return JsonResponse({"error": "Error decoding json"})
+        dataObj = data["data"]
+        type = data["type"]
+        memdb = dballe.DB.connect("sqlite://test.sqlite")
+        edit_obj = Edit(type="i" if type == "invalidate" else "v")
+        edit_obj.save()
+        with memdb.transaction() as tr:
+            for row in dataObj:
+                query_params = {"var": list(row["data"][0]["vars"].keys())[0],
+                                "ident": row["ident"] if row["ident"] != "null" else None,
+                                "rep_memo": row["network"],
+                                "lon": int(row["lon"]),
+                                "lat": int(row["lat"]),
+                                "level": dballe.Level(row["level"][0], row["level"][1], row["level"][2],
+                                                      row["level"][3]),
+                                "trange": dballe.Trange(row["trange"][0], row["trange"][1], row["trange"][2]),
+                                "query": "attrs",
+                                "datetime": datetime.datetime.strptime(row["date"], '%Y-%m-%dT%H:%M:%S')
+                                }
+                print(query_params)
+                DataEdit(var=query_params["var"], ident=query_params["ident"], network=query_params["rep_memo"],
+                         lon=query_params["lon"], lat=query_params["lat"], level=query_params["level"],
+                         trange=query_params["trange"], date=query_params["datetime"], edit=edit_obj).save()
+                for rec in tr.query_data(query_params):
+                    print(rec)
+                    if type == "invalidate":
+                        rec.insert_attrs({"B33196": 1})
+                    else:
+                        rec.remove_attrs(["B33196"])
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False})
 
 
-def prova(request):
-    memdb = dballe.DB.connect("sqlite://test.sqlite")
+@csrf_exempt
+@login_required
+@permission_required('dynamic.can_extract')
+def manual_edit_attributes_station(request):
+    if request.method == 'POST':
+        try:
+            json_str = request.body.decode('utf-8')
+            data = json.loads(json_str)
+        except ValueError:
+            return JsonResponse({"error": "Error decoding json"})
+        dataObj = data["data"]
+        type = data["type"]
+        print(type)
+        startDate = datetime.datetime.strptime(data["initialDate"], '%Y-%m-%dT%H:%M:%S.%fZ')
+        endDate = data["finalDate"]
+        memdb = dballe.DB.connect("sqlite://test.sqlite")
+        edit_obj = Edit(type="i" if type == "invalidate" else "v", data_type="s", startDate=startDate)
+        if endDate != "":
+            edit_obj.finalDate = datetime.datetime.strptime(endDate, '%Y-%m-%dT%H:%M:%S.%fZ')
+        edit_obj.save()
+        with memdb.transaction() as tr:
+            for row in dataObj:
+                query_params = {"var": row["var"],
+                                "ident": row["ident"] if row["ident"] != "null" else None,
+                                "rep_memo": row["network"],
+                                "lon": int(row["lon"]),
+                                "lat": int(row["lat"]),
+                                "level": dballe.Level(row["level"][0], row["level"][1], row["level"][2],
+                                                      row["level"][3]),
+                                "trange": dballe.Trange(row["trange"][0], row["trange"][1], row["trange"][2]),
+                                "query": "attrs",
+                                "datetimemin": startDate
+                                }
+                edit_station = StationEdit(var=query_params["var"], ident=query_params["ident"],
+                                           network=query_params["rep_memo"],
+                                           lon=query_params["lon"], lat=query_params["lat"],
+                                           level=query_params["level"],
+                                           trange=query_params["trange"], startDate=query_params["datetimemin"],
+                                           edit=edit_obj)
+                if endDate != "":
+                    query_params["datetimemax"] = datetime.datetime.strptime(endDate, '%Y-%m-%dT%H:%M:%S.%fZ')
+                    edit_station.finalDate = query_params["datetimemax"]
+                edit_station.save()
+                for rec in tr.query_data(query_params):
+                    print(rec)
+                    if type == "invalidate":
+                        rec.insert_attrs({"B33196": 1})
+                    else:
+                        rec.remove_attrs(["B33196"])
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False})
 
-    with memdb.transaction() as tr:
-        for rec in tr.query_data({"var": "B12101", "query": "attrs"}):
-            rec.insert_attrs({"B33196": 1})
-            # rec.remove_attrs(["B33196"])
-    return HttpResponse("success")
-"""
+
+class EditViewSet(viewsets.ModelViewSet):
+    serializer_class = EditSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Edit.objects.all().order_by('-created_date')
+        type = self.request.query_params.get('type', None)
+        if type is not None:
+            queryset = queryset.filter(data_type=type)
+        return queryset

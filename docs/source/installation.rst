@@ -13,13 +13,13 @@ To install run the following commands in a terminal::
 Configuration
 ==================================
 django-dynamic-map-borinud is a reusable django application, so the app needs a django project to run.
-After setting up, your django project, edit your `settings.py` file to include `'dynamic'` in the `INSTALLED_APPS`
+After setting up, your django project, edit your `settings.py` file to include `'dynamic'` and `'rest_framework'` in the `INSTALLED_APPS`
 listing::
 
 
     INSTALLED_APPS = [
         ...
-
+        'rest_framework',
         'dynamic',
     ]
 
@@ -55,3 +55,23 @@ Edit your project `urls.py` file to import the URLs::
     ]
 
 Add "dynamic.can_extract" permission to the accounts that can download the gribs from the extract-page.
+
+Add the following configuration for django-rest-framework ::
+
+    REST_FRAMEWORK = {
+        'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.IsAuthenticated',
+        ),
+        'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+        'PAGE_SIZE': 15
+        }
+
+Skinny-wms installation
+==================================
+
+To install skinny-wms, download the following repo "https://github.com/gianpieropa/skinnywms".
+Follow the instructions listed in the readme.md of the project.
+Then to run skinny-wms use the following command (using the same path you used for the REPOSITORY_DIR of django-dynamic-map-borinud::
+
+    python demo.py --path REPOSITORY_DIR
+

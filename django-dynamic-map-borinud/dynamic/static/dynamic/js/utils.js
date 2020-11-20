@@ -100,6 +100,53 @@ function windClassification(speedValue) {
 
 let windColors = ["rgb(203,201,226)", "rgb(158,154,200)", "rgb(106,81,163)"]
 
+function normalizeString(val) {
+    if (val === null)
+        return "0"
+    return val.toString()
+}
+
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    }
+});
+
+function isMarkerInsidePolygon(marker, poly) {
+    let polyPoints = poly.getLatLngs()[0];
+    let x = marker.position.lat, y = marker.position.lng;
+
+    let inside = false;
+    for (let i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+        let xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+        let xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+        let intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+
+    return inside;
+};
+
 /*
     $("#sidebar").resizable({
         handles: 'e', stop: function (e, ui) {

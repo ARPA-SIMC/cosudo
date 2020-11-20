@@ -17,6 +17,10 @@
             <ul role="tablist">
                 <li class="active"><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
                 <li><a href="#filter" role="tab"><i class="fa fa-filter"></i></a></li>
+                {% if perms.dynamic.can_edit_attributes %}
+                    <li><a href="#attributes" role="tab"><i class="fa fa-pencil"></i></a></li>
+                    <li><a href="#edit-history" role="tab"><i class="fa fa-history"></i></a></li>
+                {% endif %}
             </ul>
 
         </div>
@@ -30,57 +34,70 @@
                 </h1>
                 <div class="pt-2">
                     Select date and hour:
-                    <div class="d-flex flex-row justify-content-between my-1">
-                        <button id="lessTime" class="btn btn-link"><i class="fa fa-arrow-left"></i></button>
-                        <div class="position-relative mr-2">
-                            <input type="text" id="datetimepicker"
-                                   class="form-control form-control-sm datetimepicker-input col-xs-10 to-disable"
-                                   data-target="#datetimepicker" data-toggle="datetimepicker"/>
+                    <div class="d-flex flex-row justify-content-center my-1">
+
+                        <div class="d-flex flex-column justify-content-between">
+                            <button id="lessTime" class="btn btn-link"><i class="fa fa-arrow-up"></i></button>
+                            <div class="position-relative mr-2">
+                                <input type="text" id="datetimepicker"
+                                       class="form-control form-control-sm datetimepicker-input col-xs-10 to-disable "
+                                       data-target="#datetimepicker" data-toggle="datetimepicker"/>
+                            </div>
+                            <button id="moreTime" class="btn btn-link"><i class="fa fa-arrow-down"></i></button>
+
                         </div>
-                        <select class="form-control form-control-sm to-disable w-auto" id="hour" name="hour">
-                            <option value="*">*</option>
-                            <option value="00">00</option>
-                            <option value="01">01</option>
-                            <option value="02">02</option>
-                            <option value="03">03</option>
-                            <option value="04">04</option>
-                            <option value="05">05</option>
-                            <option value="06">06</option>
-                            <option value="07">07</option>
-                            <option value="08">08</option>
-                            <option value="09">09</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
-                            <option value="15">15</option>
-                            <option value="16">16</option>
-                            <option value="17">17</option>
-                            <option value="18">18</option>
-                            <option value="19">19</option>
-                            <option value="20">20</option>
-                            <option value="21">21</option>
-                            <option value="22">22</option>
-                            <option value="23">23</option>
-                        </select>
-                        <button id="moreTime" class="btn btn-link"><i class="fa fa-arrow-right"></i></button>
+                        <div class="d-flex flex-column justify-content-between">
+                            <button id="lessHour" class="btn btn-link"><i class="fa fa-arrow-up"></i></button>
+                            <select class="form-control form-control-sm to-disable w-auto updateOnClick" id="hour"
+                                    name="hour">
+                                <option value="*" selected>*</option>
+                                <option value="00">00</option>
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                            </select>
+                            <button id="moreHour" class="btn btn-link"><i class="fa fa-arrow-down"></i></button>
+                        </div>
+
                     </div>
 
                     <div class="form-group">
                         Type of object:<br>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" checked type="radio" name="objectToShow" id="inlineRadio2"
+                            <input class="form-check-input updateOnClick" checked type="radio" name="objectToShow"
+                                   id="inlineRadio2"
                                    value="data">
                             <label class="form-check-label" for="inlineRadio2">Data</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="objectToShow" id="inlineRadio1"
+                            <input class="form-check-input updateOnClick" type="radio" name="objectToShow"
+                                   id="inlineRadio1"
                                    value="stations">
                             <label class="form-check-label" for="inlineRadio1">Stations</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="objectToShow" id="inlineRadio3"
+                            <input class="form-check-input updateOnClick" type="radio" name="objectToShow"
+                                   id="inlineRadio3"
                                    value="constantStationData">
                             <label class="form-check-label" for="inlineRadio3">
                                 Constant station data</label>
@@ -89,75 +106,63 @@
                     </div>
                     <div class="form-group">
                         <label for="ident">Ident</label>
-                        <select id="ident" class="form-control form-control-sm " name="ident">
-                            <option value="*">*</option>
+                        <select id="ident" class="form-control form-control-sm updateOnClick search-form" name="ident">
+                            <option value="*" selected>*</option>
                         </select>
                     </div>
 
 
                     <div class="form-group">
                         <label for="lon_lat" style="width: 100%">Lon lat</label>
-                        <select id="lon_lat" class="form-control form-control-sm " name="lon_lat">
-                            <option value="*">*</option>
+                        <select id="lon_lat" class="form-control form-control-sm updateOnClick search-form"
+                                name="lon_lat">
+                            <option value="*" selected>*</option>
                         </select>
                     </div>
 
 
                     <div class="form-group">
                         <label for="network" style="width: 100%">Network</label>
-                        <select id="network" class="form-control form-control-sm to-disable" name="network">
-                            <option value="*">*</option>
+                        <select id="network" class="form-control form-control-sm  updateOnClick search-form"
+                                name="network">
+                            <option value="*" selected>*</option>
                         </select>
                     </div>
 
-                    <div hidden>
-                        <div class="form-group">
-                            <label for="date" style="width: 100%">Date</label>
-                            <select class="form-control form-control-sm to-disable" id="date" name="date">
-                                <option value="*">*</option>
-                            </select>
-                        </div>
-                    </div>
-
-
                     <div class="form-group">
                         <label for="vars" style="width: 100%">Vars</label>
-                        <select class="form-control form-control-sm to-disable" id="vars" name="vars">
-                            <option value="*">*</option>
+                        <select class="form-control form-control-sm to-disable updateOnClick search-form" id="vars"
+                                name="vars">
+                            <option value="*" selected>*</option>
                         </select>
                     </div>
 
 
                     <div class="form-group">
                         <label for="timerange" style="width: 100%">Timerange</label>
-                        <select class="form-control form-control-sm to-disable" id="timerange" name="timerange">
-                            <option value="*">*</option>
+                        <select class="form-control form-control-sm to-disable updateOnClick search-form" id="timerange"
+                                name="timerange">
+                            <option value="*" selected>*</option>
                         </select>
                     </div>
 
 
                     <div class="form-group">
                         <label for="level" style="width: 100%">Level</label>
-                        <select class="form-control form-control-sm to-disable" id="level" name="level">
-                            <option value="*">*</option>
+                        <select class="form-control form-control-sm to-disable updateOnClick search-form" id="level"
+                                name="level">
+                            <option value="*" selected>*</option>
                         </select>
                     </div>
 
 
                     <div class="form-group">
-                        <label for="dsn" style="width: 100%">DNS</label>
-                        <select class="form-control form-control-sm " id="dsn" name="dsn">
-                            <option value="report">report</option>
-                            <option value="sample">sample</option>
+                        <label for="dsn" style="width: 100%">DSN</label>
+                        <select class="form-control form-control-sm updateOnClick" id="dsn" name="dsn">
+                            <option value="report_fixed">report_fixed</option>
+                            <option value="sample_fixed">sample_fixed</option>
                         </select>
                     </div>
-                    <div class="form-group" hidden>
-                        <label for="hours" style="width: 100%">Hours</label>
-                        <select class="form-control form-control-sm to-disable" id="hours" name="hours">
-                            <option value="*">*</option>
-                        </select>
-                    </div>
-
 
                     <div class="row">
                         <div class="col-12 text-center">
@@ -173,11 +178,6 @@
                                     GRAPH
                                 </div>
                             </button>
-                            <button class="btn btn-outline-success btn-block" id="searchButton" onclick="updateMap();">
-                                <div class="d-flex flex-row justify-content-between"><i class="fa fa-search"></i> SEARCH
-                                </div>
-                            </button>
-
 
                         </div>
 
@@ -200,12 +200,12 @@
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" name="invalidData" value="0" type="radio"
                                        id="invalidData1"
-                                       checked>
+                                >
                                 <label class="form-check-label" for="invalidData1">All</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" name="invalidData" value="1" type="radio"
-                                       id="invalidData2">
+                                       id="invalidData2" checked>
                                 <label class="form-check-label" for="invalidData2">Only valid</label>
                             </div>
                             <div class="form-check form-check-inline">
@@ -268,6 +268,204 @@
 
                 </div>
             </div>
+            {% if perms.dynamic.can_edit_attributes %}
+                <div class="sidebar-pane" id="attributes">
+                    <h1 class="sidebar-header">
+                        Edit attributes
+                        <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                    </h1>
+                    <ul class="nav nav-tabs nav-fill mt-2 edit-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active " id="data-tab" data-toggle="tab" href="#data" role="tab"
+                               aria-controls="data" aria-selected="true">Data</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link edit-tabs" id="stations-tab" data-toggle="tab" href="#stations"
+                               role="tab"
+                               aria-controls="stations" aria-selected="false">Stations</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="data-tab">
+                            <div class="pt-2">
+
+                                <div class="my-2 d-flex flex-row justify-content-between">
+                                    <button id="validate" class="btn btn-outline-success w-100 mr-1 validateButton">
+                                        Validate
+                                    </button>
+
+                                    <button id="invalidate" class="btn btn-outline-danger w-100 ml-1 validateButton">
+                                        Invalidate
+                                    </button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered table-hover table-striped"
+                                           id="selectedData">
+                                        <caption>Selected data</caption>
+                                        <thead>
+                                        <tr>
+                                            <th>
+                                                <button class="btn btn-sm btn-danger" id="removeAll"><i
+                                                        class="fa fa-trash"></i></button>
+                                            </th>
+                                            <th>Ident</th>
+                                            <th>Longitudine</th>
+                                            <th>Latitudine</th>
+                                            <th>network</th>
+                                            <th>Timerange</th>
+                                            <th>Level</th>
+                                            <th>Var</th>
+                                            <th>Date</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="stations" role="tabpanel" aria-labelledby="stations-tab">
+                            <div class="pt-2">
+                                <div class="form-group">
+                                    <label for="startDateI">Initial date</label>
+                                    <div class="input-group date" id="startDateI" data-target-input="nearest">
+                                        <input type="text" id="inputStartDateI"
+                                               class="form-control datetimepicker-input"
+                                               data-target="#startDateI"/>
+                                        <div class="input-group-append" data-target="#startDateI"
+                                             data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="startDateI">Final date</label>
+                                    <div class="input-group date" id="finalDateI" data-target-input="nearest">
+                                        <input type="text" id="inputFinalDateI"
+                                               class="form-control datetimepicker-input"
+                                               data-target="#finalDateI"/>
+                                        <div class="input-group-append" data-target="#finalDateI"
+                                             data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="varsInvalidation" style="width: 100%">Vars</label>
+                                    <select class="form-control form-control-sm"
+                                            id="varsInvalidation" style="height: 200px"
+                                            name="varsInvalidation" multiple>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="trangeInvalidation" style="width: 100%">Timerange</label>
+                                    <select class="form-control form-control-sm"
+                                            id="trangeInvalidation" style="height: 200px"
+                                            name="trangeInvalidation" multiple>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="levelInvalidation" style="width: 100%">Level</label>
+                                    <select class="form-control form-control-sm"
+                                            id="levelInvalidation"
+                                            name="levelInvalidation" multiple>
+                                    </select>
+                                </div>
+                                <div class="my-2 d-flex flex-row justify-content-between">
+                                    <button id="validateStations"
+                                            class="btn btn-outline-success w-100 mr-1 validateButtonStations">
+                                        Validate
+                                    </button>
+
+                                    <button id="invalidateStations"
+                                            class="btn btn-outline-danger w-100 ml-1 validateButtonStations">
+                                        Invalidate
+                                    </button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered table-hover table-striped"
+                                           id="selectedStations">
+                                        <caption>Selected stations</caption>
+                                        <thead>
+                                        <tr>
+                                            <th>
+                                                <button class="btn btn-sm btn-danger" id="removeAllStations"><i
+                                                        class="fa fa-trash"></i></button>
+                                            </th>
+                                            <th>Ident</th>
+                                            <th>Longitudine</th>
+                                            <th>Latitudine</th>
+                                            <th>network</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="sidebar-pane" id="edit-history">
+                    <h1 class="sidebar-header">
+                        Edit history
+                        <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                    </h1>
+                    <ul class="nav nav-tabs nav-fill mt-2 edit-history-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active " id="data-history-tab" data-toggle="tab" href="#data-history"
+                               role="tab"
+                               aria-controls="data" aria-selected="true">Data</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link edit-tabs" id="stations-history-tab" data-toggle="tab"
+                               href="#stations-history"
+                               role="tab"
+                               aria-controls="stations" aria-selected="false">Stations</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="history-tab-content">
+                        <div class="tab-pane fade show active" id="data-history" role="tabpanel"
+                             aria-labelledby="data-history-tab">
+                            <div class="pt-2">
+                                <div class="card">
+                                    <ul class="list-group list-group-flush" id="data-history-list">
+
+                                    </ul>
+                                </div>
+                                <div class="d-flex flex-row justify-content-between">
+                                    <button class="btn btn-link" data-url="" id="prevHistoryData"><i
+                                            class="fa fa-arrow-left"></i></button>
+                                    <button class="btn btn-link" data-url="" id="nextHistoryData"><i
+                                            class="fa fa-arrow-right"></i></button>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="stations-history" role="tabpanel"
+                             aria-labelledby="stations-history-tab">
+                            <div class="pt-2">
+                                <div class="card">
+                                    <ul class="list-group list-group-flush" id="station-history-list">
+
+                                    </ul>
+                                </div>
+                                <div class="d-flex flex-row justify-content-between">
+                                    <button class="btn btn-link" data-url="" id="prevHistoryStation"><i
+                                            class="fa fa-arrow-left"></i></button>
+                                    <button class="btn btn-link" data-url="" id="nextHistoryStation"><i
+                                            class="fa fa-arrow-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -316,185 +514,149 @@
     </div>
 {% endblock %}
 {% block javascript %}
-    <script src="{% static 'dynamic/js/DynamicFormPopulation.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/publish-subscribe.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-data-collection.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-data-view.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-station-history-collection.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-station-history-view.js' %}"></script>
+      <script src="{% static 'dynamic/js/structure/edit-data-history-collection.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-data-history-view.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-station-collection.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-station-view.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/search-form.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/search-form-view.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/map-view.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-tab-view.js' %}"></script>
     <script>
-        function createSliderFilter(element) {
-            element.slider({
-                disabled: true,
-                values: [0, 10],
-                min: 0,
-                range: true,
-                max: 10,
-                step: 1,
-            }).slider("pips").slider("float");
-        }
+        $(function () {
+            const pruneCluster = new PruneClusterForLeaflet();
+            const pruneClusterStations = new PruneClusterForLeaflet();
+            PruneCluster.Cluster.ENABLE_MARKERS_LIST = true
+            const map = L.map('map', {
+                zoomControl: false,
+                timeDimension: true,
+                //timeDimensionControl: true,
+                //timeDimensionControlOptions: {position: "bottomright"}
+                times: [$("#hours").val() ? $("#hours").val() !== "*" : new Date()]
+            }).setView([43, 11], 13);
+            var legend = L.control({position: 'bottomright'});
 
-        function switchFilter(slider, checkbox) {
-            checkbox.change(function () {
-                if (this.checked) {
-                    slider.slider('enable');
-                } else {
-                    slider.slider('disable');
+            L.control.zoom({position: 'topright'}).addTo(map);
+            L.control.sidebar('sidebar').addTo(map);
+            var sliderTimeControl = L.Control.extend({
+                options: {position: 'bottomleft'},
+                onAdd: function (map) {
+                    var el = L.DomUtil.create('div', 'leaflet-bar slider-control');
+                    el.innerHTML = '<div id="sliderTime"></div>';
+                    return el;
                 }
-            })
-        }
+            });
+            map.addControl(new sliderTimeControl());
 
-        function setpopup(data) {
-            let popupText = "<div>" +
-                "Ident: " + null2_(data.ident) +
-                "<br>Lon: " + data.lon / 100000 +
-                "<br>Lat: " + data.lat / 100000 +
-                "<br>Network: " + data.network +
-                "<br>Trange: " + borinud.config.trange.describe(data.trange[0], data.trange[1], data.trange[2]) +
-                "<br>Level: " + borinud.config.level.describe(data.level[0], data.level[1], data.level[2], data.level[3]) +
-                "<br>Date: " + data.date
-            data.data.forEach((item) => {
-                for (let key in item.vars) {
-                    let b = borinud.config.B[key];
-                    popupText += "<br>Var: " + b.description + " " + item.vars[key].v + " (" + b.unit + ")";
-                    if (Object.keys(item.vars[key].a).length > 0) {
-                        popupText += "<br><ul>"
-                        for (let keyAttr in item.vars[key].a) {
-                            let attr = item.vars[key].a[keyAttr];
-                            popupText += keyAttr + ": " + attr;
-                        }
-                        popupText += "</ul>"
+            var layers = {};
+            var opacityControls = {};
+            const overlay = $("#overlay")
+
+
+            const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay)
+            mapView.initEvents()
+            {% if perms.dynamic.can_edit_attributes %}
+                const editDataCollection = new EditDataCollection();
+                editDataCollection.subscribe();
+
+                const editDataView = new EditDataView(editDataCollection, map, pruneCluster, overlay);
+                editDataView.initEvents();
+
+                const editStationCollection = new EditStationCollection();
+                editStationCollection.subscribe();
+
+                const editStationView = new EditStationView(editStationCollection, map, pruneClusterStations, overlay);
+                editStationView.initEvents();
+
+                const editTabView = new EditTabView("{{url_borinud}}", map, pruneCluster, overlay, pruneClusterStations)
+                editTabView.initEvents()
+
+                const editStationHistoryCollection = new EditStationHistoryCollection();
+                editStationHistoryCollection.subscribe();
+
+                const editStationHistoryView = new EditStationHistoryView(editStationHistoryCollection, map);
+                editStationHistoryView.initEvents();
+
+                const editDataHistoryCollection = new EditDataHistoryCollection();
+                editDataHistoryCollection.subscribe();
+
+                const editDataHistoryView = new EditDataHistoryView(editDataHistoryCollection, map);
+                editDataHistoryView.initEvents();
+
+                var drawnItems = new L.FeatureGroup();
+                map.addLayer(drawnItems);
+                var drawControl = new L.Control.Draw({
+                    draw: {
+                        marker: false,
+                        circlemarker: false,
+                        polyline: false,
+                        circle: false,
+                        rectangle: false
+                    },
+                    edit: {
+                        featureGroup: drawnItems,
+                        edit: false,
+                        remove: false
                     }
-
-                }
-            })
-            if (dynamicFormPopulation.selected_values.dsn === 'sample' || dynamicFormPopulation.selected_values.dsn === 'report') {
-                let {dateFrom, dateUntil} = selectedDateFormat()
-                let urlGraph = `{{url_borinud}}/geojson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
-                    `${null2_(data.network)}/${data.trange[0] +
-                    "," + data.trange[1] + "," + data.trange[2]}/${null2_(data.level[0]) + "," + null2_(data.level[1]) + "," +
-                    null2_(data.level[2]) + "," + null2_(data.level[3])}/${dynamicFormPopulation.selected_values.vars}/` +
-                    `timeseries/${dynamicFormPopulation.selected_values.date.split("-")[0]}/${dynamicFormPopulation.selected_values.date.split("-")[1]}/${dynamicFormPopulation.selected_values.date.split("-")[2]}` +
-                    `${dynamicFormPopulation.selected_values.hour !== "*" ? "/" + dynamicFormPopulation.selected_values.hour : ""}?dsn=${dynamicFormPopulation.selected_values.dsn}`
-
-                let headerModal = "Ident: " + null2_(data.ident) + " Coords: " + data.lat + "," + data.lon +
-                    " Network:" + null2_(data.network)
-                    + "<br>" + borinud.config.trange.describe(data.trange[0], data.trange[1], data.trange[2]) + "<br>"
-                    + borinud.config.level.describe(data.level[0], data.level[1], data.level[2], data.level[3]) + "<br>" + dateFrom + " - " + dateUntil + "GMT"
-                popupText += '<br><button onclick="showGraph(\'' + urlGraph + '\',\'' + headerModal + '\')" type="button" class="btn btn-primary btn-block open-graph" >Show graph</button>';
-
-                if (dynamicFormPopulation.selected_values.vars === "B11001" || dynamicFormPopulation.selected_values.vars === "B11002") {
-                    let urlDirWind = `{{url_borinud}}/dbajson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
-                        `${null2_(data.network)}/${data.trange[0] +
-                        "," + data.trange[1] + "," + data.trange[2]}/${null2_(data.level[0]) + "," + null2_(data.level[1]) + "," +
-                        null2_(data.level[2]) + "," + null2_(data.level[3])}/B11001/` +
-                        `timeseries/${dynamicFormPopulation.selected_values.date.split("-")[0]}/${dynamicFormPopulation.selected_values.date.split("-")[1]}/${dynamicFormPopulation.selected_values.date.split("-")[2]}` +
-                        `${dynamicFormPopulation.selected_values.hour !== "*" ? "/" + dynamicFormPopulation.selected_values.hour : ""}?dsn=${dynamicFormPopulation.selected_values.dsn}`
-                    let urlSpeedWind = `{{url_borinud}}/dbajson/${null2_(data.ident)}/${data.lon + "," + data.lat}/` +
-                        `${null2_(data.network)}/${data.trange[0] +
-                        "," + data.trange[1] + "," + data.trange[2]}/${null2_(data.level[0]) + "," + null2_(data.level[1]) + "," +
-                        null2_(data.level[2]) + "," + null2_(data.level[3])}/B11002/` +
-                        `timeseries/${dynamicFormPopulation.selected_values.date.split("-")[0]}/${dynamicFormPopulation.selected_values.date.split("-")[1]}/${dynamicFormPopulation.selected_values.date.split("-")[2]}` +
-                        `${dynamicFormPopulation.selected_values.hour !== "*" ? "/" + dynamicFormPopulation.selected_values.hour : ""}?dsn=${dynamicFormPopulation.selected_values.dsn}`
-                    popupText += '<button onclick="showGraphWindRose(\'' + urlDirWind + '\',\'' + urlSpeedWind + '\')" type="button" class="btn btn-primary btn-block " >Show wind rose graph</button>';
-
-                }
-
-
-            }
-            popupText += "</div>";
-            return popupText;
-        }
-
-        function selectedDateFormat() {
-            let dateFrom;
-            let dateUntil;
-            if (dynamicFormPopulation.selected_values.hour === "*") {
-                dateFrom = "00:00_" + dynamicFormPopulation.selected_values.date.replace(/-/g, "")
-                dateUntil = "23:59_" + dynamicFormPopulation.selected_values.date.replace(/-/g, "")
-            } else {
-                dateFrom = (parseInt(dynamicFormPopulation.selected_values.hour) - 1).toString().padStart(2, '0') + ":30_" + dynamicFormPopulation.selected_values.date.replace(/-/g, "")
-                dateUntil = dynamicFormPopulation.selected_values.hour.padStart(2, '0') + ":30_" + dynamicFormPopulation.selected_values.date.replace(/-/g, "")
-            }
-            return {dateFrom, dateUntil};
-        }
-
-        function showGraph(url, headerText) {
+                });
+                map.addControl(drawControl);
+            {% endif %}
             $.ajax({
-                url: url,
+                url: "{{ url_borinud }}/dbajson/*/*/*/*/*/*/summaries",
                 dataType: "json",
-                success: function (collection) {
-                    let data_dict = {}
-                    collection.features.forEach((feature) => {
-                        let key = feature.properties.lat.toString() + "," + feature.properties.lon.toString() + "," + feature.properties.trange[0].toString()
-                        if (!(key in data_dict))
-                            data_dict[key] = []
-                        data_dict[key].push({"x": new Date(feature.properties.date), "y": feature.properties.val})
+                success: function (resp) {
+                    let initialSearchForm = new SearchForm()
+                    resp.forEach((r) => {
+                        initialSearchForm.values.ident.push(r.ident === null ? "-" : r.ident + "");
+                        initialSearchForm.values.lon_lat.push(r.lon + "," + r.lat);
+                        initialSearchForm.values.network.push(r.network + "");
+                        initialSearchForm.values.date.push(r.date[0].substring(0, 10) + "")
+                        let d = r.data[0];
+                        initialSearchForm.values.vars.push(Object.keys(d.vars)[0] + "");
+                        initialSearchForm.values.timerange.push(d.timerange + "");
+                        let level = d.level.map((level) =>
+                            level === null ? "-" : level
+                        )
+                        initialSearchForm.values.level.push(level + "");
                     })
-                    let datasets = []
-                    for (let key in data_dict)
-                        datasets.push({data: data_dict[key], fill: false, borderColor: getRandomColor()})
-                    // get the canvas element
-                    document.querySelector("#chart-container").innerHTML = '<canvas id="chart"></canvas>';
-                    var ctx = document.getElementById('chart').getContext('2d');
-                    $("#modalGraph").modal("show");
-                    let chart = new Chart(ctx, {
-                        legend: {
-                            display: false
-                        },
-                        // The type of chart we want to create
-                        type: 'line',
-                        // The data for our dataset
-                        data: {
-                            datasets: datasets,
-                        },
-                        options: {
-                            scales: {
-                                xAxes: [{
-                                    type: "time",
-                                    time: {
-                                        parser: "D/M/YYYY, H:mm:ss",
-                                        displayFormats: {
-                                            millisecond: 'DD/MM/YYYY HH:mm:ss',
-                                            second: 'DD/MM/YYYY HH:mm:ss',
-                                            minute: 'DD/MM/YYYY HH:mm:ss',
-                                            hour: 'DD/MM/YYYY HH:mm:ss',
-                                            day: 'DD/MM/YYYY HH:mm:ss',
-                                            week: 'DD/MM/YYYY HH:mm:ss',
-                                            month: 'DD/MM/YYYY HH:mm:ss',
-                                            quarter: 'DD/MM/YYYY HH:mm:ss',
-                                            year: 'DD/MM/YYYY HH:mm:ss'
-                                        },
-                                        tooltipFormat: 'DD/MM/YYYY HH:mm:ss'
-                                    }
-                                }],
-                            },
-
-                            animation: {
-                                onComplete: function (e) {
-                                    this.options.animation.onComplete = null;
-                                    // remove loading spinner
-                                    jQuery("#loadingChart").hide();
-                                    // create image from canvas
-                                    let url = chart.toBase64Image();
-                                    // set download link to button
-                                    let button = document.getElementById("printGraph");
-                                    button.href = url;
-                                    // enable button download
-                                    button.removeAttribute("disabled");
-
-                                }
-                            },
-                            plugins: {
-                                zoom: {
-                                    pan: {
-                                        enabled: true,
-                                        mode: 'xy'
-                                    },
-                                    zoom: {
-                                        enabled: true,
-                                        mode: 'xy',
-                                    }
-                                }
-                            }
+                    let uniqueVars = [...new Set(initialSearchForm.values.vars)]
+                    let uniqueTrange = [...new Set(initialSearchForm.values.timerange)]
+                    let uniqueLevels = [...new Set(initialSearchForm.values.level)]
+                    let html = ""
+                    uniqueVars.forEach((item) => {
+                        let value = item
+                        if (borinud.config.B[item] !== undefined) {
+                            value = borinud.config.B[item].description + " " + borinud.config.B[item].unit;
                         }
-                    });
-                    $("#chartHeader").html(headerText)
+                        html += `<option value="${item}">${value}</option>`
+
+                    })
+                    $("#varsInvalidation").append(html)
+
+                    html = ""
+                    uniqueLevels.forEach((item) => {
+                        let [l1, l2, l3, l4] = borinud.config.level.decode(item);
+                        let value = borinud.config.level.describe(l1, l2, l3, l4);
+                        html += `<option value="${item}">${value}</option>`
+
+                    })
+                    $("#levelInvalidation").append(html)
+
+                    html = ""
+                    uniqueTrange.forEach((item) => {
+                        let [t1, t2, t3, t4] = borinud.config.trange.decode(item);
+                        let value = borinud.config.trange.describe(t1, t2, t3, t4);
+                        html += `<option value="${item}">${value}</option>`
+
+                    })
+                    $("#trangeInvalidation").append(html)
+                    const searchFormView = new SearchFormView(SearchForm, initialSearchForm)
+                    searchFormView.initEvents()
                 },
                 beforeSend: function () {
                     overlay.fadeIn(300);
@@ -502,991 +664,84 @@
                 complete: function () {
                     overlay.fadeOut(300);
                 },
+                error: function (e) {
+                    toastr.error("Borinud not available!")
+                    console.log(e.toString());
+                }
             });
-        }
-
-        function getQualityFlagSummary(cluster, bcodeKey) {
-            let results = {total: cluster.length, B33196: 0, B33192: 0, B33193: 0, B33194: 0}
-            results.B33196 = cluster.filter((item) => {
-                    return bcodeKey in item.data.data[0].vars && "B33196" in item.data.data[0].vars[bcodeKey].a
-                }
-            ).length
-            results.B33192 = Math.max(...cluster.filter((item) => {
-                    return bcodeKey in item.data.data[0].vars && "B33192" in item.data.data[0].vars[bcodeKey].a
-                }
-            ))
-            results.B33193 = Math.max(...cluster.filter((item) => {
-                    return bcodeKey in item.data.data[0].vars && "B33193" in item.data.data[0].vars[bcodeKey].a
-                }
-            ))
-            results.B33194 = Math.max(...cluster.filter((item) => {
-                    return bcodeKey in item.data.data[0].vars && "B33194" in item.data.data[0].vars[bcodeKey].a
-                }
-            ))
-            return results
-        }
-
-        function showAllGraph() {
-            let headerModal = ""
-            let url = `{{url_borinud}}/geojson/${dynamicFormPopulation.selected_values.ident}/${dynamicFormPopulation.selected_values.lon_lat}/` +
-                `${dynamicFormPopulation.selected_values.network}/${dynamicFormPopulation.selected_values.timerange}/${dynamicFormPopulation.selected_values.level}/${dynamicFormPopulation.selected_values.vars}/` +
-                `timeseries/${dynamicFormPopulation.selected_values.date.split("-")[0]}/${dynamicFormPopulation.selected_values.date.split("-")[1]}/${dynamicFormPopulation.selected_values.date.split("-")[2]}` +
-                `${dynamicFormPopulation.selected_values.hour !== "*" ? "/" + dynamicFormPopulation.selected_values.hour : ""}?dsn=${dynamicFormPopulation.selected_values.dsn}`;
-            showGraph(url, headerModal)
-        }
-
-
-        function getActiveFilters(filterList) {
-            let activeFilters = []
-            filterList.forEach((filter) => {
-                if (filter["checkbox"].prop("checked")) {
-                    activeFilters.push([filter["bcode"], filter["slider"]])
-                }
-            })
-            return activeFilters
-        }
-
-        function clusterCheckInvalid(cluster, bcodeKey) {
-            for (let item in cluster) {
-                if (bcodeKey in cluster[item].data.data[0].vars && "B33196" in cluster[item].data.data[0].vars[bcodeKey].a)
-                    return true
-            }
-            return false
-        }
-
-        function itemCheckInvalid(item, bcodeKey) {
-            let radioB33196val = parseInt($("input[name='invalidData']:checked").val())
-            switch (radioB33196val) {
-                case 0: {
-                    return true
-                }
-                case 1: {
-                    return !(bcodeKey in item.data[0].vars && "B33196" in item.data[0].vars[bcodeKey].a);
-                }
-                case 2: {
-                    return bcodeKey in item.data[0].vars && "B33196" in item.data[0].vars[bcodeKey].a;
-                }
-            }
-
-
-        }
-
-        function filterData() {
-            overlay.fadeIn(300);
-            let date = $("select[name='hours']").val()
-            let vSliderB33192 = [sliderB33192.slider("values", 0), sliderB33192.slider("values", 1)];
-            let vSliderB33193 = [sliderB33193.slider("values", 0), sliderB33193.slider("values", 1)];
-            let vSliderB33194 = [sliderB33194.slider("values", 0), sliderB33194.slider("values", 1)];
-            let bcodeKey = $("#vars").val()
-            if (lastResults.length <= 0) {
-                toastr.warning('No data!')
-            } else {
-                let collection = lastResults
-                if (date !== "*") {
-                    collection = lastResults.filter((item) => {
-                        return item.date === date
-                    })
-                }
-                let activeFilters = getActiveFilters([
-                    {
-                        "checkbox": checkFilterB33192,
-                        "slider": vSliderB33192,
-                        "bcode": "B33192"
-                    },
-                    {
-                        "checkbox": checkFilterB33193,
-                        "slider": vSliderB33193,
-                        "bcode": "B33193"
-                    }, {
-                        "checkbox": checkFilterB33194,
-                        "slider": vSliderB33194,
-                        "bcode": "B33194"
-                    }])
-                let filteredCollection = []
-                collection.forEach((item) => {
-                    let found = true
-                    activeFilters.forEach((filter) => {
-                        if (!(bcodeKey in item.data[0].vars
-                            && filter[0] in item.data[0].vars[bcodeKey].a
-                            && item.data[0].vars[bcodeKey].a[filter[0]] >= filter[1][0]
-                            && item.data[0].vars[bcodeKey].a[filter[0]] <= filter[1][1])) {
-                            found = false
-                        }
-                    })
-                    if (!itemCheckInvalid(item, bcodeKey)) {
-                        found = false
-                    }
-                    if (found) {
-                        filteredCollection.push(item)
-                    }
-
-                })
-                populateMap(filteredCollection)
-            }
-            if (date !== "*" && controlLayer !== undefined) {
-                let activeLayers = controlLayer.getActiveOverlays()
-                activeLayers.forEach((layer) => {
-                    layer.setParams({time: date})
-                })
-            }
-            overlay.fadeOut(300);
-
-        }
-
-
-        function populateMap(collection) {
-            legend.remove();
-            pruneCluster.RemoveMarkers();
-            $("#showGraphButton").attr("disabled", false)
-            if (!bcode.scale)
-                bcode.scale = 1
-            if (!bcode.offset)
-                bcode.offset = 0
-            for (let i = 0; i < collection.length; i++) {
-                min = Math.min(min, collection[i].data.map((item) => {
-                    if (dynamicFormPopulation.selected_values.vars in item.vars)
-                        return item.vars[dynamicFormPopulation.selected_values.vars].v
-                }));
-                max = Math.max(max, collection[i].data.map((item) => {
-                    if (dynamicFormPopulation.selected_values.vars in item.vars)
-                        return item.vars[dynamicFormPopulation.selected_values.vars].v
-                }));
-            }
-
-            let pi2 = Math.PI * 2;
-            if ($("#vars").val() === "B11001") {
-                pruneCluster.Cluster.Size = 15;
-                pruneCluster.BuildLeafletClusterIcon = function (cluster) {
-                    let markersCluster = cluster.GetClusterMarkers()
-                    let bcodeKey = $("#vars").val()
-                    L.Icon.MarkerCluster = L.Icon.extend({
-                        options: {
-                            iconSize: new L.Point(100, 100),
-                            className: 'prunecluster leaflet-markercluster-icon'
-                        },
-
-                        createIcon: function () {
-                            let e = document.createElement('canvas');
-                            this._setIconStyles(e, 'icon');
-                            let s = this.options.iconSize;
-                            e.width = s.x;
-                            e.height = s.y;
-                            this.draw(e.getContext('2d'), s.x, s.y);
-                            return e;
-                        },
-
-                        createShadow: function () {
-                            return null;
-                        },
-
-                        draw: function (canvas, width, height) {
-
-                            let windDirections = ["N", "NE", "E", "SE", "S", "SW", "W", "NW",]
-                            canvas.textAlign = 'center';
-                            canvas.textBaseline = 'top';
-                            canvas.font = 'bold 10px sans-serif';
-                            canvas.strokeStyle = "grey";
-                            canvas.lineWidth = 0.5;
-                            canvas.moveTo(50, 5)
-                            canvas.lineTo(50, 95);
-                            canvas.moveTo(5, 50)
-                            canvas.lineTo(95, 50);
-                            canvas.stroke();
-                            canvas.fillStyle = "grey"
-                            canvas.fillText("N", 50, 0, 20);
-                            canvas.textBaseline = 'middle';
-                            canvas.fillText("E", 96, 50, 20);
-                            canvas.textBaseline = 'bottom';
-                            canvas.fillText("S", 50, 100, 20);
-                            canvas.textBaseline = 'middle';
-                            canvas.fillText("W", 4, 50, 20);
-                            for (let i = 0, l = windDirections.length; i < l; ++i) {
-                                let maxHeight = 36
-                                var size = (this.stats[i] * maxHeight) / this.population;
-                                let radiusSize = size < 0 || isNaN(size) ? 0 : size
-                                canvas.beginPath();
-                                canvas.moveTo(50, 50);
-
-                                canvas.fillStyle = "#58e";
-                                if (clusterCheckInvalid(markersCluster, bcodeKey)) {
-                                    canvas.fillStyle = "red";
-                                }
-                                canvas.lineWidth = 1;
-                                canvas.strokeStyle = "black";
-                                switch (i) {
-                                    case 0:
-                                        canvas.arc(50, 50, radiusSize + 4, 1.375 * Math.PI, 1.625 * Math.PI);
-                                        break
-                                    case 1:
-                                        canvas.arc(50, 50, radiusSize + 4, 1.625 * Math.PI, 1.875 * Math.PI);
-                                        break
-                                    case 2:
-                                        canvas.arc(50, 50, radiusSize + 4, 1.875 * Math.PI, 0.125 * Math.PI);
-                                        break
-                                    case 3:
-                                        canvas.arc(50, 50, radiusSize + 4, 0.125 * Math.PI, 0.375 * Math.PI);
-                                        break
-                                    case 4:
-                                        canvas.arc(50, 50, radiusSize + 4, 0.375 * Math.PI, 0.625 * Math.PI);
-                                        break
-                                    case 5:
-                                        canvas.arc(50, 50, radiusSize + 4, 0.625 * Math.PI, 0.875 * Math.PI);
-                                        break
-                                    case 6:
-                                        canvas.arc(50, 50, radiusSize + 4, 0.875 * Math.PI, 1.125 * Math.PI);
-                                        break
-                                    case 7:
-                                        canvas.arc(50, 50, radiusSize + 4, 1.125 * Math.PI, 1.375 * Math.PI);
-                                        break
-                                }
-                                canvas.lineTo(50, 50);
-                                canvas.stroke();
-                                canvas.fill();
-                                canvas.closePath();
-
-                            }
-                            canvas.beginPath();
-                            canvas.fillStyle = "#fff";
-                            canvas.arc(50, 50, 4, 0, Math.PI * 2);
-                            canvas.stroke();
-                            canvas.fill();
-                            canvas.closePath();
+            fetch('{{ url_wms }}').then(
+                function (response) {
+                    return response.text();
+                }).then(
+                function (text) {
+                    let layerNames = [];
+                    let $xml = $($.parseXML(text));
+                    $xml.find('Layer').each(function () {
+                        let title = $(this).find('Title').first().text()
+                        let name = $(this).find('Name').first().text()
+                        if (name != 'background' & name != 'ol_background') {
+                            layerNames.push([name, title]);
                         }
                     });
-                    let e = new L.Icon.MarkerCluster();
-                    e.stats = cluster.stats;
-                    e.population = cluster.population;
-
-                    //this try to make the little values more visible (no less of 5%)
-                    for (let i = 0, l = e.stats.length; i < l; ++i) {
-                        if ((e.stats[i] > 0) && ((e.stats[i] / e.population) < 0.1)) {
-                            let inc = (e.population * 0.05) - e.stats[i];
-                            e.stats[i] += inc;
-                            e.population += inc;
-                        }
-                    }
-
-                    return e;
-                };
-
-                pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
-                    if (leafletMarker.getPopup()) {
-                        leafletMarker.setPopupContent(setpopup(data));
-                    } else {
-                        leafletMarker.bindPopup(setpopup(data));
-                    }
-                    let val = (data.value * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "");
-                    let vallen = val.length * 6 + 6;
-                    leafletMarker.setIcon(
-                        L.extendedDivIcon({
-                            iconSize: new L.Point(vallen, 14),
-                            labelAnchor: [vallen / 2, 0],
-                            html: val,
-                            className: 'myDivIcon',
-                            style: {backgroundColor: getColor(data.value, min, max)}
-                        })
-                    );
-                    leafletMarker.bindTooltip(data.date.toString());
-                };
-
-                $.each(collection, function (i, feature) {
-                    coords.push([feature.lat / 100000, feature.lon / 100000]);
-                    let marker = new PruneCluster.Marker(feature.lat / 100000, feature.lon / 100000);
-                    marker.data = feature;
-                    marker.data.value = 0
-                    feature.data.forEach((item) => {
-                        if (dynamicFormPopulation.selected_values.vars in item.vars) {
-                            marker.data.value = item.vars[dynamicFormPopulation.selected_values.vars].v
-                            marker.data.trange = item.timerange
-                            marker.data.level = item.level
-                        }
-                    })
-                    marker.category = getIndexCompass(marker.data.value);
-                    pruneCluster.RegisterMarker(marker);
-                });
-            } else {
-                legend.onAdd = function (map) {
-                    let div = L.DomUtil.create('div', 'info legend');
-                    // loop through our density intervals and generate a label with a colored square for each interval
-                    let halfdelta = ((max - min) / (colors.length * 2.));
-
-                    for (let i = 0; i < colors.length; i++) {
-                        let grade = min + halfdelta * (i * 2 + 1);
-                        div.innerHTML +=
-                            '<div style="background:white">' +
-                            '<b style="background:' + getColor(grade, min, max) + '">&nbsp;&nbsp;&nbsp;</b>&nbsp;' +
-                            (grade * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "") +
-                            '<br>' +
-                            '</div>';
-                    }
-                    return div;
-                };
-
-                legend.addTo(map);
-
-                pruneCluster.Cluster.Size = 15;
-
-                pruneCluster.BuildLeafletClusterIcon = function (cluster) {
-                    let markersCluster = cluster.GetClusterMarkers()
-                    let bcodeKey = $("#vars").val()
-                    //let summaryFlag = getQualityFlagSummary(markersCluster, bcodeKey)
-                    //let checkInvalid = clusterCheckInvalid(markersCluster, bcodeKey)
-                    L.Icon.MarkerCluster = L.Icon.extend({
-                        options: {
-                            iconSize: new L.Point(100, 100),
-                            className: "prunecluster leaflet-markercluster-icon"
-                        },
-
-                        createIcon: function () {
-                            let e = document.createElement('canvas');
-                            this._setIconStyles(e, 'icon');
-                            let s = this.options.iconSize;
-                            e.width = s.x;
-                            e.height = s.y;
-                            this.draw(e.getContext('2d'), s.x, s.y);
-                            return e;
-                        },
-
-                        createShadow: function () {
-                            return null;
-                        },
-
-                        draw: function (canvas, width, height) {
-                            if (clusterCheckInvalid(markersCluster, bcodeKey)) {
-                                canvas.beginPath();
-                                canvas.arc(50, 50, 30, 0, 2 * Math.PI);
-                                canvas.fillStyle = "rgba(255, 51, 51, 0.5)";
-                                canvas.fill()
-                                canvas.strokeStyle = "rgba(255, 51, 51, 1)";
-                                canvas.stroke();
-                            }
-
-                            /*
-
-                                                        //if (summaryFlag.B33192 !== -Infinity) {
-                                                        canvas.beginPath();
-                                                        canvas.arc(50, 22, 18, 0, 2 * Math.PI);
-                                                        canvas.fillStyle = "rgba(128, 128, 128, 0.6)";
-                                                        canvas.fill()
-                                                        canvas.stroke();
-                                                        canvas.fillStyle = 'black';
-                                                        canvas.textAlign = 'center';
-                                                        canvas.textBaseline = 'middle';
-                                                        canvas.font = 'bold 10px sans-serif';
-                                                        canvas.fillText("B33192", 50, 22, 36);
-                                                        canvas.fillText("10", 50, 32, 36);
-
-                                                        // }
-
-                                                       canvas.beginPath();
-                                                       canvas.arc(22, 50, 18, 0, 2 * Math.PI);
-                                                       canvas.fillStyle = "red";
-                                                       canvas.fill()
-                                                       canvas.stroke();
-
-                                                       canvas.beginPath();
-                                                       canvas.arc(50, 22, 18, 0, 2 * Math.PI);
-                                                       canvas.fillStyle = "grey";
-                                                       canvas.fill()
-                                                       canvas.stroke();
-
-                                                       canvas.beginPath();
-                                                       canvas.arc(50, 78, 18, 0, 2 * Math.PI);
-                                                       canvas.fillStyle = "grey";
-                                                       canvas.fill()
-                                                       canvas.stroke();
-
-                                                        */
-                            let start = 0;
-                            let prevalent = 0;
-                            let prevalentindex = 0;
-                            for (let i = 0, l = colors.length; i < l; ++i) {
-                                var size = this.stats[i] / this.population;
-                                if (size > 0) {
-                                    if (this.stats[i] > prevalent) {
-                                        prevalentindex = i;
-                                        prevalent = this.stats[i];
-                                    }
-                                    canvas.beginPath();
-                                    canvas.moveTo(50, 50);
-                                    canvas.fillStyle = colors[i];
-                                    let from = start;
-                                    let to = start + size * pi2;
-                                    if (to < from) {
-                                        from = start;
-                                    }
-                                    canvas.arc(50, 50, 22, from, to);
-                                    start = to;
-                                    canvas.lineTo(50, 50);
-                                    canvas.strokeStyle = "black";
-                                    canvas.stroke();
-                                    canvas.fill();
-                                    canvas.closePath();
-                                }
-                            }
-                            canvas.beginPath();
-                            canvas.fillStyle = colors[prevalentindex];
-                            canvas.arc(50, 50, 15, 0, Math.PI * 2);
-                            canvas.stroke();
-                            canvas.fill();
-                            canvas.closePath();
-                            canvas.fillStyle = '#111';
-                            canvas.textAlign = 'center';
-                            canvas.textBaseline = 'middle';
-                            canvas.font = 'bold 10px sans-serif';
-                            //canvas.fillText(this.population, 22, 22,28);
-                            let halfdelta = ((max - min) / (colors.length * 2.));
-                            let grade = min + halfdelta * (prevalentindex * 2 + 1);
-                            grade = (grade * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "");
-                            canvas.fillText(grade, 50, 50, 28);
-                        }
-                    });
-                    let e = new L.Icon.MarkerCluster();
-                    e.stats = cluster.stats;
-                    e.population = cluster.population;
-
-                    //this try to make the little values more visible (no less of 5%)
-                    for (let i = 0, l = e.stats.length; i < l; ++i) {
-                        if ((e.stats[i] > 0) && ((e.stats[i] / e.population) < 0.1)) {
-                            let inc = (e.population * 0.05) - e.stats[i];
-                            e.stats[i] += inc;
-                            e.population += inc;
-                        }
-                    }
-
-                    return e;
-                };
-
-                pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
-                    if (leafletMarker.getPopup()) {
-                        leafletMarker.setPopupContent(setpopup(data));
-                    } else {
-                        leafletMarker.bindPopup(setpopup(data));
-                    }
-                    let val = (data.value * bcode.scale + bcode.offset).toPrecision(5).replace(/\.?0+$/, "");
-                    let vallen = val.length * 6 + 6;
-                    leafletMarker.setIcon(
-                        L.extendedDivIcon({
-                            iconSize: new L.Point(vallen, 14),
-                            labelAnchor: [vallen / 2, 0],
-                            html: val,
-                            className: 'myDivIcon',
-                            style: {backgroundColor: getColor(data.value, min, max)}
-                        })
-                    );
-                    leafletMarker.bindTooltip(data.date.toString());
-                };
-
-                $.each(collection, function (i, feature) {
-
-                    coords.push([feature.lat / 100000, feature.lon / 100000]);
-
-                    let marker = new PruneCluster.Marker(feature.lat / 100000, feature.lon / 100000);
-                    marker.data = feature;
-                    marker.data.value = 0
-                    feature.data.forEach((item) => {
-                        if (dynamicFormPopulation.selected_values.vars in item.vars) {
-                            marker.data.value = item.vars[dynamicFormPopulation.selected_values.vars].v
-                            marker.data.trange = item.timerange
-                            marker.data.level = item.level
-                        }
-                    })
-                    marker.category = getColorIndex(marker.data.value, min, max);
-
-                    pruneCluster.RegisterMarker(marker);
-                });
-            }
-            map.addLayer(pruneCluster);
-            try {
-                map.fitBounds(coords);
-            } catch (err) {
-                toastr.error("Error setting bounds...");
-            }
-        }
-
-        function showGraphWindRose(urlWind, urlSpeed) {
-            $.ajax({
-                    url: urlWind,
-                    dataType: "json",
-                    success: function (windDirectionData) {
-
-                        $.ajax({
-                                url: urlSpeed,
-                                dataType: "json",
-                                success: function (windSpeedData) {
-                                    let dataWindSpeedDByDir = {}
-                                    windSpeedData.forEach((speedValue) => {
-
-                                        windDirectionData.forEach((directionValue) => {
-                                            if (speedValue.date === directionValue.date
-                                                && speedValue.ident === directionValue.ident
-                                                && speedValue.lon === directionValue.lon
-                                                && speedValue.lat === directionValue.lat
-                                                && speedValue.network === directionValue.network) {
-                                                let speed = speedValue.data[0].vars["B11002"].v
-                                                let key = windClassification(speed)
-                                                if (!(key in dataWindSpeedDByDir)) {
-                                                    dataWindSpeedDByDir[key] = {
-                                                        "dir": {
-                                                            "N": {total: 0},
-                                                            "NNE": {total: 0},
-                                                            "NE": {total: 0},
-                                                            "ENE": {total: 0},
-                                                            "E": {total: 0},
-                                                            "ESE": {total: 0},
-                                                            "SE": {total: 0},
-                                                            "SSE": {total: 0},
-                                                            "S": {total: 0},
-                                                            "SSW": {total: 0},
-                                                            "SW": {total: 0},
-                                                            "WSW": {total: 0},
-                                                            "W": {total: 0},
-                                                            "WNW": {total: 0},
-                                                            "NW": {total: 0},
-                                                            "NNW": {total: 0}
-                                                        },
-                                                        "total": 0
-
-                                                    }
-                                                }
-                                                let direction = degToCompass(directionValue.data[0].vars["B11001"].v)
-                                                dataWindSpeedDByDir[key].dir[direction].total += 1
-                                                dataWindSpeedDByDir[key].total += 1
-                                            }
-                                        })
-                                    })
-                                    let dataSpeedAverage = []
-                                    let i = 0
-                                    for (let key in dataWindSpeedDByDir) {
-                                        dataSpeedAverage.push({
-                                            r: Object.keys(dataWindSpeedDByDir[key].dir).map(function (keyDir) {
-                                                return (dataWindSpeedDByDir[key].dir[keyDir].total / dataWindSpeedDByDir[key].total) * 100;
-                                            }),
-                                            theta: Object.keys(dataWindSpeedDByDir[key].dir),
-                                            name: key,
-                                            marker: {color: windColors[i]},
-                                            type: "barpolar"
-                                        })
-                                        i++
-                                    }
-                                    let dataDict = {
-                                        "N": 0,
-                                        "NNE": 0,
-                                        "NE": 0,
-                                        "ENE": 0,
-                                        "E": 0,
-                                        "ESE": 0,
-                                        "SE": 0,
-                                        "SSE": 0,
-                                        "S": 0,
-                                        "SSW": 0,
-                                        "SW": 0,
-                                        "WSW": 0,
-                                        "W": 0,
-                                        "WNW": 0,
-                                        "NW": 0,
-                                        "NNW": 0
-                                    }
-                                    windDirectionData.forEach((data) => {
-                                        dataDict[degToCompass(data.data[0].vars["B11001"].v)] += 1;
-                                    })
-                                    $("#modalWindRose").modal("show");
-                                    let data = [{
-                                        r: Object.keys(dataDict).map(function (key) {
-                                            return dataDict[key];
-                                        }),
-                                        theta: Object.keys(dataDict),
-                                        name: "11-14 m/s",
-                                        marker: {color: getRandomColor()},
-                                        type: "barpolar"
-                                    }
-                                    ]
-                                    let layout = {
-                                        title: "Wind Direction Distribution",
-                                        font: {size: 16},
-                                        legend: {font: {size: 16}},
-                                        polar: {
-                                            radialaxis: {angle: 90,},
-                                            angularaxis: {direction: "clockwise"}
-                                        },
-                                        autosize: true,
-                                    }
-                                    let layoutSpeed = {
-                                        title: "Wind Speed Distribution",
-                                        font: {size: 16},
-                                        legend: {font: {size: 16}},
-                                        showlegend: true,
-                                        polar: {
-                                            barmode: "overlay",
-                                            bargap: 0,
-                                            radialaxis: {ticksuffix: "%", angle: 90, dtick: 20},
-                                            angularaxis: {direction: "clockwise"}
-                                        },
-                                        autosize: true,
-                                    }
-                                    Plotly.newPlot(document.getElementById("windRoseContainer"), data, layout)
-                                    Plotly.newPlot(document.getElementById("windRoseSpeedContainer"), dataSpeedAverage, layoutSpeed)
-
-                                },
-                                beforeSend: function () {
-                                    overlay.fadeIn(300);
-                                },
-                                complete: function () {
-                                    overlay.fadeOut(300);
-                                },
-
-                            }
-                        )
-                    }
-                    ,
-                    beforeSend: function () {
-                        overlay.fadeIn(300);
-                    }
-                    ,
-                    complete: function () {
-                        overlay.fadeOut(300);
-                    }
-                    ,
-
-                }
-            )
-        }
-
-        function resetFilters() {
-            checkFilterB33192.prop("checked", false).trigger('change');
-            checkFilterB33193.prop("checked", false).trigger('change');
-            checkFilterB33194.prop("checked", false).trigger('change');
-            $("#invalidData1").prop("checked", true);
-        }
-
-        //update map markers
-        function updateMap() {
-            resetFilters()
-            if ($("input[name='objectToShow']:checked").val() === "data") {
-                if (dynamicFormPopulation.selected_values.vars !== "*") {
-                    $("#showGraphButton").attr("disabled", true)
-                    coords = [];
-                    min = Infinity;
-                    max = -Infinity;
-
-                    //create request url
-                    var url = `{{url_borinud}}/dbajson/${dynamicFormPopulation.selected_values.ident}/${dynamicFormPopulation.selected_values.lon_lat}/` +
-                        `${dynamicFormPopulation.selected_values.network}/${dynamicFormPopulation.selected_values.timerange}/${dynamicFormPopulation.selected_values.level}/${dynamicFormPopulation.selected_values.vars}/` +
-                        `spatialseries/${dynamicFormPopulation.selected_values.date.split("-")[0]}/${dynamicFormPopulation.selected_values.date.split("-")[1]}/${dynamicFormPopulation.selected_values.date.split("-")[2]}` +
-                        `${dynamicFormPopulation.selected_values.hour !== "*" ? "/" + dynamicFormPopulation.selected_values.hour : ""}?dsn=${dynamicFormPopulation.selected_values.dsn}&query=attr`;
-
-                    //require map point
-                    $.ajax({
-                            url: url,
-                            dataType: "json",
-                            success: function (collection) {
-                                lastResults = collection
-                                if (collection.length <= 0) {
-                                    toastr.warning('Nessun risultato!')
-                                } else {
-                                    if (dynamicFormPopulation.selected_values.vars !== "*") {
-                                        bcode = borinud.config.B[dynamicFormPopulation.selected_values.vars];
-                                    } else {
-                                        bcode = {
-                                            "bcode": "B00001",
-                                            "description": "Undefined",
-                                            "unit": "Undefined",
-                                            "offset": 0,
-                                            "scale": 1,
-                                            "userunit": ""
-                                        }
-                                    }
-                                    populateMap(collection)
-
-                                }
-
-                            },
-                            beforeSend: function () {
-                                overlay.fadeIn(300);
-                            },
-                            complete: function () {
-                                overlay.fadeOut(300);
-                            },
-
-                        }
-                    )
-                } else {
-                    toastr.error("Select a var")
-                }
-            } else {
-                legend.remove();
-                pruneCluster.RemoveMarkers();
-                let url = ""
-                if ($("input[name='objectToShow']:checked").val() === "stations") {
-                    url = `{{url_borinud}}/geojson/${dynamicFormPopulation.selected_values.ident}/${dynamicFormPopulation.selected_values.lon_lat}/` +
-                        `*/*/*/*/stations?dsn=${dynamicFormPopulation.selected_values.dsn}`;
-                } else {
-                    url = `{{url_borinud}}/geojson/${dynamicFormPopulation.selected_values.ident}/${dynamicFormPopulation.selected_values.lon_lat}/` +
-                        `*/*/*/*/stationdata?dsn=${dynamicFormPopulation.selected_values.dsn}`
-                }
-                $.ajax({
-                    url: url,
-                    dataType: "json",
-                    success: function (collection) {
-                        if (collection.features.length <= 0) {
-                            toastr.warning('Nessun risultato!')
-                        } else {
-                            let coords = []
-                            pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
-                                let text = "Ident: " + null2_(data.ident) +
-                                    "<br>Lon: " + data.lon / 100000 +
-                                    "<br>Lat: " + data.lat / 100000 +
-                                    "<br>Network: " + data.network
-                                if ($("input[name='objectToShow']:checked").val() === "constantStationData") {
-                                    text += "<br>" + borinud.config.B[data.var].description + " :" + data.val
-
-                                }
-                                if (leafletMarker.getPopup()) {
-                                    leafletMarker.setPopupContent(text);
-                                } else {
-                                    leafletMarker.bindPopup(text);
-                                }
-                            };
-                            pruneCluster.BuildLeafletClusterIcon = function (cluster) {
-                                return PruneClusterForLeaflet.prototype.BuildLeafletClusterIcon.call(this, cluster);
-                            };
-                            collection.features.forEach((station) => {
-                                coords.push([station.geometry.coordinates[1], station.geometry.coordinates[0]]);
-                                let marker = new PruneCluster.Marker(station.geometry.coordinates[1], station.geometry.coordinates[0])
-                                marker.data = station.properties
-                                pruneCluster.RegisterMarker(marker);
-                            })
-                            map.addLayer(pruneCluster);
-                            map.fitBounds(coords)
-                        }
-                    },
-                    beforeSend: function () {
-                        overlay.fadeIn(300);
-                    },
-                    complete: function () {
-                        overlay.fadeOut(300);
-                    },
-                })
-            }
-        }
+                    let ol_background = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    }).addTo(map);
 
 
-        var pruneCluster = new PruneClusterForLeaflet();
-        PruneCluster.Cluster.ENABLE_MARKERS_LIST = true
-        var overlay = $("#overlay")
-        var sliderB33192 = $("#filterB33192")
-        var checkFilterB33192 = $("#checkFilterB33192")
-        var sliderB33193 = $("#filterB33193")
-        var checkFilterB33193 = $("#checkFilterB33193")
-        var sliderB33194 = $("#filterB33194")
-        var checkFilterB33194 = $("#checkFilterB33194")
-        var radioB33196 = $("input[name='invalidData']")
-        var lastResults = []
-        createSliderFilter(sliderB33192)
-        switchFilter(sliderB33192, checkFilterB33192)
-        createSliderFilter(sliderB33193)
-        switchFilter(sliderB33193, checkFilterB33193)
-        createSliderFilter(sliderB33194)
-        switchFilter(sliderB33194, checkFilterB33194)
-        var map = L.map('map', {
-            zoomControl: false,
-            timeDimension: true,
-            //timeDimensionControl: true,
-            //timeDimensionControlOptions: {position: "bottomright"}
-            times: [$("#hours").val() ? $("#hours").val() !== "*" : new Date()]
-        }).setView([43, 11], 13);
-
-        L.control.zoom({position: 'topright'}).addTo(map);
-        L.control.sidebar('sidebar').addTo(map);
-        var sliderTimeControl = L.Control.extend({
-            options: {position: 'bottomleft'},
-            onAdd: function (map) {
-                var el = L.DomUtil.create('div', 'leaflet-bar slider-control');
-                el.innerHTML = '<div id="sliderTime"></div>';
-                return el;
-            }
-        });
-        map.addControl(new sliderTimeControl());
-        var dynamicFormPopulation = new DynamicFormPopulation();
-        var coords = [];
-        var legend = L.control({position: 'bottomright'});
-        var min = Infinity;
-        var max = -Infinity;
-        var bcode = {
-            "bcode": "B00001",
-            "description": "Undefined",
-            "unit": "Undefined",
-            "offset": 0,
-            "scale": 1,
-            "userunit": ""
-        }
-        var controlLayer;
-        var layers = {};
-        var opacityControls = {};
-
-        $("input[name='objectToShow']").change(function () {
-            if ($("input[name='objectToShow']:checked").val() === "data") {
-                $(".to-disable").prop("disabled", false);
-            } else {
-                $(".to-disable").prop("disabled", true);
-            }
-        })
-
-        $("#applyFilter").click(function () {
-            filterData();
-        })
-        $(document.body).on("slidestop", "#sliderTime", function (event, ui) {
-            filterData()
-        });
-        $(document.body).on("mousedown", ".slider-control", function () {
-            map.dragging.disable();
-        });
-        $(document.body).on("mouseout", ".slider-control", function () {
-            map.dragging.enable();
-        });
-
-
-        $.ajax({
-            url: "{{ url_borinud }}/jsonline/*/*/*/*/*/*/summaries",
-            dataType: "text",
-            success: function (resp) {
-                resp = (JSON.parse("{\"j\":[" + resp.replace(/}\n{/g, "}, {") + "]}")).j;
-                for (var r of resp) {
-                    dynamicFormPopulation.select_values_lists.ident.push(r.ident + "");
-                    dynamicFormPopulation.select_values_lists.lon_lat.push(r.lon + "," + r.lat);
-                    dynamicFormPopulation.select_values_lists.network.push(r.network + "");
-                    dynamicFormPopulation.select_values_lists.date.push(r.date[0].substring(0, 10) + "")
-                    dynamicFormPopulation.select_values_lists.hours.push(r.date[0])
-                    let d = r.data[0];
-                    dynamicFormPopulation.select_values_lists.vars.push(Object.keys(d.vars)[0] + "");
-                    dynamicFormPopulation.select_values_lists.timerange.push(d.timerange + "");
-                    let level = d.level.map((level) => {
-                        if (level == null) {
-                            return "-"
-                        }
-                        return level
-                    })
-                    dynamicFormPopulation.select_values_lists.level.push(level + "");
-                }
-                for (let key in dynamicFormPopulation.select_values_lists.day_hour) {
-                    dynamicFormPopulation.select_values_lists.day_hour[key].sort(function (a, b) {
-                        return new Date(a) - new Date(b);
-                    });
-                }
-                dynamicFormPopulation.populateForm(undefined);
-            },
-            beforeSend: function () {
-                overlay.fadeIn(300);
-            },
-            complete: function () {
-                overlay.fadeOut(300);
-            },
-            error: function (e) {
-                toastr.error("Borinud not available!")
-                $("#searchButton").attr("disabled", true)
-                console.log(e.toString());
-            }
-        });
-
-        fetch('{{ url_wms }}').then(
-            function (response) {
-                return response.text();
-            }).then(
-            function (text) {
-                let layerNames = [];
-                let $xml = $($.parseXML(text));
-                $xml.find('Layer').each(function () {
-                    let title = $(this).find('Title').first().text()
-                    let name = $(this).find('Name').first().text()
-                    if (name != 'background' & name != 'ol_background') {
-                        layerNames.push([name, title]);
-                    }
-                });
-                let ol_background = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                }).addTo(map);
-
-
-                let background = L.tileLayer.wms('{{ url_wms }}?', {
-                    layers: 'background',
-                    format: 'image/png',
-                    transparent: 'TRUE',
-                    attribution: '',
-                    version: '1.3.0'
-                }).addTo(map);
-
-                layerNames.forEach(function (layer_name) {
-                    let layer = L.tileLayer.wms('{{ url_wms }}?', {
-                        layers: layer_name[0],
+                    let background = L.tileLayer.wms('{{ url_wms }}?', {
+                        layers: 'background',
                         format: 'image/png',
                         transparent: 'TRUE',
                         attribution: '',
-                        version: '1.3.0',
-                        errorTileUrl: "{% static 'dynamic/images/map-not-found.png' %}"
-                    })
-                    layer.setParams({time: new Date().toJSON()})
-                    layers[layer_name[1]] = layer;
-                    let aa = {};
-                    aa[layer_name[0]] = layer;
-                    opacityControls[layer_name[0]] = L.control.opacity(
-                        aa,
-                        {}
-                    );
-                });
+                        version: '1.3.0'
+                    }).addTo(map);
 
-                map.on('layeradd', function (l) {
-                    if (opacityControls[l.layer.options.layers]) {
-                        opacityControls[l.layer.options.layers].addTo(map);
-                    }
-                });
+                    layerNames.forEach(function (layer_name) {
+                        let layer = L.tileLayer.wms('{{ url_wms }}?', {
+                            layers: layer_name[0],
+                            format: 'image/png',
+                            transparent: 'TRUE',
+                            attribution: '',
+                            version: '1.3.0',
+                            errorTileUrl: "{% static 'dynamic/images/map-not-found.png' %}"
+                        })
+                        layer.setParams({time: new Date().toJSON()})
+                        layers[layer_name[1]] = layer;
+                        let aa = {};
+                        aa[layer_name[0]] = layer;
+                        opacityControls[layer_name[0]] = L.control.opacity(
+                            aa,
+                            {}
+                        );
+                    });
 
-                map.on('layerremove', function (l) {
-                    if (opacityControls[l.layer.options.layers]) {
-                        opacityControls[l.layer.options.layers].remove();
-                    }
-                });
+                    map.on('layeradd', function (l) {
+                        if (opacityControls[l.layer.options.layers]) {
+                            opacityControls[l.layer.options.layers].addTo(map);
+                        }
+                    });
 
-                let baseMaps = {
-                    'background': background,
-                    'ol_background': ol_background
-                };
-                controlLayer = L.control.layers(baseMaps, layers)
-                controlLayer.addTo(map);
-                L.control.scale({position: 'bottomright'}).addTo(map);
-                //updateMap()
-            }).catch((error) => {
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                }).addTo(map);
-            }
-        );
-        $('select[name="vars"]').change(function () {
-            if (this.value === "B11001" || this.value === "B11002") {
-                $("#showWindRose").show();
-            } else {
-                $("#showWindRose").hide();
-            }
-        })
+                    map.on('layerremove', function (l) {
+                        if (opacityControls[l.layer.options.layers]) {
+                            opacityControls[l.layer.options.layers].remove();
+                        }
+                    });
 
-
-        $(document.body).on("click", "#showWindRose", function () {
-            let selected_var = $("select[name='vars']").val()
-            if (selected_var === "B11001" || selected_var === "B11002") {
-                //create request url
-                let urlDir = `{{url_borinud}}/dbajson/${dynamicFormPopulation.selected_values.ident}/${dynamicFormPopulation.selected_values.lon_lat}/` +
-                    `${dynamicFormPopulation.selected_values.network}/${dynamicFormPopulation.selected_values.timerange}/${dynamicFormPopulation.selected_values.level}/B11001/` +
-                    `spatialseries/${dynamicFormPopulation.selected_values.date.split("-")[0]}/${dynamicFormPopulation.selected_values.date.split("-")[1]}/${dynamicFormPopulation.selected_values.date.split("-")[2]}` +
-                    `${dynamicFormPopulation.selected_values.hour !== "*" ? "/" + dynamicFormPopulation.selected_values.hour : ""}?dsn=${dynamicFormPopulation.selected_values.dsn}`;
-                let urlSpeed = `{{url_borinud}}/dbajson/${dynamicFormPopulation.selected_values.ident}/${dynamicFormPopulation.selected_values.lon_lat}/` +
-                    `${dynamicFormPopulation.selected_values.network}/${dynamicFormPopulation.selected_values.timerange}/${dynamicFormPopulation.selected_values.level}/B11002/` +
-                    `spatialseries/${dynamicFormPopulation.selected_values.date.split("-")[0]}/${dynamicFormPopulation.selected_values.date.split("-")[1]}/${dynamicFormPopulation.selected_values.date.split("-")[2]}` +
-                    `${dynamicFormPopulation.selected_values.hour !== "*" ? "/" + dynamicFormPopulation.selected_values.hour : ""}?dsn=${dynamicFormPopulation.selected_values.dsn}`;
-
-                showGraphWindRose(urlDir, urlSpeed)
-            }
-        })
-
-
+                    let baseMaps = {
+                        'background': background,
+                        'ol_background': ol_background
+                    };
+                    controlLayer = L.control.layers(baseMaps, layers)
+                    controlLayer.addTo(map);
+                    L.control.scale({position: 'bottomright'}).addTo(map);
+                    //updateMap()
+                }).catch((error) => {
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    }).addTo(map);
+                }
+            );
+        });
     </script>
 
 {% endblock %}
