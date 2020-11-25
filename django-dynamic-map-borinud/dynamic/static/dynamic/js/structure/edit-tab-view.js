@@ -1,10 +1,11 @@
-let EditTabView = function (urlBorinud, map, pruneCluster, overlay, pruneCluster) {
+let EditTabView = function (urlBorinud, map, pruneCluster, overlay, pruneClusterStations, stationCollection) {
     this.stations = [];
+    this.allStations = stationCollection;
     this.urlBorinud = urlBorinud
     this.map = map
     this.overlay = overlay
     this.stationsMarkers = []
-    this.pruneCluster = pruneCluster
+    this.pruneCluster = pruneClusterStations
 };
 
 EditTabView.prototype.initEvents = function () {
@@ -13,31 +14,15 @@ EditTabView.prototype.initEvents = function () {
     $('.edit-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         e.target // newly activated tab
         e.relatedTarget // previous active tab
-        let url = `${self.urlBorinud}/geojson/*/*/*/*/*/*/stations`
         if (e.target.id === "stations-tab") {
-            $.ajax({
-                url: url,
-                dataType: "json",
-                success: function (collection) {
-                    hours = ["*"]
-                    self.stations = collection.features
-                    self.render()
-                },
-                beforeSend: function () {
-                    self.overlay.fadeIn(300);
-                },
-                complete: function () {
-                    self.overlay.fadeOut(300);
-                },
-
-            })
+            self.stations = self.allStations.getAll()
         } else {
             self.stations = []
-            self.render()
         }
+        self.render()
     })
 }
-EditTabView.prototype.render = function (collection = []) {
+EditTabView.prototype.render = function () {
     const self = this
     let pruneCluster = self.pruneCluster
 
@@ -64,10 +49,11 @@ EditTabView.prototype.render = function (collection = []) {
             return PruneClusterForLeaflet.prototype.BuildLeafletClusterIcon.call(this, cluster);
         };
         self.stations.forEach((station) => {
-            coords.push([station.geometry.coordinates[1], station.geometry.coordinates[0]]);
-            let marker = new PruneCluster.Marker(station.geometry.coordinates[1], station.geometry.coordinates[0])
-            marker.data = station.properties
-            marker.data.station = true
+            let lon = station.lon / 100000,
+                lat = station.lat / 100000
+            coords.push([lat, lon]);
+            let marker = new PruneCluster.Marker(lat, lon)
+            marker.data = station
             self.stationsMarkers.push(marker)
             pruneCluster.RegisterMarker(marker);
         })

@@ -166,8 +166,7 @@
 
                     <div class="row">
                         <div class="col-12 text-center">
-                            <button class="btn btn-outline-primary btn-block" disabled id="showGraphButton"
-                                    onclick="showAllGraph();">
+                            <button class="btn btn-outline-primary btn-block" disabled id="showGraphButton">
                                 <div class="d-flex flex-row justify-content-between"><i class="fa fa-line-chart"></i>
                                     Show graph
                                 </div>
@@ -328,6 +327,30 @@
                         </div>
                         <div class="tab-pane fade" id="stations" role="tabpanel" aria-labelledby="stations-tab">
                             <div class="pt-2">
+                                <div class="row my-2">
+                                    <div class="col-12">
+                                        <div class="row px-3">
+                                            <div class="col-12">Height of station ground above mean sea level</div>
+                                            <div class="col-12 mt-1">
+                                                <div id="filterStationsB07030"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row my-2">
+                                    <div class="col-12">
+                                        <div class="row px-3">
+                                            <div class="col-12">Height of barometer above mean sea level</div>
+                                            <div class="col mt-1">
+                                                <div id="filterStationsB07031"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary btn-outline btn-block" id="addStationsFromConstantData">
+                                    Add stations
+                                </button>
+                                <hr style="width: 100%">
                                 <div class="form-group">
                                     <label for="startDateI">Initial date</label>
                                     <div class="input-group date" id="startDateI" data-target-input="nearest">
@@ -373,6 +396,10 @@
                                             name="levelInvalidation" multiple>
                                     </select>
                                 </div>
+
+
+                                <hr style="width: 100%">
+                                <p class="mt-2">Selected stations:</p>
                                 <div class="my-2 d-flex flex-row justify-content-between">
                                     <button id="validateStations"
                                             class="btn btn-outline-success w-100 mr-1 validateButtonStations">
@@ -516,10 +543,11 @@
 {% block javascript %}
     <script src="{% static 'dynamic/js/structure/publish-subscribe.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/edit-data-collection.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/station-collection.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/edit-data-view.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/edit-station-history-collection.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/edit-station-history-view.js' %}"></script>
-      <script src="{% static 'dynamic/js/structure/edit-data-history-collection.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/edit-data-history-collection.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/edit-data-history-view.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/edit-station-collection.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/edit-station-view.js' %}"></script>
@@ -527,6 +555,7 @@
     <script src="{% static 'dynamic/js/structure/search-form-view.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/map-view.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/edit-tab-view.js' %}"></script>
+    <script src="{% static 'dynamic/js/structure/invalidation-vars-form-view.js' %}"></script>
     <script>
         $(function () {
             const pruneCluster = new PruneClusterForLeaflet();
@@ -561,32 +590,51 @@
             const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay)
             mapView.initEvents()
             {% if perms.dynamic.can_edit_attributes %}
-                const editDataCollection = new EditDataCollection();
-                editDataCollection.subscribe();
+                const stationCollection = new StationCollection()
 
-                const editDataView = new EditDataView(editDataCollection, map, pruneCluster, overlay);
-                editDataView.initEvents();
+                $.ajax({
+                    url: "{% url "get-all-stations-vm2" %}",
+                    dataType: "json",
+                    success: function (collection) {
+                        stationCollection.addMultiple(collection["stations"])
+                        console.log(stationCollection)
+                    },
+                    beforeSend: function () {
+                        overlay.fadeIn(300);
+                    },
+                    complete: function () {
+                        overlay.fadeOut(300);
+                    },
+                }).then(() => {
+                    const editDataCollection = new EditDataCollection();
+                    editDataCollection.subscribe();
 
-                const editStationCollection = new EditStationCollection();
-                editStationCollection.subscribe();
+                    const editDataView = new EditDataView(editDataCollection, map, pruneCluster, overlay);
+                    editDataView.initEvents();
 
-                const editStationView = new EditStationView(editStationCollection, map, pruneClusterStations, overlay);
-                editStationView.initEvents();
+                    const editStationCollection = new EditStationCollection();
+                    editStationCollection.subscribe();
 
-                const editTabView = new EditTabView("{{url_borinud}}", map, pruneCluster, overlay, pruneClusterStations)
-                editTabView.initEvents()
+                    const editStationView = new EditStationView(editStationCollection, map, pruneClusterStations, overlay, "{{ url_borinud }}", stationCollection);
+                    editStationView.initEvents();
 
-                const editStationHistoryCollection = new EditStationHistoryCollection();
-                editStationHistoryCollection.subscribe();
+                    const editTabView = new EditTabView("{{url_borinud}}", map, pruneCluster, overlay, pruneClusterStations, stationCollection)
+                    editTabView.initEvents()
 
-                const editStationHistoryView = new EditStationHistoryView(editStationHistoryCollection, map);
-                editStationHistoryView.initEvents();
+                    const editStationHistoryCollection = new EditStationHistoryCollection();
+                    editStationHistoryCollection.subscribe();
 
-                const editDataHistoryCollection = new EditDataHistoryCollection();
-                editDataHistoryCollection.subscribe();
+                    const editStationHistoryView = new EditStationHistoryView(editStationHistoryCollection, map);
+                    editStationHistoryView.initEvents();
 
-                const editDataHistoryView = new EditDataHistoryView(editDataHistoryCollection, map);
-                editDataHistoryView.initEvents();
+                    const editDataHistoryCollection = new EditDataHistoryCollection();
+                    editDataHistoryCollection.subscribe();
+
+                    const editDataHistoryView = new EditDataHistoryView(editDataHistoryCollection, map);
+                    editDataHistoryView.initEvents();
+
+                })
+
 
                 var drawnItems = new L.FeatureGroup();
                 map.addLayer(drawnItems);
@@ -624,37 +672,6 @@
                         )
                         initialSearchForm.values.level.push(level + "");
                     })
-                    let uniqueVars = [...new Set(initialSearchForm.values.vars)]
-                    let uniqueTrange = [...new Set(initialSearchForm.values.timerange)]
-                    let uniqueLevels = [...new Set(initialSearchForm.values.level)]
-                    let html = ""
-                    uniqueVars.forEach((item) => {
-                        let value = item
-                        if (borinud.config.B[item] !== undefined) {
-                            value = borinud.config.B[item].description + " " + borinud.config.B[item].unit;
-                        }
-                        html += `<option value="${item}">${value}</option>`
-
-                    })
-                    $("#varsInvalidation").append(html)
-
-                    html = ""
-                    uniqueLevels.forEach((item) => {
-                        let [l1, l2, l3, l4] = borinud.config.level.decode(item);
-                        let value = borinud.config.level.describe(l1, l2, l3, l4);
-                        html += `<option value="${item}">${value}</option>`
-
-                    })
-                    $("#levelInvalidation").append(html)
-
-                    html = ""
-                    uniqueTrange.forEach((item) => {
-                        let [t1, t2, t3, t4] = borinud.config.trange.decode(item);
-                        let value = borinud.config.trange.describe(t1, t2, t3, t4);
-                        html += `<option value="${item}">${value}</option>`
-
-                    })
-                    $("#trangeInvalidation").append(html)
                     const searchFormView = new SearchFormView(SearchForm, initialSearchForm)
                     searchFormView.initEvents()
                 },

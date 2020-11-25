@@ -1,14 +1,47 @@
-let EditStationView = function (stationCollection, map, pruneCluster, overlay) {
-    this.data = stationCollection;
+let EditStationView = function (editStationCollection, map, pruneCluster, overlay, urlBorinud, stationCollection) {
+    this.data = editStationCollection;
     this.pruneCluster = pruneCluster;
     this.overlay = overlay;
     this.map = map;
+    this.urlBorinud = urlBorinud
+    this.allStations = stationCollection
 };
 
 EditStationView.prototype.initEvents = function () {
     this.publishers();
     this.subscribers();
     const self = this
+
+    const invalidationVarsFormView = new InvalidationVarsFormView()
+    invalidationVarsFormView.initEvents()
+
+    function createSlider(values, id) {
+        let min = Math.min(...values.filter(function (n) {
+            return !isNaN(n);
+        }))
+        let max = Math.max(...values.filter(function (n) {
+            return !isNaN(n);
+        }))
+
+        $(`${id}`).slider({
+            values: [min, max],
+            min: min,
+            range: true,
+            max: max,
+            step: 10,
+        }).slider("pips").slider("float");
+    }
+
+    let B07030values = []
+    let B07031values = []
+
+    self.allStations.getAll().forEach((station) => {
+        B07030values.push(station["B07030"])
+        B07031values.push(station["B07031"])
+    })
+    createSlider([...new Set(B07031values)], "#filterStationsB07031")
+    createSlider(B07030values, "#filterStationsB07030")
+
     $('#startDateI').datetimepicker({
         widgetPositioning: {
             horizontal: 'left',
@@ -93,6 +126,12 @@ EditStationView.prototype.initEvents = function () {
                             },
                             error: function (errMsg) {
                                 console.log(errMsg);
+                            },
+                            beforeSend: function () {
+                                self.overlay.fadeIn(300);
+                            },
+                            complete: function () {
+                                self.overlay.fadeOut(300);
                             }
                         });
 
@@ -111,7 +150,7 @@ EditStationView.prototype.initEvents = function () {
 
         }
     })
-};
+}
 
 
 EditStationView.prototype.publishers = function () {
@@ -130,7 +169,23 @@ EditStationView.prototype.publishers = function () {
             }
         }
     );
-
+    $(document.body).on("click", "#addStationsFromConstantData", function () {
+        let sliderB07030 = $("#filterStationsB07030")
+        let sliderB07031 = $("#filterStationsB07031")
+        let vSliderB07030 = [sliderB07030.slider("values", 0), sliderB07030.slider("values", 1)];
+        let vSliderB07031 = [sliderB07031.slider("values", 0), sliderB07031.slider("values", 1)];
+        let stationsToAdd = []
+        self.allStations.getAll().forEach((station) => {
+            let valueB07030 = station["B07030"]
+            let valueB07031 = station["B07031"]
+            if ((valueB07030 >= vSliderB07030[0] && valueB07030 <= vSliderB07030[1])
+                && (valueB07031 >= vSliderB07031[0] && valueB07031 <= vSliderB07031[1])) {
+                stationsToAdd.push(station)
+            }
+        })
+        $.Topic("station-add-multiple").publish(stationsToAdd);
+        toastr.success("Done!")
+    })
 
     $(document.body).on("click", ".removeFromTableStation", function () {
         let id = $(this).data('id');
@@ -155,6 +210,10 @@ EditStationView.prototype.subscribers = function () {
     });
 
     $.Topic("station-remove").subscribe(function () {
+        self.render();
+    });
+
+    $.Topic("station-add-multiple").subscribe(function () {
         self.render();
     });
 
