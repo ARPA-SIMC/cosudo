@@ -57,7 +57,7 @@ EditDataView.prototype.publishers = function () {
                 success: function (data) {
                     if (data.success) {
                         $.Topic("data-remove-all").publish();
-                         $.Topic("edit-data-history-reload").publish();
+                        $.Topic("edit-data-history-reload").publish();
                         toastr.success("Done!")
                     } else {
                         toastr.error("Something went wrong!")
@@ -67,6 +67,12 @@ EditDataView.prototype.publishers = function () {
                 },
                 error: function (errMsg) {
                     console.log(errMsg);
+                },
+                beforeSend: function () {
+                    self.overlay.fadeIn(300);
+                },
+                complete: function () {
+                    self.overlay.fadeOut(300);
                 }
             });
 

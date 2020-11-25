@@ -125,9 +125,9 @@ EditDataHistoryView.prototype.render = function () {
                             <div class="d-flex flex-row justify-content-between"><b>Edit date:</b>${moment(data.created_date).format("DD/MM/YYYY HH:mm:ss")}</div>
                             <div class="d-flex flex-row justify-content-between"><b>Type:</b><span class="badge ${classColor}">${typeStr}</span></div>
                         </div>
-                        <button class="btn btn-secondary makeDataReport my-auto" data-id="${data.id}" type="button"">
+                        <a href="/dynamic/download-table-validation/${data.id}/data/" target="_blank" class="btn btn-secondary makeDataReport my-auto" data-id="${data.id}" type="button"">
                             <i class="fa fa-download"></i>
-                        </button>
+                        </a>
                         <button class="btn btn-link my-auto" type="button" data-toggle="collapse" data-target="#collapseEditStation${data.id}" aria-expanded="false" aria-controls="collapseEditStation${data.id}">
                             <i class="fa fa-caret-down"></i>
                         </button>

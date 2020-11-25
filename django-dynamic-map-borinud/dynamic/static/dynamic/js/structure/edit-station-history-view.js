@@ -125,9 +125,9 @@ EditStationHistoryView.prototype.render = function () {
                             ${data.startDate !== null ? `<div class="d-flex flex-row justify-content-between"><b>Start date:</b>${moment(data.startDate).utcOffset(data.startDate).format("DD/MM/YYYY HH:mm:ss")}</div>` : ""}
                             ${data.finalDate !== null ? `<div class="d-flex flex-row justify-content-between"><b>End date:</b>${moment(data.finalDate).utcOffset(data.finalDate).format("DD/MM/YYYY HH:mm:ss")}</div>` : ""}
                         </div>
-                        <button class="btn btn-secondary makeStationReport my-auto" data-id="${data.id}" type="button"">
+                        <a href="/dynamic/download-table-validation/${data.id}/station/" target="_blank" class="btn btn-secondary makeStationReport my-auto" data-id="${data.id}" type="button"">
                             <i class="fa fa-download"></i>
-                        </button>
+                        </a>
                         <button class="btn btn-link my-auto" type="button" data-toggle="collapse" data-target="#collapseEditStation${data.id}" aria-expanded="false" aria-controls="collapseEditStation${data.id}">
                             <i class="fa fa-caret-down"></i>
                         </button>
