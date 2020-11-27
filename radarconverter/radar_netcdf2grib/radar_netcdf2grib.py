@@ -120,20 +120,19 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
     # Data di emissione
     date_time = date
 
-    # Setto i parametri del grib
+    # Setto i parametri comuni dei grib1 e grib2
     key_map_grib = {
         'generatingProcessIdentifier': 1,
-        # 'centre': 80,
+        'centre': 200, # 'centre': 80,
         'missingValue': rmiss,
         'packingType': 'grid_simple',
         'bitmapPresent': 1,
 
-        'resolutionAndComponentFlags': 0,  # resolutionAndComponentFlags
+        'resolutionAndComponentFlags': 0,
 
         'topLevel': 0,  # l1
         'bottomLevel': imiss,  # l2
-        # Variabile precipitazione
-        'centre': 200,
+
         # istante di emissione del dato
         'dataDate': int(date_time.strftime(GRIB_DAY_FORMAT)),
         'dataTime': int(date_time.strftime(GRIB_TIME_FORMAT)),
@@ -142,7 +141,7 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
     # correzioni chiavi diverse tra grib1  e grib2
     if grib_output_type == 1:
         # Timerange
-        key_map_grib['timeRangeIndicator'] = 4 #non dovrebbe essere 13?
+        key_map_grib['timeRangeIndicator'] = 13
         key_map_grib['P1'] = 0
         key_map_grib['P2'] = acc_t
         key_map_grib['indicatorOfUnitOfTimeRange'] = 1
@@ -204,7 +203,7 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
     codes_release(gaid_template)
     fout.close()
 
-    #Chiusura file netcdf
+    # Chiusura file netcdf
     ncid.close()
 
     print("OK")
