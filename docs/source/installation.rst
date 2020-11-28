@@ -73,9 +73,11 @@ Add the following configuration for django-rest-framework ::
         }
 
 Execute migrations ::
+
     python manage.py migrate
 
 or on rmap::
+
     rmapctrl --syncdb
 
 Skinny-wms installation
