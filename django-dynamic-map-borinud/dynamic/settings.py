@@ -25,7 +25,3 @@ PASSWORD_ARKIWEB = get("PASSWORD_ARKIWEB", "")
 """dballe db string"""
 DBALLE_DB_DYNAMIC = get("DBALLE_DB_DYNAMIC", "sqlite://test.sqlite")
 
-"""directory of fixtures"""
-FIXTURES_ROOT = get(
-    "FIXTURES_ROOT", os.path.abspath(os.path.dirname(__file__)) + "/fixtures/"
-)
