@@ -13,7 +13,6 @@ router.register(r"alarms", views.AlarmViewSetEdit, basename="alarms")
 urlpatterns = [
     path("", include(router.urls)),
     path("map/", views.render_map, name="map"),
-    path("map-validation/", views.render_map_validation),
     path("extract-grib/", views.render_extract_page, name="extract-page"),
     path(
         "manual-edit-attributes-data/",

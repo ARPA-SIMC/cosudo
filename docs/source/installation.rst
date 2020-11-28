@@ -45,6 +45,12 @@ Edit your `settings.py` file to add the credentials for arkiweb and the url for 
     PASSWORD_ARKIWEB = "..."
     ARKIWEB_URL = "..." 
 
+Add the string for the dballe db (standart is '"sqlite://test.sqlite"')::
+
+    DBALLE_DB_DYNAMIC = "sqlite://example.sqlite"
+
+
+
 Edit your project `urls.py` file to import the URLs::
 
 
@@ -65,6 +71,12 @@ Add the following configuration for django-rest-framework ::
         'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
         'PAGE_SIZE': 15
         }
+
+Execute migrations ::
+    python manage.py migrate
+
+or on rmap::
+    rmapctrl --syncdb
 
 Skinny-wms installation
 ==================================

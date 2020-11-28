@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.conf import settings
+from dynamic import settings
 from http.client import HTTPSConnection
 from base64 import b64encode
 import requests
@@ -20,44 +20,23 @@ from dynamic.permissions import HasCanExtract
 
 
 def render_map(request):
-    url = (
-        settings.BORINUD_URL if hasattr(settings, "BORINUD_URL") else "/borinud/api/v1"
+
+    return render(
+        request,
+        "map.html",
+        {"url_borinud": settings.BORINUD_URL, "url_wms": settings.WMS_URL},
     )
-
-    url_wms = (
-        settings.WMS_URL if hasattr(settings, "WMS_URL") else "http://0.0.0.0:5000/wms"
-    )
-
-    return render(request, "map.html", {"url_borinud": url, "url_wms": url_wms})
-
-
-def render_map_validation(request):
-    url = (
-        settings.BORINUD_URL if hasattr(settings, "BORINUD_URL") else "/borinud/api/v1"
-    )
-    return render(request, "map_validation.html", {"url_borinud": url})
 
 
 @login_required
 @permission_required("dynamic.can_extract")
 def render_extract_page(request):
     if request.method == "POST":
-        repository = (
-            settings.REPOSITORY_DIR
-            if hasattr(settings, "REPOSITORY_DIR")
-            else "./testgrib/"
-        )
-
-        url = (
-            settings.ARKIWEB_URL
-            if hasattr(settings, "ARKIWEB_URL")
-            else "https://simc.arpae.it/services/arkiweb/data"
-        )
+        repository = settings.REPOSITORY_DIR
+        url = settings.ARKIWEB_URL
 
         if not (
-            hasattr(settings, "USERNAME_ARKIWEB")
-            and hasattr(settings, "PASSWORD_ARKIWEB")
-            and os.path.exists(repository)
+            os.path.exists(repository)
             and "startTime" in request.POST
             and "product" in request.POST
             and "level" in request.POST
@@ -117,7 +96,7 @@ def manual_edit_attributes(request):
             return JsonResponse({"error": "Error decoding json"})
         dataObj = data["data"]
         type = data["type"]
-        memdb = dballe.DB.connect("sqlite://test.sqlite")
+        memdb = dballe.DB.connect(settings.DBALLE_DB_DYNAMIC)
         edit_obj = Edit(type="i" if type == "invalidate" else "v")
         edit_obj.save()
         with memdb.transaction() as tr:
@@ -154,7 +133,6 @@ def manual_edit_attributes(request):
                     edit=edit_obj,
                 ).save()
                 for rec in tr.query_data(query_params):
-                    print(rec)
                     if type == "invalidate":
                         rec.insert_attrs({"B33196": 1})
                     else:
@@ -179,7 +157,7 @@ def manual_edit_attributes_station(request):
             data["initialDate"], "%Y-%m-%dT%H:%M:%S.%fZ"
         )
         endDate = data["finalDate"]
-        memdb = dballe.DB.connect("sqlite://test.sqlite")
+        memdb = dballe.DB.connect(settings.DBALLE_DB_DYNAMIC)
         edit_obj = Edit(
             type="i" if type == "invalidate" else "v",
             data_type="s",
@@ -228,7 +206,6 @@ def manual_edit_attributes_station(request):
                     edit_station.finalDate = query_params["datetimemax"]
                 edit_station.save()
                 for rec in tr.query_data(query_params):
-                    print(rec)
                     if type == "invalidate":
                         rec.insert_attrs({"B33196": 1})
                     else:
@@ -240,7 +217,7 @@ def manual_edit_attributes_station(request):
 @login_required
 @permission_required("dynamic.can_extract")
 def get_all_stations_vm2(request):
-    f = open("dynamic/stations.json")
+    f = open(settings.FIXTURES_ROOT+"stations.json")
     data = json.load(f)
     stations = list(data.values())
     for station in stations:
@@ -253,7 +230,7 @@ def get_all_stations_vm2(request):
 @login_required
 @permission_required("dynamic.can_extract")
 def get_all_vars_vm2(request):
-    f = open("dynamic/variables.json")
+    f = open(settings.FIXTURES_ROOT+"variables.json")
     data = json.load(f)
     variables = list(data.values())
     return JsonResponse({"variables": variables})
@@ -323,8 +300,8 @@ def download_table_validations(request, id, type):
     )
     if len(data) <= 0:
         return HttpResponseNotFound()
-    stations = read_json("dynamic/stations.json")
-    variables = read_json("dynamic/variables.json")
+    stations = read_json(settings.FIXTURES_ROOT+"stations.json")
+    variables = read_json(settings.FIXTURES_ROOT+"variables.json")
     type_edit = "1" if edit.type == "i" else "0"
     table = ""
     for d in data:
@@ -357,7 +334,7 @@ class AlarmViewSetEdit(
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
-    mixins.RetrieveModelMixin, 
+    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
     serializer_class = AlarmSerializer
