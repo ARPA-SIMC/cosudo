@@ -17,6 +17,7 @@ from dynamic.serializers import EditSerializer, AlarmSerializer, AlarmEditSerial
 from django.http import HttpResponseNotFound
 from dynamic.compare_summaries import compare_summaries_data
 from dynamic.permissions import HasCanExtract
+from django.contrib.staticfiles import finders
 
 
 def render_map(request):
@@ -217,7 +218,7 @@ def manual_edit_attributes_station(request):
 @login_required
 @permission_required("dynamic.can_extract")
 def get_all_stations_vm2(request):
-    f = open(settings.FIXTURES_ROOT+"stations.json")
+    f = open(finders.find("dynamic/fixtures/stations.json"))
     data = json.load(f)
     stations = list(data.values())
     for station in stations:
@@ -230,7 +231,7 @@ def get_all_stations_vm2(request):
 @login_required
 @permission_required("dynamic.can_extract")
 def get_all_vars_vm2(request):
-    f = open(settings.FIXTURES_ROOT+"variables.json")
+    f = open(finders.find("dynamic/fixtures/variables.json"))
     data = json.load(f)
     variables = list(data.values())
     return JsonResponse({"variables": variables})
@@ -300,8 +301,8 @@ def download_table_validations(request, id, type):
     )
     if len(data) <= 0:
         return HttpResponseNotFound()
-    stations = read_json(settings.FIXTURES_ROOT+"stations.json")
-    variables = read_json(settings.FIXTURES_ROOT+"variables.json")
+    stations = read_json(finders.find("dynamic/fixtures/stations.json"))
+    variables = read_json(finders.find("dynamic/fixtures/variables.json"))
     type_edit = "1" if edit.type == "i" else "0"
     table = ""
     for d in data:
