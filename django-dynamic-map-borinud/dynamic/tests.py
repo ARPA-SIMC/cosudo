@@ -66,4 +66,4 @@ class ExtractPageTestCase(TestCase):
                                              "product": ["s", "s"],
                                              "level": ["s", "s"],
                                              "dataset": ""})
-                self.assertEqual(response.status_code, 404)
+                self.assertEqual(response.status_code, 500)
