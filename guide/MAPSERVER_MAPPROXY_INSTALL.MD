@@ -300,15 +300,15 @@ sudo su
 
 dnf install python3 python3-devel python3-paramiko -y
 
-python -m pip install MapProxy
-
-python -m pip install virtualenv
-
 cd /usr/local/src
+
+dnf installpython3-virtualenv
 
 virtualenv --system-site-packages mapproxy
 
 source mapproxy/bin/activate
+
+pip install MapProxy
 
 mapproxy-util create -t base-config mymapproxy
 
