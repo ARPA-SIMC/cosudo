@@ -295,10 +295,8 @@ systemctl restart httpd
 http://server_ip/wms?service=wms&version=1.3.0&CRS=CRS:84&REQUEST=GetMap&FORMAT=image/jpeg&SRS=EPSG:3857&BBOX=511393,4837571,801893,4999571-&WIDTH=581&HEIGHT=324&LAYERS=fltfile
 
 
-#Installazione Mapproxy
+#MAPPROXY install
 sudo su
-
-**Install python dev, pip and venv**
 
 dnf install python3 python3-devel python3-paramiko -y
 
