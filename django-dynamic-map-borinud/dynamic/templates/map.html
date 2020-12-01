@@ -968,6 +968,7 @@
   $(function () {
       const pruneCluster = new PruneClusterForLeaflet();
       const pruneClusterStations = new PruneClusterForLeaflet();
+      const todayDateSummary = moment(new Date()).format("YYYY/MM")
       PruneCluster.Cluster.ENABLE_MARKERS_LIST = true
       const map = L.map('map', {
           zoomControl: false,
@@ -1064,7 +1065,7 @@
           map.addControl(drawControl);
       {% endif %}
       $.ajax({
-          url: "{{ url_borinud }}/dbajson/*/*/*/*/*/*/summaries",
+          url: `{{ url_borinud }}/dbajson/*/*/*/*/*/*/summaries/${todayDateSummary}`,
           dataType: "json",
           success: function (resp) {
               let initialSearchForm = new SearchForm()
