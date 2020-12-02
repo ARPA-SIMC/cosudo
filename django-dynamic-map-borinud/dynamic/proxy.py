@@ -30,7 +30,7 @@ class Proxy(object):
         conn = HTTPConnection(server_base, server_port)
 
         url = "?".join([server_url, request.environ["QUERY_STRING"]])
-        print(url)
+
         conn.request(request.method, url, request.body, headers)
 
         result = conn.getresponse()

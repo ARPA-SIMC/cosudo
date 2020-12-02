@@ -5,7 +5,8 @@ let MapView = function (
   legend,
   overlay,
   urlWms,
-  notFoundImage
+  notFoundImage,
+  urlMapServer
 ) {
   this.collection = [];
   this.urlBorinud = urlBorinud;
@@ -17,6 +18,7 @@ let MapView = function (
   this.controlLayer = undefined;
   this.urlWms = urlWms;
   this.notFoundImage = notFoundImage;
+  this.urlMapServer = urlMapServer;
 };
 
 MapView.prototype.initEvents = function () {
@@ -55,6 +57,7 @@ MapView.prototype.initEvents = function () {
     },
   });
   self.map.addControl(new customControl());
+  
   $.ajax({
     type: "GET",
     url: self.urlWms,
@@ -106,30 +109,73 @@ MapView.prototype.initEvents = function () {
         aa[layer_name[0]] = layer;
         opacityControls[layer_name[0]] = L.control.opacity(aa, {});
       });
-
-      self.map.on("layeradd", function (l) {
-        if (opacityControls[l.layer.options.layers]) {
-          opacityControls[l.layer.options.layers].addTo(self.map);
-        }
-        try {
-          l.layer.setParams({ time: self.selectedHour });
-        } catch {}
+      $.ajax({
+        type: "GET",
+        url: `${self.urlMapServer}?service=wms`,
+        data: { request: "getCapabilities" },
+        dataType: "xml",
+        success: function (xml) {
+            layerNames = []
+           url = `${self.urlMapServer}?`;
+     
+          $(xml)
+            .find("Layer")
+            .each(function () {
+              let title = $(this).find("Title").first().text();
+              let name = $(this).find("Name").first().text();
+              if ((name != "background") & (name != "ol_background")) {
+                layerNames.push([name, title]);
+              }
+            });
+          
+          layerNames.forEach(function (layer_name) {
+            let layer = L.tileLayer.wms(url, {
+              layers: layer_name[0],
+              format: "image/png",
+              transparent: "TRUE",
+              attribution: "",
+              version: "1.3.0",
+              errorTileUrl: self.notFoundImage,
+            });
+            layers[layer_name[1]] = layer;
+            let aa = {};
+            aa[layer_name[0]] = layer;
+            opacityControls[layer_name[0]] = L.control.opacity(aa, {});
+          });
+    
+          self.map.on("layeradd", function (l) {
+            if (opacityControls[l.layer.options.layers]) {
+              opacityControls[l.layer.options.layers].addTo(self.map);
+            }
+            try {
+              l.layer.setParams({ time: self.selectedHour });
+            } catch {}
+          });
+    
+          self.map.on("layerremove", function (l) {
+            if (opacityControls[l.layer.options.layers]) {
+              opacityControls[l.layer.options.layers].remove();
+            }
+          });
+    
+          let baseMaps = {
+            background: background,
+            ol_background: ol_background,
+          };
+          console.log(layers);
+          self.controlLayer = L.control.layers(baseMaps, layers);
+          self.controlLayer.addTo(self.map);
+          L.control.scale({ position: "bottomright" }).addTo(self.map);
+        },
+        error: function (error) {
+          console.log(error);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution:
+              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          }).addTo(self.map);
+        },
       });
-
-      self.map.on("layerremove", function (l) {
-        if (opacityControls[l.layer.options.layers]) {
-          opacityControls[l.layer.options.layers].remove();
-        }
-      });
-
-      let baseMaps = {
-        background: background,
-        ol_background: ol_background,
-      };
-      console.log(layers);
-      self.controlLayer = L.control.layers(baseMaps, layers);
-      self.controlLayer.addTo(self.map);
-      L.control.scale({ position: "bottomright" }).addTo(self.map);
+     
     },
     error: function (error) {
       console.log(error);
