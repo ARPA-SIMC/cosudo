@@ -28,12 +28,14 @@ def render_map(request):
     return render(
         request,
         "map.html",
-        {"url_borinud": settings.BORINUD_URL, },
+        {
+            "url_borinud": settings.BORINUD_URL,
+        },
     )
 
 
 class WMS(PermissionRequiredMixin, View):
-    permission_required = 'dynamic.can_extract'
+    permission_required = "dynamic.can_extract"
     proxy = Proxy(settings.WMS_URL, settings.WMS_PORT)
 
     def get(self, request, *args, **kwargs):
@@ -41,7 +43,7 @@ class WMS(PermissionRequiredMixin, View):
 
 
 class MAPSERVERWMS(PermissionRequiredMixin, View):
-    permission_required = 'dynamic.can_extract'
+    permission_required = "dynamic.can_extract"
     proxy = Proxy(settings.MAP_SERVER_WMS_URL, settings.MAP_SERVER_WMS_PORT)
 
     def get(self, request, *args, **kwargs):
