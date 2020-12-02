@@ -20,6 +20,7 @@ from dynamic.permissions import HasCanExtract
 from django.contrib.staticfiles import finders
 from django.views.generic import View
 from .proxy import Proxy
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 def render_map(request):
@@ -27,12 +28,21 @@ def render_map(request):
     return render(
         request,
         "map.html",
-        {"url_borinud": settings.BORINUD_URL, "url_wms": settings.WMS_URL},
+        {"url_borinud": settings.BORINUD_URL, },
     )
 
 
-class WMS(View):
+class WMS(PermissionRequiredMixin, View):
+    permission_required = 'dynamic.can_extract'
     proxy = Proxy(settings.WMS_URL, settings.WMS_PORT)
+
+    def get(self, request, *args, **kwargs):
+        return self.proxy.request(request)
+
+
+class MAPSERVERWMS(PermissionRequiredMixin, View):
+    permission_required = 'dynamic.can_extract'
+    proxy = Proxy(settings.MAP_SERVER_WMS_URL, settings.MAP_SERVER_WMS_PORT)
 
     def get(self, request, *args, **kwargs):
         return self.proxy.request(request)
