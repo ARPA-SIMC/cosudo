@@ -122,7 +122,8 @@ make install
 
 
 
-##  CONFIGURE APACHE CGI
+###  CONFIGURE APACHE CGI
+
 **example config http://www.yolinux.com/TUTORIALS/GIS-Servers-MapServer.html**
 
 yum install httpd -y
@@ -296,13 +297,14 @@ http://server_ip/wms?service=wms&version=1.3.0&CRS=CRS:84&REQUEST=GetMap&FORMAT=
 
 
 #MAPPROXY install
+
 sudo su
 
-dnf install python3 python3-devel python3-paramiko -y
+dnf install python3 python3-devel python3-paramiko proj-devel -y
 
 cd /usr/local/src
 
-dnf installpython3-virtualenv
+dnf install python3-virtualenv -y
 
 virtualenv --system-site-packages mapproxy
 
@@ -313,6 +315,8 @@ pip install MapProxy
 mapproxy-util create -t base-config mymapproxy
 
 cd mymapproxy
+
+rm -f mapproxy.yaml
 
 **Config example file (change wms info, url and name)**
 
@@ -333,9 +337,12 @@ nano mapproxy.yaml
           use_grid_names: true
       wmts:
       wms:
+        srs: ['EPSG:4326', 'EPSG:3857']
+        bbox_srs: ['EPSG:4326', 'EPSG:3857']
+        versions: [ '1.1.1', '1.3.0' ]
         md:
-          title: MapProxy WMS Proxy
-          abstract: This is a minimal MapProxy example.
+          title: MapProxy
+          abstract: MapProxy
     
     
     # -------------------------------
@@ -366,7 +373,7 @@ nano mapproxy.yaml
           featureinfo: true
           legendgraphic: True
         req:
-          url: http://52.59.135.208:5000/wms?
+          url: http://127.0.0.1:5000/wms?
           layers: kx
     
       wms_10fg:
@@ -375,7 +382,7 @@ nano mapproxy.yaml
           featureinfo: true
           legendgraphic: True
         req:
-          url: http://52.59.135.208:5000/wms?
+          url: http://127.0.0.1:5000/wms?
           layers: 10fg
     
     
