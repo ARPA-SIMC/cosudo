@@ -9,7 +9,6 @@ router.register(r"edits", views.EditViewSet, basename="edits")
 router.register(r"alarms", views.AlarmViewSetEdit, basename="alarms")
 
 
-
 urlpatterns = [
     path("", include(router.urls)),
     path("map/", views.render_map, name="map"),
@@ -37,6 +36,11 @@ urlpatterns = [
         "compare-summaries/",
         views.compare_summaries,
         name="compare-summaries",
+    ),
+    path(
+        "wms/",
+        views.WMS.as_view(),
+        name="wms",
     ),
     # path('prova/', views.prova),
 ]
