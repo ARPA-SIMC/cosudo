@@ -996,7 +996,7 @@
       const overlay = $("#overlay")
 
 
-      const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay,"{{url_wms}}","{% static 'dynamic/images/map-not-found.png' %}")
+      const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay,"{% url "wms" %}","{% static 'dynamic/images/map-not-found.png' %}")
       mapView.initEvents()
       {% if perms.dynamic.can_extract %}
 

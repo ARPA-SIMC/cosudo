@@ -18,6 +18,8 @@ from django.http import HttpResponseNotFound
 from dynamic.compare_summaries import compare_summaries_data
 from dynamic.permissions import HasCanExtract
 from django.contrib.staticfiles import finders
+from django.views.generic import View
+from .proxy import Proxy
 
 
 def render_map(request):
@@ -27,6 +29,13 @@ def render_map(request):
         "map.html",
         {"url_borinud": settings.BORINUD_URL, "url_wms": settings.WMS_URL},
     )
+
+
+class WMS(View):
+    proxy = Proxy(settings.WMS_URL, settings.WMS_PORT)
+
+    def get(self, request, *args, **kwargs):
+        return self.proxy.request(request)
 
 
 @login_required
@@ -218,7 +227,7 @@ def manual_edit_attributes_station(request):
 @login_required
 @permission_required("dynamic.can_extract")
 def get_all_stations_vm2(request):
-    f = open(finders.find("dynamic/fixtures/stations.json"))
+    f = open(finders.find("dynamic/fixtures/stations.json"), encoding="utf-8")
     data = json.load(f)
     stations = list(data.values())
     for station in stations:
@@ -231,7 +240,7 @@ def get_all_stations_vm2(request):
 @login_required
 @permission_required("dynamic.can_extract")
 def get_all_vars_vm2(request):
-    f = open(finders.find("dynamic/fixtures/variables.json"))
+    f = open(finders.find("dynamic/fixtures/variables.json"), encoding="utf-8")
     data = json.load(f)
     variables = list(data.values())
     return JsonResponse({"variables": variables})
@@ -284,7 +293,7 @@ def find_id_var(json_variables, bcode, trange, level):
 
 
 def read_json(path):
-    f = open(path)
+    f = open(path, encoding="utf-8")
     return json.load(f)
 
 

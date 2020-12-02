@@ -10,7 +10,11 @@ def get(key, default):
 BORINUD_URL = get("BORINUD_URL", "/borinud/api/v1")
 
 """url of skinny wms service"""
-WMS_URL = get("WMS_URL", "http://0.0.0.0:5000/wms")
+WMS_URL = get("WMS_URL", "http://0.0.0.0/wms")
+
+"""wms port"""
+WMS_PORT = get("WMS_PORT", "5000")
+
 
 """path of repository dir """
 REPOSITORY_DIR = get("REPOSITORY_DIR", "./testgrib/")
