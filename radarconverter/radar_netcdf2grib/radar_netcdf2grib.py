@@ -21,7 +21,8 @@ date_format_filename = "%Y/%m/%d/%H/%M"
 GRIB_DAY_FORMAT = "%Y%m%d"
 GRIB_TIME_FORMAT = "%H%M"
 
-rmiss = -0.0100000  # lo imposto uguale al valore rmiss di default dei netcdf
+rmiss_netcdf = "   -0.0100000"  #  default dei netcdf
+rmiss_grib = 9999
 imiss = 255
 
 tipo = 'regular_ll'  # string
@@ -84,7 +85,7 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
                 acc_t = 1.0
             # Sostituisco il valor mancante con rmiss
             cum_pr_mm = np.array(cum_pr_mm)
-            #cum_pr_mm = np.where(cum_pr_mm >= 0.0, cum_pr_mm, rmiss)
+            cum_pr_mm = np.where(cum_pr_mm >= 0.0, cum_pr_mm, rmiss_grib)
             cum_pr_mm = cum_pr_mm[0]
 
         elif k == 'geo_dim':
@@ -123,8 +124,8 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
     # Setto i parametri comuni dei grib1 e grib2
     key_map_grib = {
         'generatingProcessIdentifier': 1,
-        'centre': 200, # 'centre': 80,
-        'missingValue': rmiss,
+        'centre': 80, # 200, # 'centre': 80,
+        'missingValue': rmiss_grib,
         'packingType': 'grid_simple',
         'bitmapPresent': 1,
 
@@ -216,7 +217,8 @@ radar_netcdf2grib("/home/fabio/PycharmProjects/skinnywms-master/skinnywms/testda
 '''
 
 
-def check_param(argv):
+def main():
+    argv = sys.argv[1:]
     inputfile = None
     outputfile = None
     grib_version = None
@@ -246,10 +248,9 @@ def check_param(argv):
             print(str(opt) + " not exist, \"radar_netcdf2grib.py -h\" for help")
             print('Error parameter: "radar_netcdf2grib.py -h" for help')
             sys.exit(2)
-    return inputfile, outputfile, grib_version
+    radar_netcdf2grib(inputfile, outputfile, grib_version)
 
 
 if __name__ == '__main__':
     # Map command line arguments to function arguments.
-    param = check_param(sys.argv[1:])
-    radar_netcdf2grib(param[0], param[1], param[2])
+    main()

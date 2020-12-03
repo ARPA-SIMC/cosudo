@@ -134,7 +134,7 @@ systemctl enable httpd
 
 systemctl status httpd
 
-yum install mod_fcgid php-fpm -y
+yum install mod_fcgid -y
 
 systemctl restart httpd
 
@@ -164,13 +164,6 @@ nano /etc/httpd/conf/httpd.conf
 **create file /etc/httpd/conf.d/MapServer.conf**
 
 nano /etc/httpd/conf.d/MapServer.conf
-
-    <Directory /data>
-        Options +ExecCGI +FollowSymlinks -SymLinksIfOwnerMatch
-        AllowOverride AuthConfig
-        Order allow,deny
-        Allow from all
-    </Directory>
     
     Alias /wms  /var/www/cgi-bin/mapserv
     <location /wms>
@@ -295,106 +288,3 @@ systemctl restart httpd
 **linktest**
 http://server_ip/wms?service=wms&version=1.3.0&CRS=CRS:84&REQUEST=GetMap&FORMAT=image/jpeg&SRS=EPSG:3857&BBOX=511393,4837571,801893,4999571-&WIDTH=581&HEIGHT=324&LAYERS=fltfile
 
-
-#MAPPROXY install
-
-sudo su
-
-dnf install python3 python3-devel python3-paramiko proj-devel -y
-
-cd /usr/local/src
-
-dnf install python3-virtualenv -y
-
-virtualenv --system-site-packages mapproxy
-
-source mapproxy/bin/activate
-
-pip install MapProxy
-
-mapproxy-util create -t base-config mymapproxy
-
-cd mymapproxy
-
-rm -f mapproxy.yaml
-
-**Config example file (change wms info, url and name)**
-
-nano mapproxy.yaml
-    
-    # -------------------------------
-    # MapProxy example configuration.
-    # -------------------------------
-    
-    
-    services:
-      demo:
-      tms:
-        use_grid_names: true
-        # origin for /tiles service
-        origin: 'nw'
-      kml:
-          use_grid_names: true
-      wmts:
-      wms:
-        srs: ['EPSG:4326', 'EPSG:3857']
-        bbox_srs: ['EPSG:4326', 'EPSG:3857']
-        versions: [ '1.1.1', '1.3.0' ]
-        md:
-          title: MapProxy
-          abstract: MapProxy
-    
-    
-    # -------------------------------
-    # Layer kx
-    # -------------------------------
-    layers:
-      - name: kx
-        title: kx
-        sources: [cache_wms_kx]
-    
-      - name: 10fg
-        title: 10fg
-        sources: [cache_wms_10fg]
-    
-    caches:
-      cache_wms_kx:
-        grids: [webmercator]
-        sources: [wms_kx]
-    
-      cache_wms_10fg:
-        grids: [webmercator]
-        sources: [wms_10fg]
-    
-    sources:
-      wms_kx:
-        type: wms
-        wms_opts:
-          featureinfo: true
-          legendgraphic: True
-        req:
-          url: http://127.0.0.1:5000/wms?
-          layers: kx
-    
-      wms_10fg:
-        type: wms
-        wms_opts:
-          featureinfo: true
-          legendgraphic: True
-        req:
-          url: http://127.0.0.1:5000/wms?
-          layers: 10fg
-    
-    
-    grids:
-        webmercator:
-            base: GLOBAL_WEBMERCATOR
-    
-    globals:
-    
-    
-**Run test server**
-
-mapproxy-util serve-develop mapproxy.yaml -b 0.0.0.0:8080
-
-**For production mode: https://mapproxy.org/docs/1.13.0/deployment.html**
