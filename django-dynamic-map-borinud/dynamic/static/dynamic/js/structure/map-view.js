@@ -147,10 +147,26 @@ MapView.prototype.initEvents = function () {
             if (opacityControls[l.layer.options.layers]) {
               opacityControls[l.layer.options.layers].addTo(self.map);
             }
+            let hour = self.selectedHour
+            if (hour=="*"){
+              hour = moment($("#datetimepicker").datetimepicker("viewDate")).format("YYYY-MM-DD")
+              selectedHourForm = $("#hour").val()
+              hour = `${hour}T${selectedHourForm}:00:00`
+            }
             try {
-              l.layer.setParams({ time: self.selectedHour });
+              l.layer.setParams({ time: hour });
             } catch {}
           });
+
+          $(document.body).on("change", "#hour", function(){
+            hour = moment($("#datetimepicker").datetimepicker("viewDate")).format("YYYY-MM-DD")
+            selectedHourForm = $("#hour").val()
+            hour = `${hour}T${selectedHourForm}:00:00`
+            let activeLayers = self.controlLayer.getActiveOverlays();
+            activeLayers.forEach((layer) => {
+              layer.setParams({ time: hour });
+            });
+          })
     
           self.map.on("layerremove", function (l) {
             if (opacityControls[l.layer.options.layers]) {
