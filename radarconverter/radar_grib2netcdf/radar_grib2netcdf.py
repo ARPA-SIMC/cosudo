@@ -62,6 +62,7 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     v.standard_name = "longitude"
     a = codes_get(gid, 'longitudeOfFirstGridPointInDegrees')
     b = codes_get(gid, 'longitudeOfLastGridPointInDegrees')
+    mesh_lon = (b - a) / (codes_get(gid, "Ni") - 1)
     v[:] = np.append(np.array(np.arange(a, b, (b - a) / (codes_get(gid, "Ni") - 1))), b)
 
     v = ncid.createVariable("lat", "f4", ("lat",))
@@ -70,6 +71,7 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     v.standard_name = "latitude"
     a = codes_get(gid, 'latitudeOfLastGridPointInDegrees')
     b = codes_get(gid, 'latitudeOfFirstGridPointInDegrees')
+    mesh_lat = (b - a) / (codes_get(gid, "Nj") - 1)
     v[:] = np.append(np.array(np.arange(a, b, (b - a) / (codes_get(gid, "Nj") - 1))), b)
 
     v = ncid.createVariable("time", "f8", ("time",))
@@ -96,7 +98,7 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     v = ncid.createVariable("mesh_dim", "f4", ("mesh_dim",))
     v.long_name = "Grid Mesh Size [X_mesh_size, Y_mesh_size]"
     v.units = "degrees"
-    v[:] = np.array([0.01264954, 0.008998871])
+    v[:] = np.array([mesh_lon, mesh_lat])
 
     v = ncid.createVariable("cum_pr_mm", "f4", ("time", "lat", "lon",))
     v.long_name = "Radar Precipitation amount"

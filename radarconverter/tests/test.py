@@ -2,6 +2,8 @@ import unittest
 from os import listdir, path, remove
 from os.path import isfile, join
 import filecmp
+import netCDF4
+import numpy as np
 
 from radarconverter.radar_grib2netcdf.radar_grib2netcdf import radar_grib2netcdf
 from radarconverter.radar_netcdf2grib.radar_netcdf2grib import radar_netcdf2grib
@@ -23,7 +25,33 @@ def clear_dir(dir_name):
     print("CLEAN DIR {} DONE".format(dir_name))
 
 
+def read_netcdf_data(name_nc):
+    # Apertura del file netcdf
+    ncid = netCDF4.Dataset(name_nc)
+    for k in ncid.variables.keys():
+        if k == 'cum_pr_mm':  # Estraggo gli attributi del campo di pioggia
+            varid_pr = ncid.variables['cum_pr_mm']
+            temp = [varid_pr[:]][0]
+            temp = np.array(temp)
+            cum_pr_mm = temp[0]
+        if k == 'lat':
+            varid_pr = ncid.variables['lat']
+            temp = [varid_pr[:]][0]
+            temp = np.array(temp)
+            lats = temp[0]
+        if k == 'lon':
+            varid_pr = ncid.variables['lon']
+            temp = [varid_pr[:]][0]
+            temp = np.array(temp)
+            lons = temp[0]
+
+    return lats, lons, cum_pr_mm
+
+
 class TestMethods(unittest.TestCase):
+    """
+    Insert
+    """
 
     def test_convertion_grib1(self):
         print("TEST GRIB1")
@@ -59,7 +87,7 @@ class TestMethods(unittest.TestCase):
         self.assertTrue(same_file)
 
         clear_dir(path_temps)
-    
+    '''
     def test_convertion_netcdf(self):
         print("TEST NETCDF")
         same_file = True
@@ -71,12 +99,25 @@ class TestMethods(unittest.TestCase):
             radar_netcdf2grib(nc_filename_orig, grib_filename, 1)
             radar_grib2netcdf(grib_filename, nc_filename_new)
             if not filecmp.cmp(nc_filename_orig, nc_filename_new):
-                same_file = False
-                print("Errore su file: {}".format(nc_filename_orig))
+                lats_new, lons_new, cum_pr_mm_new = read_netcdf_data(nc_filename_new)
+                lats_orig, lons_orig, cum_pr_mm_orig = read_netcdf_data(nc_filename_orig)
+                error_max_lat = np.max(np.abs(lats_new - lats_orig))
+                error_max_lon = np.max(np.abs(lons_new - lons_orig))
+                error_max_cum_pr_mm = np.max(np.abs(cum_pr_mm_new - cum_pr_mm_orig))
+                error_max = error_max_lat
+                if error_max < error_max_lon:
+                    error_max = error_max_lon
+                if error_max < error_max_cum_pr_mm:
+                    error_max = error_max_cum_pr_mm
+
+                if error_max >= 0.005:
+                    print("errore massmo {}".format(str(error_max)))
+                    same_file = False
+                    print("Errore su file: {}".format(nc_filename_orig))
         self.assertTrue(same_file)
 
         clear_dir(path_temps)
-    '''
+
 
 
 if __name__ == '__main__':
