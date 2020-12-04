@@ -21,7 +21,7 @@ Summary:        Environment for building spatially-enabled internet applications
 License:        BSD
 URL:            http://www.mapserver.org
 
-Source0:        https://github.com/MapServer/MapServer/releases/download/rel-7-6-1/mapserver-7.6.1.tar.gz  #https://github.com/%{project_owner}/%{project_name}/releases/download/rel-%{versiontag}/%{project_name}-%{versiontag}.tar.gz
+Source0:        https://github.com/%{project_owner}/%{project_name}/releases/download/rel-%{versiontag}/%{project_name}-%{versiontag}.tar.gz
 
 Requires:       httpd
 Requires:       dejavu-sans-fonts
