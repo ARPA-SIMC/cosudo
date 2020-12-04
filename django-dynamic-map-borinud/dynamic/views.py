@@ -21,7 +21,7 @@ from django.contrib.staticfiles import finders
 from django.views.generic import View
 from .proxy import Proxy
 from django.contrib.auth.mixins import PermissionRequiredMixin
-
+import shutil
 
 def render_map(request):
 
@@ -97,6 +97,15 @@ def render_extract_page(request):
 
         if r.status_code == 200:
             if len(r.content) > 0:
+                for filename in os.listdir(repository):
+                    file_path_delete = os.path.join(repository, filename)
+                    try:
+                        if os.path.isfile(file_path_delete) or os.path.islink(file_path_delete):
+                            os.unlink(file_path_delete)
+                        elif os.path.isdir(file_path_delete):
+                            shutil.rmtree(file_path_delete)
+                    except Exception as e:
+                        print('Failed to delete %s. Reason: %s' % (file_path_delete, e))
                 with open(file_path, "wb") as f:
                     for chunk in r.iter_content(chunk_size=1024):
                         f.write(chunk)

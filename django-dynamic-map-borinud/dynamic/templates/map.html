@@ -28,6 +28,11 @@
           ><i class="fa fa-exclamation-triangle"></i
         ></a>
       </li>
+       <li>
+        <a href="{% url "extract-page"%}" target="_blank"
+          ><i class="fa fa-download"></i
+        ></a>
+      </li>
       {% endif %}
     </ul>
   </div>
@@ -53,6 +58,7 @@
                 class="form-control form-control-sm datetimepicker-input col-xs-10 to-disable"
                 data-target="#datetimepicker"
                 data-toggle="datetimepicker"
+                autocomplete="off"
               />
             </div>
             <button id="moreTime" class="btn btn-link">
@@ -744,7 +750,7 @@
           </div>
           <div class="col-12">
             <div class="d-flex flex-row justify-content-between">
-              <div class="d-flex flex-column justify-content-between  mr-2">
+              <div class="d-flex flex-column justify-content-between mr-2">
                 <label for="startDateSecondPeriod"
                   >Start date second period</label
                 >
@@ -951,7 +957,7 @@
 <script src="{% static 'dynamic/js/structure/edit-data-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/alarm-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/alarm-view.js' %}"></script>
-<script src="{% static 'dynamic/js/structure/station-collection.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/data-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-data-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-history-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-history-view.js' %}"></script>
@@ -966,6 +972,14 @@
 <script src="{% static 'dynamic/js/structure/invalidation-vars-form-view.js' %}"></script>
 <script>
   $(function () {
+          const overlay = $("#overlay")
+
+     const searchForm = new SearchForm();
+     searchForm.subscribe();
+
+     const searchFormView = new SearchFormView(searchForm, "{{ url_borinud }}",overlay);
+     searchFormView.initEvents();
+
       const pruneCluster = new PruneClusterForLeaflet();
       const pruneClusterStations = new PruneClusterForLeaflet();
       const todayDateSummary = moment(new Date()).format("YYYY/MM")
@@ -992,58 +1006,67 @@
       });
       map.addControl(new sliderTimeControl());
 
-   
-      const overlay = $("#overlay")
+
 
 
       const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay,"{% url "wms" %}","{% static 'dynamic/images/map-not-found.png' %}","{% url "mapserver-wms"%}")
       mapView.initEvents()
       {% if perms.dynamic.can_extract %}
 
-          const stationCollection = new StationCollection()
+          const stationCollection = new DataCollection()
+          const varCollection = new DataCollection()
+          let networks = []
+          let vars = []
 
-          $.ajax({
-              url: "{% url "get-all-stations-vm2" %}",
-              dataType: "json",
-              success: function (collection) {
-                  stationCollection.addMultiple(collection["stations"])
-                  console.log(stationCollection)
-              },
-              beforeSend: function () {
-                  overlay.fadeIn(300);
-              },
-              complete: function () {
-                  overlay.fadeOut(300);
-              },
-          }).then(() => {
-              const editDataCollection = new EditDataCollection();
-              editDataCollection.subscribe();
+          async function fetchVm2Table(url,responseKey,collection, itemKey){
+             let response = await $.ajax({
+                      url: url,
+                      dataType: "json",
+                  })
+              let returnArray = [...new Set(response[responseKey].map((variable)=>variable[itemKey]))]
+              collection.addMultiple(response[responseKey])
+              return returnArray
+          }
+          fetchVm2Table("{% url "get-all-vars-vm2" %}","variables",varCollection,"bcode").then((vars)=>{
 
-              const editDataView = new EditDataView(editDataCollection, map, pruneCluster, overlay);
-              editDataView.initEvents();
+            fetchVm2Table("{% url "get-all-stations-vm2" %}","stations",stationCollection,"network").then((networks)=>{
 
-              const editStationCollection = new EditStationCollection();
-              editStationCollection.subscribe();
+            const alarmCollection = new AlarmCollection();
+            alarmCollection.subscribe();
 
-              const editStationView = new EditStationView(editStationCollection, map, pruneClusterStations, overlay, "{{ url_borinud }}", stationCollection);
-              editStationView.initEvents();
+            const alarmView = new AlarmView(alarmCollection, map, {networks:networks, vars:vars},sidebar);
+            alarmView.initEvents();
 
-              const editTabView = new EditTabView("{{url_borinud}}", map, pruneCluster, overlay, pruneClusterStations, stationCollection)
-              editTabView.initEvents()
+            const editDataCollection = new EditDataCollection();
+            editDataCollection.subscribe();
 
-              const editStationHistoryCollection = new EditStationHistoryCollection();
-              editStationHistoryCollection.subscribe();
+            const editDataView = new EditDataView(editDataCollection, map, pruneCluster, overlay);
+            editDataView.initEvents();
 
-              const editStationHistoryView = new EditStationHistoryView(editStationHistoryCollection, map);
-              editStationHistoryView.initEvents();
+            const editStationCollection = new EditStationCollection();
+            editStationCollection.subscribe();
 
-              const editDataHistoryCollection = new EditDataHistoryCollection();
-              editDataHistoryCollection.subscribe();
+            const editStationView = new EditStationView(editStationCollection, map, pruneClusterStations, overlay, "{{ url_borinud }}", stationCollection);
+            editStationView.initEvents();
 
-              const editDataHistoryView = new EditDataHistoryView(editDataHistoryCollection, map);
-              editDataHistoryView.initEvents();
+            const editTabView = new EditTabView("{{url_borinud}}", map, pruneCluster, overlay, pruneClusterStations, stationCollection)
+            editTabView.initEvents()
 
+            const editStationHistoryCollection = new EditStationHistoryCollection();
+            editStationHistoryCollection.subscribe();
+
+            const editStationHistoryView = new EditStationHistoryView(editStationHistoryCollection, map);
+            editStationHistoryView.initEvents();
+
+            const editDataHistoryCollection = new EditDataHistoryCollection();
+            editDataHistoryCollection.subscribe();
+
+            const editDataHistoryView = new EditDataHistoryView(editDataHistoryCollection, map);
+            editDataHistoryView.initEvents();
+
+            })
           })
+
 
 
           var drawnItems = new L.FeatureGroup();
@@ -1064,44 +1087,7 @@
           });
           map.addControl(drawControl);
       {% endif %}
-      $.ajax({
-          url: `{{ url_borinud }}/dbajson/*/*/*/*/*/*/summaries/${todayDateSummary}`,
-          dataType: "json",
-          success: function (resp) {
-              let initialSearchForm = new SearchForm()
-              resp.forEach((r) => {
-                  initialSearchForm.values.ident.push(r.ident === null ? "-" : r.ident + "");
-                  initialSearchForm.values.lon_lat.push(r.lon + "," + r.lat);
-                  initialSearchForm.values.network.push(r.network + "");
-                  initialSearchForm.values.date.push(r.date[0].substring(0, 10) + "")
-                  let d = r.data[0];
-                  initialSearchForm.values.vars.push(Object.keys(d.vars)[0] + "");
-                  initialSearchForm.values.timerange.push(d.timerange + "");
-                  let level = d.level.map((level) =>
-                      level === null ? "-" : level
-                  )
-                  initialSearchForm.values.level.push(level + "");
-              })
-              const searchFormView = new SearchFormView(SearchForm, initialSearchForm)
-              searchFormView.initEvents()
 
-              const alarmCollection = new AlarmCollection();
-              alarmCollection.subscribe();
-              const alarmView = new AlarmView(alarmCollection, map, {networks:[...new Set(initialSearchForm.values.network)], vars:[...new Set(initialSearchForm.values.vars)]},sidebar);
-              alarmView.initEvents();
-          },
-          beforeSend: function () {
-              overlay.fadeIn(300);
-          },
-          complete: function () {
-              overlay.fadeOut(300);
-          },
-          error: function (e) {
-              toastr.error("Borinud not available!")
-              console.log(e.toString());
-          }
-      });
-     
   });
 </script>
 
