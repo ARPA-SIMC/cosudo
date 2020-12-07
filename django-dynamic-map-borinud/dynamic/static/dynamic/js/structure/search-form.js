@@ -3,38 +3,9 @@ let SearchForm = function () {
     ident: [],
     lon_lat: [],
     network: [],
-    date: [],
-    hour: [
-      "*",
-      "00",
-      "01",
-      "02",
-      "03",
-      "04",
-      "05",
-      "06",
-      "07",
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-      "21",
-      "22",
-      "23",
-    ],
     vars: [],
     timerange: [],
     level: [],
-    dsn: ["report_fixed", "sample_fixed"],
   };
   this.selectedValues = {
     ident: "*",
@@ -109,11 +80,3 @@ SearchForm.prototype.getSelectedValues = function (key, value) {
   };
   
 
-SearchForm.prototype.subscribe = function () {
-  const self = this;
-
-  $.Topic("set-values-search-form").subscribe(function (values) {
-    self.setValues(values);
-    console.log(self.values);
-  });
-};

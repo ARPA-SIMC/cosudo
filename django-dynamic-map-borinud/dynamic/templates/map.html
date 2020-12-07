@@ -5,7 +5,31 @@
     <span class="spinner"></span>
   </div>
 </div>
-
+<div
+  id="sidebarChart"
+  style="
+    position: absolute;
+    right: 0;
+    width: calc(100% - 490px);
+    margin-left: 10px;
+    margin-right: 10px;
+    background: white;
+    z-index: 10000;
+    margin-top: 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    height: auto;
+    display: none;
+    padding:10px;
+    overflow-x:auto
+  "
+>
+  <!-- Nav tabs -->
+  <div id="chart-container">
+    <canvas id="chart"></canvas>
+  </div>
+  <div id="tableChart"></div>
+</div>
 <div id="sidebar" class="sidebar">
   <!-- Nav tabs -->
   <div class="sidebar-tabs">
@@ -15,6 +39,9 @@
       </li>
       <li>
         <a href="#filter" role="tab"><i class="fa fa-filter"></i></a>
+      </li>
+      <li>
+        <a href="#chart-tab" role="tab"><i class="fa fa-bar-chart-o"></i></a>
       </li>
       {% if perms.dynamic.can_extract %}
       <li>
@@ -218,31 +245,6 @@
             <option value="report_fixed">report_fixed</option>
             <option value="sample_fixed">sample_fixed</option>
           </select>
-        </div>
-
-        <div class="row">
-          <div class="col-12 text-center">
-            <button
-              class="btn btn-outline-primary btn-block"
-              disabled
-              id="showGraphButton"
-            >
-              <div class="d-flex flex-row justify-content-between">
-                <i class="fa fa-line-chart"></i>
-                Show graph
-              </div>
-            </button>
-            <button
-              class="btn btn-outline-primary btn-block"
-              style="display: none"
-              id="showWindRose"
-            >
-              <div class="d-flex flex-row justify-content-between">
-                <i class="fa fa-pie-chart"></i>
-                WIND ROSE GRAPH
-              </div>
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -900,37 +902,182 @@
     </div>
 
     {% endif %}
-  </div>
-</div>
-
-<div id="map" class="sidebar-map"></div>
-<div class="modal" id="modalGraph" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document" style="max-width: 900px">
-    <div class="modal-content">
-      <div class="modal-body">
-        <div id="chartHeader"></div>
-        <div id="loadingChart" class="loader"></div>
-        <div id="chart-container">
-          <canvas id="chart"></canvas>
+    <div class="sidebar-pane" id="chart-tab">
+      <h1 class="sidebar-header">
+        Search
+        <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+      </h1>
+      <div class="pt-2">
+        Select date and hour:
+        <div class="d-flex flex-row justify-content-center my-1">
+          <div class="d-flex flex-column justify-content-between">
+            <button id="lessTimeGraph" class="btn btn-link">
+              <i class="fa fa-arrow-up"></i>
+            </button>
+            <div class="position-relative mr-2">
+              <input
+                type="text"
+                id="datetimepickerGraph"
+                class="form-control form-control-sm datetimepicker-input col-xs-10"
+                data-target="#datetimepickerGraph"
+                data-toggle="datetimepicker"
+              />
+            </div>
+            <button id="moreTimeGraph" class="btn btn-link">
+              <i class="fa fa-arrow-down"></i>
+            </button>
+          </div>
+          <div class="d-flex flex-column justify-content-between">
+            <button id="lessHourGraph" class="btn btn-link">
+              <i class="fa fa-arrow-up"></i>
+            </button>
+            <select
+              class="form-control form-control-sm w-auto"
+              id="hourGraph"
+              name="hourGraph"
+            >
+              <option value="*" selected>*</option>
+              <option value="00">00</option>
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="03">03</option>
+              <option value="04">04</option>
+              <option value="05">05</option>
+              <option value="06">06</option>
+              <option value="07">07</option>
+              <option value="08">08</option>
+              <option value="09">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+              <option value="21">21</option>
+              <option value="22">22</option>
+              <option value="23">23</option>
+            </select>
+            <button id="moreHourGraph" class="btn btn-link">
+              <i class="fa fa-arrow-down"></i>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a
-          disabled
-          download="chart.png"
-          id="printGraph"
-          role="button"
-          class="btn btn-primary"
-          >Download grafico</a
-        >
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
+        <div class="form-group">
+          <label for="identGraph">Ident</label>
+          <select
+            id="identGraph"
+            class="form-control form-control-sm search-form-graph"
+            name="identGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="lon_latGraph" style="width: 100%">Lon lat</label>
+          <select
+            id="lon_latGraph"
+            class="form-control form-control-sm search-form-graph"
+            name="lon_latGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="networkGraph" style="width: 100%">Network</label>
+          <select
+            id="networkGraph"
+            class="form-control form-control-sm search-form-graph "
+            name="networkGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="varsGraph" style="width: 100%">Vars</label>
+          <select
+            class="form-control form-control-sm search-form-graph"
+            id="varsGraph"
+            name="varsGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="timerangeGraph" style="width: 100%">Timerange</label>
+          <select
+            class="form-control form-control-sm search-form-graph"
+            id="timerangeGraph"
+            name="timerangeGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="levelGraph" style="width: 100%">Level</label>
+          <select
+            class="form-control form-control-sm search-form-graph"
+            id="levelGraph"
+            name="levelGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="dsnGraph" style="width: 100%">DSN</label>
+          <select
+            class="form-control form-control-sm "
+            id="dsnGraph"
+            name="dsnGraph"
+          >
+            <option value="report_fixed">report_fixed</option>
+            <option value="sample_fixed">sample_fixed</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="col-12 text-center">
+            <button
+              class="btn btn-outline-primary btn-block"
+              
+              id="showGraphButton"
+            >
+              <div class="d-flex flex-row justify-content-between">
+                <i class="fa fa-line-chart"></i>
+                Add to graph
+              </div>
+            </button>
+            <button
+              class="btn btn-outline-primary btn-block"
+              style="display: none"
+              id="showWindRose"
+            >
+              <div class="d-flex flex-row justify-content-between">
+                <i class="fa fa-pie-chart"></i>
+                WIND ROSE GRAPH
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-<div class="modal" id="modalWindRose" tabindex="-1" role="dialog">
+
+
+<div id="map" class="sidebar-map"></div>
+
+<div class="modal" id="modalWindRose" tabindex="-1" role="dialog" style="z-index: 99999;">
   <div class="modal-dialog" role="document" style="max-width: 1000px">
     <div class="modal-content">
       <div class="modal-body">
@@ -954,9 +1101,14 @@
 </div>
 {% endblock %} {% block javascript %}
 <script src="{% static 'dynamic/js/structure/publish-subscribe.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/search-form.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/search-form-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-data-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/alarm-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/alarm-view.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/graph/graph-wind-rose.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/graph/query-collection.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/graph/graph-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/data-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-data-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-history-collection.js' %}"></script>
@@ -965,8 +1117,6 @@
 <script src="{% static 'dynamic/js/structure/edit-data-history-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-view.js' %}"></script>
-<script src="{% static 'dynamic/js/structure/search-form.js' %}"></script>
-<script src="{% static 'dynamic/js/structure/search-form-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/map-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-tab-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/invalidation-vars-form-view.js' %}"></script>
@@ -975,10 +1125,14 @@
           const overlay = $("#overlay")
 
      const searchForm = new SearchForm();
-     searchForm.subscribe();
 
-     const searchFormView = new SearchFormView(searchForm, "{{ url_borinud }}",overlay);
+     const searchFormView = new SearchFormView(searchForm, "{{ url_borinud }}",overlay,"","search-form");
      searchFormView.initEvents();
+
+     const searchFormGraph = new SearchForm();
+
+     const searchFormGraphView = new SearchFormView(searchFormGraph, "{{ url_borinud }}",overlay,"Graph","search-form-graph");
+     searchFormGraphView.initEvents();
 
       const pruneCluster = new PruneClusterForLeaflet();
       const pruneClusterStations = new PruneClusterForLeaflet();
@@ -996,6 +1150,10 @@
       L.control.zoom({position: 'topright'}).addTo(map);
       let sidebar = L.control.sidebar('sidebar')
       sidebar.addTo(map);
+         const queryCollection = new QueryCollection()
+        queryCollection.subscribe()
+        const graphView = new GraphView(queryCollection,"{{url_borinud}}",sidebar, overlay);
+        graphView.initEvents()
       var sliderTimeControl = L.Control.extend({
           options: {position: 'bottomleft'},
           onAdd: function (map) {
