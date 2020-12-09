@@ -160,6 +160,14 @@ MapView.prototype.initEvents = function () {
             try {
               l.layer.setParams({ time: hour });
             } catch {}
+            if ($("#syncColors").is(":checked")) {
+              if (self.grades.length > 0) {
+                let activeLayers = self.controlLayer.getActiveOverlays();
+                activeLayers.forEach((layer) => {
+                  layer.setParams({ dim_grades: self.grades, dim_colors: colors });
+                });
+              } 
+            }
           });
 
           $(document.body).on("change", "#hour", function () {
