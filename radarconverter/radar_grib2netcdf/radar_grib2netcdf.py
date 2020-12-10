@@ -21,7 +21,9 @@ date_format_netcdf = "hour before %Y-%m-%d %H:%M:0"
 GRIB_DAY_FORMAT = "%Y%m%d"
 GRIB_TIME_FORMAT = "%H%M"
 
-rmiss = "   -0.0100000"  # lo imposto uguale al valore rmiss di default dei netcdf
+rmiss_netcdf = "   -0.0100000"  #  default dei netcdf
+rmiss_grib = 9999
+
 
 def radar_grib2netcdf(name_grib, name_nc=""):
 
@@ -33,17 +35,14 @@ def radar_grib2netcdf(name_grib, name_nc=""):
 
     gid = codes_grib_new_from_file(grib_file)
 
-    tempo = str(codes_get(gid, "dataDate")) + str(codes_get(gid, "dataTime"))
+    tempo = str(codes_get(gid, "dataDate"))
+    ora = str(codes_get(gid, "dataTime"))
+    while len(ora) < 4:
+        ora = "0" + ora
+    tempo = tempo + ora
     tempo = datetime.datetime.strptime(tempo, GRIB_DAY_FORMAT + GRIB_TIME_FORMAT)
 
-    if name_nc is not None and name_nc != "":
-        if not os.path.exists(os.path.dirname(name_nc)):
-            try:
-                os.makedirs(os.path.dirname(name_nc))
-            except OSError as exc:  # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
-    else:
+    if name_nc is None or name_nc == "":
         name_nc = ".".join(name_grib.split("/")[-1].split(".")[:-1]) + ".nc"
 
 
@@ -63,6 +62,7 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     v.standard_name = "longitude"
     a = codes_get(gid, 'longitudeOfFirstGridPointInDegrees')
     b = codes_get(gid, 'longitudeOfLastGridPointInDegrees')
+    mesh_lon = (b - a) / (codes_get(gid, "Ni") - 1)
     v[:] = np.append(np.array(np.arange(a, b, (b - a) / (codes_get(gid, "Ni") - 1))), b)
 
     v = ncid.createVariable("lat", "f4", ("lat",))
@@ -71,6 +71,7 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     v.standard_name = "latitude"
     a = codes_get(gid, 'latitudeOfLastGridPointInDegrees')
     b = codes_get(gid, 'latitudeOfFirstGridPointInDegrees')
+    mesh_lat = (b - a) / (codes_get(gid, "Nj") - 1)
     v[:] = np.append(np.array(np.arange(a, b, (b - a) / (codes_get(gid, "Nj") - 1))), b)
 
     v = ncid.createVariable("time", "f8", ("time",))
@@ -97,7 +98,7 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     v = ncid.createVariable("mesh_dim", "f4", ("mesh_dim",))
     v.long_name = "Grid Mesh Size [X_mesh_size, Y_mesh_size]"
     v.units = "degrees"
-    v[:] = np.array([0.01264954, 0.008998871])
+    v[:] = np.array([mesh_lon, mesh_lat])
 
     v = ncid.createVariable("cum_pr_mm", "f4", ("time", "lat", "lon",))
     v.long_name = "Radar Precipitation amount"
@@ -108,11 +109,11 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     v.coordinates = "lat lon"
     v.detection_minimum = "      0.00000"
     v.undetectable = "      0.00000"
-    v.var_missing = "   -0.0100000"
+    v.var_missing = rmiss_netcdf
     v.accum_time_h = 1.0
     # Necessario convertire in arraymultidim, uso il numero di valori della lon(Ni) e poi inverto sul primo asse
     data = np.array(codes_get_values(gid))
-    data = np.where(data != codes_get(gid, "missingValue"), data, rmiss)  # replace missingvalue
+    data = np.where(data != codes_get(gid, "missingValue"), data, rmiss_netcdf)  # replace missingvalue
     v[:] = np.array([np.flip(np.reshape(data, (-1, codes_get(gid, "Ni"))), 0)])
 
     # ATTIBUTI GLOBALI
@@ -132,14 +133,9 @@ def radar_grib2netcdf(name_grib, name_nc=""):
 
     print("OK")
 
-'''
-#radar_grib2netcdf("/home/fabio/PycharmProjects/grib_converter/datasets/radar_SRT_202003260000_1h.grib2")
-radar_grib2netcdf("/home/fabio/PycharmProjects/skinnywms-master/skinnywms/testdata/radar_SRT_202003260015_1h.grib1",
-                  "/home/fabio/PycharmProjects/skinnywms-master/skinnywms/testdata/radar_SRT_202003260015_1h.nc")
-'''
 
-
-def check_param(argv):
+def main():
+    argv = sys.argv[1:]
     inputfile = None
     outputfile = None
     try:
@@ -165,10 +161,9 @@ def check_param(argv):
             print(str(opt) + " not exist, \"radar_grib2netcdf.py -h\" for help")
             print('Error parameter: "radar_grib2netcdf.py -h" for help')
             sys.exit(2)
-    return inputfile, outputfile
+    radar_grib2netcdf(inputfile, outputfile)
 
 
 if __name__ == '__main__':
     # Map command line arguments to function arguments.
-    param = check_param(sys.argv[1:])
-    radar_grib2netcdf(param[0], param[1])
+    main()

@@ -321,6 +321,22 @@ AlarmView.prototype.render = function () {
     let lat = alarm.lat / 100000;
     coords.push([lat, lon]);
     //let classColor = alarm.status === "a" ? "badge-success" : "badge-danger";
+    let vars= alarm.var
+     if (borinud.config.B[vars] !== undefined) {
+        vars =
+          borinud.config.B[vars].description +
+          " " +
+          borinud.config.B[vars].unit;
+      }
+      let level = alarm.level
+      let [l1, l2, l3, l4] = borinud.config.level.decode(level);
+      level = borinud.config.level.describe(l1, l2, l3, l4);
+
+      let trange = alarm.trange
+      console.log(alarm.trange)
+      let [t1, t2, t3, t4] = borinud.config.trange.decode(trange);
+      trange = borinud.config.trange.describe(t1, t2, t3, t4);
+ 
     let typeStr = alarm.status === "d" ? "Disabled" : "Active";
     innerTrs += `
     <tr data-id="${alarm.id}">
@@ -335,9 +351,9 @@ AlarmView.prototype.render = function () {
     <td>${alarm.lon}</td>
     <td>${alarm.lat}</td>
     <td>${alarm.network}</td>
-    <td>${alarm.var}</td>
-    <td>${alarm.trange}</td>
-    <td>${alarm.level}</td>
+    <td>${vars}</td>
+    <td>${trange}</td>
+    <td>${level}</td>
     </tr>`;
 
     let found = false;

@@ -42,5 +42,10 @@ urlpatterns = [
         views.WMS.as_view(),
         name="wms",
     ),
+    path(
+        "wms-mapserver/",
+        views.MAPSERVERWMS.as_view(),
+        name="mapserver-wms",
+    ),
     # path('prova/', views.prova),
 ]

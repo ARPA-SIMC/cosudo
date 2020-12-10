@@ -5,7 +5,31 @@
     <span class="spinner"></span>
   </div>
 </div>
-
+<div
+  id="sidebarChart"
+  style="
+    position: absolute;
+    right: 0;
+    width: calc(100% - 490px);
+    margin-left: 10px;
+    margin-right: 10px;
+    background: white;
+    z-index: 10000;
+    margin-top: 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    height: auto;
+    display: none;
+    padding:10px;
+    overflow-x:auto
+  "
+>
+  <!-- Nav tabs -->
+  <div id="chart-container">
+    <canvas id="chart"></canvas>
+  </div>
+  <div id="tableChart"></div>
+</div>
 <div id="sidebar" class="sidebar">
   <!-- Nav tabs -->
   <div class="sidebar-tabs">
@@ -15,6 +39,9 @@
       </li>
       <li>
         <a href="#filter" role="tab"><i class="fa fa-filter"></i></a>
+      </li>
+      <li>
+        <a href="#chart-tab" role="tab"><i class="fa fa-bar-chart-o"></i></a>
       </li>
       {% if perms.dynamic.can_extract %}
       <li>
@@ -26,6 +53,11 @@
       <li>
         <a href="#alarms" role="tab"
           ><i class="fa fa-exclamation-triangle"></i
+        ></a>
+      </li>
+       <li>
+        <a href="{% url "extract-page"%}" target="_blank"
+          ><i class="fa fa-download"></i
         ></a>
       </li>
       {% endif %}
@@ -53,6 +85,7 @@
                 class="form-control form-control-sm datetimepicker-input col-xs-10 to-disable"
                 data-target="#datetimepicker"
                 data-toggle="datetimepicker"
+                autocomplete="off"
               />
             </div>
             <button id="moreTime" class="btn btn-link">
@@ -212,31 +245,6 @@
             <option value="report_fixed">report_fixed</option>
             <option value="sample_fixed">sample_fixed</option>
           </select>
-        </div>
-
-        <div class="row">
-          <div class="col-12 text-center">
-            <button
-              class="btn btn-outline-primary btn-block"
-              disabled
-              id="showGraphButton"
-            >
-              <div class="d-flex flex-row justify-content-between">
-                <i class="fa fa-line-chart"></i>
-                Show graph
-              </div>
-            </button>
-            <button
-              class="btn btn-outline-primary btn-block"
-              style="display: none"
-              id="showWindRose"
-            >
-              <div class="d-flex flex-row justify-content-between">
-                <i class="fa fa-pie-chart"></i>
-                WIND ROSE GRAPH
-              </div>
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -744,7 +752,7 @@
           </div>
           <div class="col-12">
             <div class="d-flex flex-row justify-content-between">
-              <div class="d-flex flex-column justify-content-between  mr-2">
+              <div class="d-flex flex-column justify-content-between mr-2">
                 <label for="startDateSecondPeriod"
                   >Start date second period</label
                 >
@@ -894,37 +902,182 @@
     </div>
 
     {% endif %}
-  </div>
-</div>
-
-<div id="map" class="sidebar-map"></div>
-<div class="modal" id="modalGraph" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document" style="max-width: 900px">
-    <div class="modal-content">
-      <div class="modal-body">
-        <div id="chartHeader"></div>
-        <div id="loadingChart" class="loader"></div>
-        <div id="chart-container">
-          <canvas id="chart"></canvas>
+    <div class="sidebar-pane" id="chart-tab">
+      <h1 class="sidebar-header">
+        Search
+        <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+      </h1>
+      <div class="pt-2">
+        Select date and hour:
+        <div class="d-flex flex-row justify-content-center my-1">
+          <div class="d-flex flex-column justify-content-between">
+            <button id="lessTimeGraph" class="btn btn-link">
+              <i class="fa fa-arrow-up"></i>
+            </button>
+            <div class="position-relative mr-2">
+              <input
+                type="text"
+                id="datetimepickerGraph"
+                class="form-control form-control-sm datetimepicker-input col-xs-10"
+                data-target="#datetimepickerGraph"
+                data-toggle="datetimepicker"
+              />
+            </div>
+            <button id="moreTimeGraph" class="btn btn-link">
+              <i class="fa fa-arrow-down"></i>
+            </button>
+          </div>
+          <div class="d-flex flex-column justify-content-between">
+            <button id="lessHourGraph" class="btn btn-link">
+              <i class="fa fa-arrow-up"></i>
+            </button>
+            <select
+              class="form-control form-control-sm w-auto"
+              id="hourGraph"
+              name="hourGraph"
+            >
+              <option value="*" selected>*</option>
+              <option value="00">00</option>
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="03">03</option>
+              <option value="04">04</option>
+              <option value="05">05</option>
+              <option value="06">06</option>
+              <option value="07">07</option>
+              <option value="08">08</option>
+              <option value="09">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+              <option value="21">21</option>
+              <option value="22">22</option>
+              <option value="23">23</option>
+            </select>
+            <button id="moreHourGraph" class="btn btn-link">
+              <i class="fa fa-arrow-down"></i>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a
-          disabled
-          download="chart.png"
-          id="printGraph"
-          role="button"
-          class="btn btn-primary"
-          >Download grafico</a
-        >
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Close
-        </button>
+        <div class="form-group">
+          <label for="identGraph">Ident</label>
+          <select
+            id="identGraph"
+            class="form-control form-control-sm search-form-graph"
+            name="identGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="lon_latGraph" style="width: 100%">Lon lat</label>
+          <select
+            id="lon_latGraph"
+            class="form-control form-control-sm search-form-graph"
+            name="lon_latGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="networkGraph" style="width: 100%">Network</label>
+          <select
+            id="networkGraph"
+            class="form-control form-control-sm search-form-graph "
+            name="networkGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="varsGraph" style="width: 100%">Vars</label>
+          <select
+            class="form-control form-control-sm search-form-graph"
+            id="varsGraph"
+            name="varsGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="timerangeGraph" style="width: 100%">Timerange</label>
+          <select
+            class="form-control form-control-sm search-form-graph"
+            id="timerangeGraph"
+            name="timerangeGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="levelGraph" style="width: 100%">Level</label>
+          <select
+            class="form-control form-control-sm search-form-graph"
+            id="levelGraph"
+            name="levelGraph"
+          >
+            <option value="*" selected>*</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="dsnGraph" style="width: 100%">DSN</label>
+          <select
+            class="form-control form-control-sm "
+            id="dsnGraph"
+            name="dsnGraph"
+          >
+            <option value="report_fixed">report_fixed</option>
+            <option value="sample_fixed">sample_fixed</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="col-12 text-center">
+            <button
+              class="btn btn-outline-primary btn-block"
+              
+              id="showGraphButton"
+            >
+              <div class="d-flex flex-row justify-content-between">
+                <i class="fa fa-line-chart"></i>
+                Add to graph
+              </div>
+            </button>
+            <button
+              class="btn btn-outline-primary btn-block"
+              style="display: none"
+              id="showWindRose"
+            >
+              <div class="d-flex flex-row justify-content-between">
+                <i class="fa fa-pie-chart"></i>
+                WIND ROSE GRAPH
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-<div class="modal" id="modalWindRose" tabindex="-1" role="dialog">
+
+
+<div id="map" class="sidebar-map"></div>
+
+<div class="modal" id="modalWindRose" tabindex="-1" role="dialog" style="z-index: 99999;">
   <div class="modal-dialog" role="document" style="max-width: 1000px">
     <div class="modal-content">
       <div class="modal-body">
@@ -948,10 +1101,15 @@
 </div>
 {% endblock %} {% block javascript %}
 <script src="{% static 'dynamic/js/structure/publish-subscribe.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/search-form.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/search-form-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-data-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/alarm-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/alarm-view.js' %}"></script>
-<script src="{% static 'dynamic/js/structure/station-collection.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/graph/graph-wind-rose.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/graph/query-collection.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/graph/graph-view.js' %}"></script>
+<script src="{% static 'dynamic/js/structure/data-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-data-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-history-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-history-view.js' %}"></script>
@@ -959,13 +1117,23 @@
 <script src="{% static 'dynamic/js/structure/edit-data-history-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-collection.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-station-view.js' %}"></script>
-<script src="{% static 'dynamic/js/structure/search-form.js' %}"></script>
-<script src="{% static 'dynamic/js/structure/search-form-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/map-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/edit-tab-view.js' %}"></script>
 <script src="{% static 'dynamic/js/structure/invalidation-vars-form-view.js' %}"></script>
 <script>
   $(function () {
+          const overlay = $("#overlay")
+
+     const searchForm = new SearchForm();
+
+     const searchFormView = new SearchFormView(searchForm, "{{ url_borinud }}",overlay,"","search-form");
+     searchFormView.initEvents();
+
+     const searchFormGraph = new SearchForm();
+
+     const searchFormGraphView = new SearchFormView(searchFormGraph, "{{ url_borinud }}",overlay,"Graph","search-form-graph");
+     searchFormGraphView.initEvents();
+
       const pruneCluster = new PruneClusterForLeaflet();
       const pruneClusterStations = new PruneClusterForLeaflet();
       const todayDateSummary = moment(new Date()).format("YYYY/MM")
@@ -982,6 +1150,10 @@
       L.control.zoom({position: 'topright'}).addTo(map);
       let sidebar = L.control.sidebar('sidebar')
       sidebar.addTo(map);
+         const queryCollection = new QueryCollection()
+        queryCollection.subscribe()
+        const graphView = new GraphView(queryCollection,"{{url_borinud}}",sidebar, overlay);
+        graphView.initEvents()
       var sliderTimeControl = L.Control.extend({
           options: {position: 'bottomleft'},
           onAdd: function (map) {
@@ -992,58 +1164,67 @@
       });
       map.addControl(new sliderTimeControl());
 
-   
-      const overlay = $("#overlay")
 
 
-      const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay,"{% url "wms" %}","{% static 'dynamic/images/map-not-found.png' %}")
+
+      const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay,"{% url "wms" %}","{% static 'dynamic/images/map-not-found.png' %}","{% url "mapserver-wms"%}")
       mapView.initEvents()
       {% if perms.dynamic.can_extract %}
 
-          const stationCollection = new StationCollection()
+          const stationCollection = new DataCollection()
+          const varCollection = new DataCollection()
+          let networks = []
+          let vars = []
 
-          $.ajax({
-              url: "{% url "get-all-stations-vm2" %}",
-              dataType: "json",
-              success: function (collection) {
-                  stationCollection.addMultiple(collection["stations"])
-                  console.log(stationCollection)
-              },
-              beforeSend: function () {
-                  overlay.fadeIn(300);
-              },
-              complete: function () {
-                  overlay.fadeOut(300);
-              },
-          }).then(() => {
-              const editDataCollection = new EditDataCollection();
-              editDataCollection.subscribe();
+          async function fetchVm2Table(url,responseKey,collection, itemKey){
+             let response = await $.ajax({
+                      url: url,
+                      dataType: "json",
+                  })
+              let returnArray = [...new Set(response[responseKey].map((variable)=>variable[itemKey]))]
+              collection.addMultiple(response[responseKey])
+              return returnArray
+          }
+          fetchVm2Table("{% url "get-all-vars-vm2" %}","variables",varCollection,"bcode").then((vars)=>{
 
-              const editDataView = new EditDataView(editDataCollection, map, pruneCluster, overlay);
-              editDataView.initEvents();
+            fetchVm2Table("{% url "get-all-stations-vm2" %}","stations",stationCollection,"network").then((networks)=>{
 
-              const editStationCollection = new EditStationCollection();
-              editStationCollection.subscribe();
+            const alarmCollection = new AlarmCollection();
+            alarmCollection.subscribe();
 
-              const editStationView = new EditStationView(editStationCollection, map, pruneClusterStations, overlay, "{{ url_borinud }}", stationCollection);
-              editStationView.initEvents();
+            const alarmView = new AlarmView(alarmCollection, map, {networks:networks, vars:vars},sidebar);
+            alarmView.initEvents();
 
-              const editTabView = new EditTabView("{{url_borinud}}", map, pruneCluster, overlay, pruneClusterStations, stationCollection)
-              editTabView.initEvents()
+            const editDataCollection = new EditDataCollection();
+            editDataCollection.subscribe();
 
-              const editStationHistoryCollection = new EditStationHistoryCollection();
-              editStationHistoryCollection.subscribe();
+            const editDataView = new EditDataView(editDataCollection, map, pruneCluster, overlay);
+            editDataView.initEvents();
 
-              const editStationHistoryView = new EditStationHistoryView(editStationHistoryCollection, map);
-              editStationHistoryView.initEvents();
+            const editStationCollection = new EditStationCollection();
+            editStationCollection.subscribe();
 
-              const editDataHistoryCollection = new EditDataHistoryCollection();
-              editDataHistoryCollection.subscribe();
+            const editStationView = new EditStationView(editStationCollection, map, pruneClusterStations, overlay, "{{ url_borinud }}", stationCollection);
+            editStationView.initEvents();
 
-              const editDataHistoryView = new EditDataHistoryView(editDataHistoryCollection, map);
-              editDataHistoryView.initEvents();
+            const editTabView = new EditTabView("{{url_borinud}}", map, pruneCluster, overlay, pruneClusterStations, stationCollection)
+            editTabView.initEvents()
 
+            const editStationHistoryCollection = new EditStationHistoryCollection();
+            editStationHistoryCollection.subscribe();
+
+            const editStationHistoryView = new EditStationHistoryView(editStationHistoryCollection, map);
+            editStationHistoryView.initEvents();
+
+            const editDataHistoryCollection = new EditDataHistoryCollection();
+            editDataHistoryCollection.subscribe();
+
+            const editDataHistoryView = new EditDataHistoryView(editDataHistoryCollection, map);
+            editDataHistoryView.initEvents();
+
+            })
           })
+
 
 
           var drawnItems = new L.FeatureGroup();
@@ -1064,44 +1245,7 @@
           });
           map.addControl(drawControl);
       {% endif %}
-      $.ajax({
-          url: `{{ url_borinud }}/dbajson/*/*/*/*/*/*/summaries/${todayDateSummary}`,
-          dataType: "json",
-          success: function (resp) {
-              let initialSearchForm = new SearchForm()
-              resp.forEach((r) => {
-                  initialSearchForm.values.ident.push(r.ident === null ? "-" : r.ident + "");
-                  initialSearchForm.values.lon_lat.push(r.lon + "," + r.lat);
-                  initialSearchForm.values.network.push(r.network + "");
-                  initialSearchForm.values.date.push(r.date[0].substring(0, 10) + "")
-                  let d = r.data[0];
-                  initialSearchForm.values.vars.push(Object.keys(d.vars)[0] + "");
-                  initialSearchForm.values.timerange.push(d.timerange + "");
-                  let level = d.level.map((level) =>
-                      level === null ? "-" : level
-                  )
-                  initialSearchForm.values.level.push(level + "");
-              })
-              const searchFormView = new SearchFormView(SearchForm, initialSearchForm)
-              searchFormView.initEvents()
 
-              const alarmCollection = new AlarmCollection();
-              alarmCollection.subscribe();
-              const alarmView = new AlarmView(alarmCollection, map, {networks:[...new Set(initialSearchForm.values.network)], vars:[...new Set(initialSearchForm.values.vars)]},sidebar);
-              alarmView.initEvents();
-          },
-          beforeSend: function () {
-              overlay.fadeIn(300);
-          },
-          complete: function () {
-              overlay.fadeOut(300);
-          },
-          error: function (e) {
-              toastr.error("Borinud not available!")
-              console.log(e.toString());
-          }
-      });
-     
   });
 </script>
 

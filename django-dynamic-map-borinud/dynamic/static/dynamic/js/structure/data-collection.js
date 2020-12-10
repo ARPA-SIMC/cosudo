@@ -1,17 +1,17 @@
-let StationCollection = function () {
+let DataCollection = function () {
     // Here we store the Wish objects
     this.data = [];
 };
 
-StationCollection.prototype.add = function (data) {
+DataCollection.prototype.add = function (data) {
     this.data.push(data);
 };
 
-StationCollection.prototype.addMultiple = function (dataArray) {
+DataCollection.prototype.addMultiple = function (dataArray) {
     this.data.push(...dataArray);
 };
 
-StationCollection.prototype.getAll = function () {
+DataCollection.prototype.getAll = function () {
     return this.data;
 };
 

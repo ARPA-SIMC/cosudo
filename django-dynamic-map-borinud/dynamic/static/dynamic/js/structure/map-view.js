@@ -5,7 +5,8 @@ let MapView = function (
   legend,
   overlay,
   urlWms,
-  notFoundImage
+  notFoundImage,
+  urlMapServer
 ) {
   this.collection = [];
   this.urlBorinud = urlBorinud;
@@ -17,6 +18,8 @@ let MapView = function (
   this.controlLayer = undefined;
   this.urlWms = urlWms;
   this.notFoundImage = notFoundImage;
+  this.urlMapServer = urlMapServer;
+  this.grades = [];
 };
 
 MapView.prototype.initEvents = function () {
@@ -42,6 +45,7 @@ MapView.prototype.initEvents = function () {
   switchFilter(sliderB33193, checkFilterB33193);
   createSliderFilter(sliderB33194);
   switchFilter(sliderB33194, checkFilterB33194);
+
   let customControl = L.Control.extend({
     options: {
       position: "topright",
@@ -55,6 +59,7 @@ MapView.prototype.initEvents = function () {
     },
   });
   self.map.addControl(new customControl());
+
   $.ajax({
     type: "GET",
     url: self.urlWms,
@@ -106,30 +111,118 @@ MapView.prototype.initEvents = function () {
         aa[layer_name[0]] = layer;
         opacityControls[layer_name[0]] = L.control.opacity(aa, {});
       });
+      $.ajax({
+        type: "GET",
+        url: `${self.urlMapServer}?service=wms`,
+        data: { request: "getCapabilities" },
+        dataType: "xml",
+        success: function (xml) {
+          layerNames = [];
+          url = `${self.urlMapServer}?`;
 
-      self.map.on("layeradd", function (l) {
-        if (opacityControls[l.layer.options.layers]) {
-          opacityControls[l.layer.options.layers].addTo(self.map);
-        }
-        try {
-          l.layer.setParams({ time: self.selectedHour });
-        } catch {}
+          $(xml)
+            .find("Layer")
+            .each(function () {
+              let title = $(this).find("Title").first().text();
+              let name = $(this).find("Name").first().text();
+              if ((name != "background") & (name != "ol_background")) {
+                layerNames.push([name, title]);
+              }
+            });
+
+          layerNames.forEach(function (layer_name) {
+            let layer = L.tileLayer.wms(url, {
+              layers: layer_name[0],
+              format: "image/png",
+              transparent: "TRUE",
+              attribution: "",
+              version: "1.3.0",
+              errorTileUrl: self.notFoundImage,
+            });
+            layers[layer_name[1]] = layer;
+            let aa = {};
+            aa[layer_name[0]] = layer;
+            opacityControls[layer_name[0]] = L.control.opacity(aa, {});
+          });
+
+          self.map.on("layeradd", function (l) {
+            if (opacityControls[l.layer.options.layers]) {
+              opacityControls[l.layer.options.layers].addTo(self.map);
+            }
+            let hour = self.selectedHour;
+            if (hour == "*") {
+              hour = moment(
+                $("#datetimepicker").datetimepicker("viewDate")
+              ).format("YYYY-MM-DD");
+              selectedHourForm = $("#hour").val();
+              hour = `${hour}T${selectedHourForm}:00:00`;
+            }
+            try {
+              l.layer.setParams({ time: hour });
+            } catch {}
+            if ($("#syncColors").is(":checked")) {
+              if (self.grades.length > 0) {
+                let activeLayers = self.controlLayer.getActiveOverlays();
+                activeLayers.forEach((layer) => {
+                  layer.setParams({ dim_grades: self.grades, dim_colors: colors });
+                });
+              } 
+            }
+          });
+
+          $(document.body).on("change", "#hour", function () {
+            hour = moment(
+              $("#datetimepicker").datetimepicker("viewDate")
+            ).format("YYYY-MM-DD");
+            selectedHourForm = $("#hour").val();
+            hour = `${hour}T${selectedHourForm}:00:00`;
+            let activeLayers = self.controlLayer.getActiveOverlays();
+            activeLayers.forEach((layer) => {
+              layer.setParams({ time: hour });
+            });
+          });
+
+          self.map.on("layerremove", function (l) {
+            if (opacityControls[l.layer.options.layers]) {
+              opacityControls[l.layer.options.layers].remove();
+            }
+          });
+
+          let baseMaps = {
+            background: background,
+            ol_background: ol_background,
+          };
+          console.log(layers);
+          self.controlLayer = L.control.layers(baseMaps, layers);
+          self.controlLayer.addTo(self.map);
+          L.control.scale({ position: "bottomright" }).addTo(self.map);
+
+          let command = L.control({ position: "topright" });
+
+          command.onAdd = function (map) {
+            var div = L.DomUtil.create("div");
+            div.innerHTML = `
+            <div class="leaflet-control-layers leaflet-control-layers-expanded">
+              <form>
+                <input class="leaflet-control-layers-overlays" id="syncColors" 
+                  type="checkbox">
+                  Sync colors
+                </input>
+              </form>
+            </div>`;
+            return div;
+          };
+
+          command.addTo(self.map);
+        },
+        error: function (error) {
+          console.log(error);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution:
+              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          }).addTo(self.map);
+        },
       });
-
-      self.map.on("layerremove", function (l) {
-        if (opacityControls[l.layer.options.layers]) {
-          opacityControls[l.layer.options.layers].remove();
-        }
-      });
-
-      let baseMaps = {
-        background: background,
-        ol_background: ol_background,
-      };
-      console.log(layers);
-      self.controlLayer = L.control.layers(baseMaps, layers);
-      self.controlLayer.addTo(self.map);
-      L.control.scale({ position: "bottomright" }).addTo(self.map);
     },
     error: function (error) {
       console.log(error);
@@ -138,6 +231,30 @@ MapView.prototype.initEvents = function () {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(self.map);
     },
+  });
+
+  $(document.body).on("change", "#syncColors", function () {
+    if ($(this).is(":checked")) {
+      if (self.grades.length > 0) {
+        let activeLayers = self.controlLayer.getActiveOverlays();
+        activeLayers.forEach((layer) => {
+          console.log(self.grades);
+          layer.setParams({ dim_grades: self.grades, dim_colors: colors });
+        });
+      } else {
+        
+        toastr.warning("Search first");
+        $(this).prop("checked", false);
+      }
+    }
+    else{
+      let activeLayers = self.controlLayer.getActiveOverlays();
+      activeLayers.forEach((layer) => {
+        delete(layer.wmsParams.dim_grades);
+        delete(layer.wmsParams.dim_colors);
+        layer.setParams();
+      });
+    }
   });
 
   $(document.body).on("click", "#toggleMarkers", function () {
@@ -342,380 +459,34 @@ MapView.prototype.initEvents = function () {
         layer.setParams({ time: date });
       });
     }
+  
     return filteredCollection;
   }
 
-  function openGraph(urlGraph, headerModal) {
-    $.ajax({
-      url: urlGraph,
-      dataType: "json",
-      success: function (collection) {
-        let data_dict = {};
-        collection.features.forEach((feature) => {
-          let trange = borinud.config.trange.describe(
-            ...feature.properties.trange
-          );
-          let key = `IDENT:${null2_(feature.properties.ident)}|LAT_LON:${
-            feature.properties.lat.toString() +
-            "," +
-            feature.properties.lon.toString()
-          }|NETWORK: ${feature.properties.network}|TIMERANGE: ${trange}`;
-          if (!(key in data_dict)) data_dict[key] = [];
-          data_dict[key].push({
-            x: new Date(feature.properties.date),
-            y: feature.properties.val,
-          });
-        });
-        let datasets = [];
-        for (let key in data_dict)
-          datasets.push({
-            data: data_dict[key],
-            fill: false,
-            borderColor: getRandomColor(),
-            tooltip: key,
-          });
-        // get the canvas element
-        console.log(datasets);
-        document.querySelector("#chart-container").innerHTML =
-          '<canvas id="chart"></canvas>';
-        var ctx = document.getElementById("chart").getContext("2d");
-        $("#modalGraph").modal("show");
-        let chart = new Chart(ctx, {
-          legend: {
-            display: false,
-          },
-          // The type of chart we want to create
-          type: "line",
-          // The data for our dataset
-          data: {
-            datasets: datasets,
-          },
-          options: {
-            scales: {
-              xAxes: [
-                {
-                  type: "time",
-                  time: {
-                    parser: "D/M/YYYY, H:mm:ss",
-                    displayFormats: {
-                      millisecond: "DD/MM/YYYY HH:mm:ss",
-                      second: "DD/MM/YYYY HH:mm:ss",
-                      minute: "DD/MM/YYYY HH:mm:ss",
-                      hour: "DD/MM/YYYY HH:mm:ss",
-                      day: "DD/MM/YYYY HH:mm:ss",
-                      week: "DD/MM/YYYY HH:mm:ss",
-                      month: "DD/MM/YYYY HH:mm:ss",
-                      quarter: "DD/MM/YYYY HH:mm:ss",
-                      year: "DD/MM/YYYY HH:mm:ss",
-                    },
-                    tooltipFormat: "DD/MM/YYYY HH:mm:ss",
-                  },
-                },
-              ],
-            },
-            tooltips: {
-              callbacks: {
-                afterLabel: function (tooltipItem, data) {
-                  var label = data.datasets[
-                    tooltipItem.datasetIndex
-                  ].tooltip.split("|");
-                  return label;
-                },
-              },
-            },
-
-            animation: {
-              onComplete: function (e) {
-                this.options.animation.onComplete = null;
-                // remove loading spinner
-                jQuery("#loadingChart").hide();
-                // create image from canvas
-                let url = chart.toBase64Image();
-                // set download link to button
-                let button = document.getElementById("printGraph");
-                button.href = url;
-                // enable button download
-                button.removeAttribute("disabled");
-              },
-            },
-            plugins: {
-              zoom: {
-                pan: {
-                  enabled: true,
-                  mode: "xy",
-                },
-                zoom: {
-                  enabled: true,
-                  mode: "xy",
-                },
-              },
-            },
-          },
-        });
-        $("#chartHeader").html(headerModal);
-      },
-      beforeSend: function () {
-        self.overlay.fadeIn(300);
-      },
-      complete: function () {
-        self.overlay.fadeOut(300);
-      },
-    });
-  }
-
-  $(document.body).on("click", "#showGraphButton", function () {
-    let selectedValues = getSelectedValues();
-
-    let urlGraph =
-      `${self.urlBorinud}/geojson/${null2_(selectedValues.ident)}/${
-        selectedValues.lon_lat
-      }/` +
-      `${null2_(selectedValues.network)}/${selectedValues.timerange}/${
-        selectedValues.level
-      }/${selectedValues.vars}/` +
-      `timeseries/${selectedValues.date.split("-")[0]}/${
-        selectedValues.date.split("-")[1]
-      }/${selectedValues.date.split("-")[2]}` +
-      `${selectedValues.hour !== "*" ? "/" + selectedValues.hour : ""}?dsn=${
-        selectedValues.dsn
-      }`;
-
-    let headerModal = "";
-    openGraph(urlGraph, headerModal);
-  });
   $(document.body).on("click", ".open-graph", function () {
     let idCol = $(this).attr("data-id");
-    let selectedValues = getSelectedValues();
     if (self.collection[idCol]) {
+      let selectedValues = getSelectedValues();
       let data = self.collection[idCol];
-      let urlGraph =
-        `${self.urlBorinud}/geojson/${null2_(data.ident)}/${
-          data.lon + "," + data.lat
-        }/` +
-        `${null2_(data.network)}/${
-          data.trange[0] + "," + data.trange[1] + "," + data.trange[2]
-        }/${
-          null2_(data.level[0]) +
-          "," +
-          null2_(data.level[1]) +
-          "," +
-          null2_(data.level[2]) +
-          "," +
-          null2_(data.level[3])
-        }/${selectedValues.vars}/` +
-        `timeseries/${selectedValues.date.split("-")[0]}/${
-          selectedValues.date.split("-")[1]
-        }/${selectedValues.date.split("-")[2]}` +
-        `${selectedValues.hour !== "*" ? "/" + selectedValues.hour : ""}?dsn=${
-          selectedValues.dsn
-        }`;
-
-      let headerModal =
-        "Ident: " +
-        null2_(data.ident) +
-        " Coords: " +
-        data.lat +
-        "," +
-        data.lon +
-        " Network:" +
-        null2_(data.network) +
-        "<br>" +
-        borinud.config.trange.describe(
-          data.trange[0],
-          data.trange[1],
-          data.trange[2]
-        ) +
-        "<br>" +
-        borinud.config.level.describe(
-          data.level[0],
-          data.level[1],
-          data.level[2],
-          data.level[3]
-        ) +
-        "<br>";
-      openGraph(urlGraph, headerModal);
+      let query = {
+        ident: data.ident,
+        lon_lat: `${data.lon},${data.lat}`,
+        network: data.network,
+        timerange: `${normalizeString(data.trange[0])},${normalizeString(
+          data.trange[1]
+        )},${normalizeString(data.trange[2])}`,
+        level: `${null2_(data.level[0])},${null2_(data.level[1])},${null2_(
+          data.level[2]
+        )},${null2_(data.level[3])}`,
+        vars: Object.keys(data.data[0].vars)[0],
+        date: selectedValues.date,
+        hour: selectedValues.hour,
+        dsn: selectedValues.dsn,
+      };
+      $.Topic("query-add").publish(query);
+      toastr.success("Done!");
     }
   });
-  $(document.body).on("click", "#showWindRose", function () {
-    let selectedValues = getSelectedValues();
-    //create request url
-    let urlDir =
-      `${self.urlBorinud}/dbajson/${selectedValues.ident}/${selectedValues.lon_lat}/` +
-      `${selectedValues.network}/${selectedValues.timerange}/${selectedValues.level}/B11001/` +
-      `spatialseries/${selectedValues.date.split("-")[0]}/${
-        selectedValues.date.split("-")[1]
-      }/${selectedValues.date.split("-")[2]}` +
-      `${selectedValues.hour !== "*" ? "/" + selectedValues.hour : ""}?dsn=${
-        selectedValues.dsn
-      }`;
-    let urlSpeed =
-      `${self.urlBorinud}/dbajson/${selectedValues.ident}/${selectedValues.lon_lat}/` +
-      `${selectedValues.network}/${selectedValues.timerange}/${selectedValues.level}/B11002/` +
-      `spatialseries/${selectedValues.date.split("-")[0]}/${
-        selectedValues.date.split("-")[1]
-      }/${selectedValues.date.split("-")[2]}` +
-      `${selectedValues.hour !== "*" ? "/" + selectedValues.hour : ""}?dsn=${
-        selectedValues.dsn
-      }`;
-
-    openGraphWind(urlDir, urlSpeed);
-  });
-
-  function openGraphWind(urlDirWind, urlSpeedWind) {
-    $.ajax({
-      url: urlDirWind,
-      dataType: "json",
-      success: function (windDirectionData) {
-        $.ajax({
-          url: urlSpeedWind,
-          dataType: "json",
-          success: function (windSpeedData) {
-            let dataWindSpeedDByDir = {};
-            windSpeedData.forEach((speedValue) => {
-              windDirectionData.forEach((directionValue) => {
-                if (
-                  speedValue.date === directionValue.date &&
-                  speedValue.ident === directionValue.ident &&
-                  speedValue.lon === directionValue.lon &&
-                  speedValue.lat === directionValue.lat &&
-                  speedValue.network === directionValue.network
-                ) {
-                  let speed = speedValue.data[0].vars["B11002"].v;
-                  let key = windClassification(speed);
-                  if (!(key in dataWindSpeedDByDir)) {
-                    dataWindSpeedDByDir[key] = {
-                      dir: {
-                        N: { total: 0 },
-                        NNE: { total: 0 },
-                        NE: { total: 0 },
-                        ENE: { total: 0 },
-                        E: { total: 0 },
-                        ESE: { total: 0 },
-                        SE: { total: 0 },
-                        SSE: { total: 0 },
-                        S: { total: 0 },
-                        SSW: { total: 0 },
-                        SW: { total: 0 },
-                        WSW: { total: 0 },
-                        W: { total: 0 },
-                        WNW: { total: 0 },
-                        NW: { total: 0 },
-                        NNW: { total: 0 },
-                      },
-                      total: 0,
-                    };
-                  }
-                  let direction = degToCompass(
-                    directionValue.data[0].vars["B11001"].v
-                  );
-                  dataWindSpeedDByDir[key].dir[direction].total += 1;
-                  dataWindSpeedDByDir[key].total += 1;
-                }
-              });
-            });
-            let dataSpeedAverage = [];
-            let i = 0;
-            for (let key in dataWindSpeedDByDir) {
-              dataSpeedAverage.push({
-                r: Object.keys(dataWindSpeedDByDir[key].dir).map(function (
-                  keyDir
-                ) {
-                  return (
-                    (dataWindSpeedDByDir[key].dir[keyDir].total /
-                      dataWindSpeedDByDir[key].total) *
-                    100
-                  );
-                }),
-                theta: Object.keys(dataWindSpeedDByDir[key].dir),
-                name: key,
-                marker: { color: windColors[i] },
-                type: "barpolar",
-              });
-              i++;
-            }
-            let dataDict = {
-              N: 0,
-              NNE: 0,
-              NE: 0,
-              ENE: 0,
-              E: 0,
-              ESE: 0,
-              SE: 0,
-              SSE: 0,
-              S: 0,
-              SSW: 0,
-              SW: 0,
-              WSW: 0,
-              W: 0,
-              WNW: 0,
-              NW: 0,
-              NNW: 0,
-            };
-            windDirectionData.forEach((data) => {
-              dataDict[degToCompass(data.data[0].vars["B11001"].v)] += 1;
-            });
-            $("#modalWindRose").modal("show");
-            let data = [
-              {
-                r: Object.keys(dataDict).map(function (key) {
-                  return dataDict[key];
-                }),
-                theta: Object.keys(dataDict),
-                name: "11-14 m/s",
-                marker: { color: getRandomColor() },
-                type: "barpolar",
-              },
-            ];
-            let layout = {
-              title: "Wind Direction Distribution",
-              font: { size: 16 },
-              legend: { font: { size: 16 } },
-              polar: {
-                radialaxis: { angle: 90 },
-                angularaxis: { direction: "clockwise" },
-              },
-              autosize: true,
-            };
-            let layoutSpeed = {
-              title: "Wind Speed Distribution",
-              font: { size: 16 },
-              legend: { font: { size: 16 } },
-              showlegend: true,
-              polar: {
-                barmode: "overlay",
-                bargap: 0,
-                radialaxis: { ticksuffix: "%", angle: 90, dtick: 20 },
-                angularaxis: { direction: "clockwise" },
-              },
-              autosize: true,
-            };
-            Plotly.newPlot(
-              document.getElementById("windRoseContainer"),
-              data,
-              layout
-            );
-            Plotly.newPlot(
-              document.getElementById("windRoseSpeedContainer"),
-              dataSpeedAverage,
-              layoutSpeed
-            );
-          },
-          beforeSend: function () {
-            self.overlay.fadeIn(300);
-          },
-          complete: function () {
-            self.overlay.fadeOut(300);
-          },
-        });
-      },
-      beforeSend: function () {
-        self.overlay.fadeIn(300);
-      },
-      complete: function () {
-        self.overlay.fadeOut(300);
-      },
-    });
-  }
 
   $(document.body).on("click", ".open-wind-graph", function () {
     let idCol = $(this).attr("data-id");
@@ -764,7 +535,7 @@ MapView.prototype.initEvents = function () {
         `${selectedValues.hour !== "*" ? "/" + selectedValues.hour : ""}?dsn=${
           selectedValues.dsn
         }`;
-      openGraphWind(urlDirWind, urlSpeedWind);
+      openGraphWind(urlDirWind, urlSpeedWind, self.overlay);
     }
   });
 
@@ -925,7 +696,7 @@ MapView.prototype.render = function (
         }
       }
     });
-    popupText += `<br><button data-id="${data.indexCol}" type="button" class="btn btn-primary btn-block open-graph" >Show graph</button>`;
+    popupText += `<br><button data-id="${data.indexCol}" type="button" class="btn btn-primary btn-block open-graph" >Add to graph</button>`;
     if (
       selected_values.vars === "B11001" ||
       selected_values.vars === "B11002"
@@ -941,10 +712,8 @@ MapView.prototype.render = function (
   self.pruneCluster.RemoveMarkers();
   self.pruneCluster.RedrawIcons();
   if (collection.length <= 0) {
-    $("#showGraphButton").attr("disabled", true);
     toastr.warning("No data");
   } else {
-    $("#showGraphButton").attr("disabled", false);
     let coords = [];
     if (selectedObj !== "data") {
       self.pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
@@ -1070,8 +839,14 @@ MapView.prototype.render = function (
           );
         }
         leafletMarker.bindTooltip(data.date.toString());
+        let dataCopy = { ...data };
+        delete dataCopy.indexCol;
         leafletMarker.on("contextmenu", function () {
-          $.Topic("data-add").publish(data);
+          let r = confirm("Add to edit table?");
+          if (r) {
+            $.Topic("data-add").publish(dataCopy);
+            toastr.success("Done!");
+          }
         });
       };
       self.pruneCluster.Cluster.Size = 15;
@@ -1257,7 +1032,7 @@ MapView.prototype.render = function (
           let div = L.DomUtil.create("div", "info legend");
           // loop through our density intervals and generate a label with a colored square for each interval
           let halfdelta = (max - min) / (colors.length * 2);
-
+          let grades = [];
           for (let i = 0; i < colors.length; i++) {
             let grade = min + halfdelta * (i * 2 + 1);
             div.innerHTML +=
@@ -1270,6 +1045,15 @@ MapView.prototype.render = function (
                 .replace(/\.?0+$/, "") +
               "<br>" +
               "</div>";
+            grades.push(grade * bcode.scale + bcode.offset);
+          }
+          self.grades = grades;
+          if ($("#syncColors").is(":checked")) {
+            let activeLayers = self.controlLayer.getActiveOverlays();
+            activeLayers.forEach((layer) => {
+              console.log(self.grades);
+              layer.setParams({ dim_grades: self.grades, dim_colors: colors });
+            });
           }
           return div;
         };
@@ -1384,7 +1168,6 @@ MapView.prototype.render = function (
               marker.data.value = item.vars[selectedValues.vars].v;
               marker.data.trange = item.timerange;
               marker.data.level = item.level;
-              marker.data.selected = false;
             }
           });
           marker.category = getColorIndex(marker.data.value, min, max);
