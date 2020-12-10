@@ -19,6 +19,7 @@ let MapView = function (
   this.urlWms = urlWms;
   this.notFoundImage = notFoundImage;
   this.urlMapServer = urlMapServer;
+  this.grades = [];
 };
 
 MapView.prototype.initEvents = function () {
@@ -44,6 +45,7 @@ MapView.prototype.initEvents = function () {
   switchFilter(sliderB33193, checkFilterB33193);
   createSliderFilter(sliderB33194);
   switchFilter(sliderB33194, checkFilterB33194);
+
   let customControl = L.Control.extend({
     options: {
       position: "topright",
@@ -158,6 +160,14 @@ MapView.prototype.initEvents = function () {
             try {
               l.layer.setParams({ time: hour });
             } catch {}
+            if ($("#syncColors").is(":checked")) {
+              if (self.grades.length > 0) {
+                let activeLayers = self.controlLayer.getActiveOverlays();
+                activeLayers.forEach((layer) => {
+                  layer.setParams({ dim_grades: self.grades, dim_colors: colors });
+                });
+              } 
+            }
           });
 
           $(document.body).on("change", "#hour", function () {
@@ -186,6 +196,24 @@ MapView.prototype.initEvents = function () {
           self.controlLayer = L.control.layers(baseMaps, layers);
           self.controlLayer.addTo(self.map);
           L.control.scale({ position: "bottomright" }).addTo(self.map);
+
+          let command = L.control({ position: "topright" });
+
+          command.onAdd = function (map) {
+            var div = L.DomUtil.create("div");
+            div.innerHTML = `
+            <div class="leaflet-control-layers leaflet-control-layers-expanded">
+              <form>
+                <input class="leaflet-control-layers-overlays" id="syncColors" 
+                  type="checkbox">
+                  Sync colors
+                </input>
+              </form>
+            </div>`;
+            return div;
+          };
+
+          command.addTo(self.map);
         },
         error: function (error) {
           console.log(error);
@@ -203,6 +231,30 @@ MapView.prototype.initEvents = function () {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(self.map);
     },
+  });
+
+  $(document.body).on("change", "#syncColors", function () {
+    if ($(this).is(":checked")) {
+      if (self.grades.length > 0) {
+        let activeLayers = self.controlLayer.getActiveOverlays();
+        activeLayers.forEach((layer) => {
+          console.log(self.grades);
+          layer.setParams({ dim_grades: self.grades, dim_colors: colors });
+        });
+      } else {
+        
+        toastr.warning("Search first");
+        $(this).prop("checked", false);
+      }
+    }
+    else{
+      let activeLayers = self.controlLayer.getActiveOverlays();
+      activeLayers.forEach((layer) => {
+        delete(layer.wmsParams.dim_grades);
+        delete(layer.wmsParams.dim_colors);
+        layer.setParams();
+      });
+    }
   });
 
   $(document.body).on("click", "#toggleMarkers", function () {
@@ -407,6 +459,7 @@ MapView.prototype.initEvents = function () {
         layer.setParams({ time: date });
       });
     }
+  
     return filteredCollection;
   }
 
@@ -422,19 +475,18 @@ MapView.prototype.initEvents = function () {
         timerange: `${normalizeString(data.trange[0])},${normalizeString(
           data.trange[1]
         )},${normalizeString(data.trange[2])}`,
-        level: `${null2_(data.level[0])},${null2_(
-          data.level[1]
-        )},${null2_(data.level[2])},${null2_(data.level[3])}`,
+        level: `${null2_(data.level[0])},${null2_(data.level[1])},${null2_(
+          data.level[2]
+        )},${null2_(data.level[3])}`,
         vars: Object.keys(data.data[0].vars)[0],
         date: selectedValues.date,
         hour: selectedValues.hour,
-        dsn :selectedValues.dsn
+        dsn: selectedValues.dsn,
       };
       $.Topic("query-add").publish(query);
       toastr.success("Done!");
     }
   });
-  
 
   $(document.body).on("click", ".open-wind-graph", function () {
     let idCol = $(this).attr("data-id");
@@ -483,7 +535,7 @@ MapView.prototype.initEvents = function () {
         `${selectedValues.hour !== "*" ? "/" + selectedValues.hour : ""}?dsn=${
           selectedValues.dsn
         }`;
-      openGraphWind(urlDirWind, urlSpeedWind,self.overlay);
+      openGraphWind(urlDirWind, urlSpeedWind, self.overlay);
     }
   });
 
@@ -980,7 +1032,7 @@ MapView.prototype.render = function (
           let div = L.DomUtil.create("div", "info legend");
           // loop through our density intervals and generate a label with a colored square for each interval
           let halfdelta = (max - min) / (colors.length * 2);
-
+          let grades = [];
           for (let i = 0; i < colors.length; i++) {
             let grade = min + halfdelta * (i * 2 + 1);
             div.innerHTML +=
@@ -993,6 +1045,15 @@ MapView.prototype.render = function (
                 .replace(/\.?0+$/, "") +
               "<br>" +
               "</div>";
+            grades.push(grade * bcode.scale + bcode.offset);
+          }
+          self.grades = grades;
+          if ($("#syncColors").is(":checked")) {
+            let activeLayers = self.controlLayer.getActiveOverlays();
+            activeLayers.forEach((layer) => {
+              console.log(self.grades);
+              layer.setParams({ dim_grades: self.grades, dim_colors: colors });
+            });
           }
           return div;
         };
