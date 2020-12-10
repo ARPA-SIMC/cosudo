@@ -5,7 +5,7 @@ if [[ $image =~ ^centos:8 ]]
 then
     dnf install -q -y epel-release
     dnf install -q -y yum-plugin-copr
-    dnf config-manager --set-enabled PowerTools
+    dnf config-manager --set-enabled powertools
     dnf copr enable -q -y simc/stable
 elif [[ $image =~ ^fedora: ]]
 then
