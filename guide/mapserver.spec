@@ -21,7 +21,7 @@ Summary:        Environment for building spatially-enabled internet applications
 License:        BSD
 URL:            http://www.mapserver.org
 
-Source0:        https://github.com/%{project_owner}/%{project_name}/releases/download/rel-%{versiontag}/%{project_name}-%{versiontag}.tar.gz
+Source0:        https://github.com/%{project_owner}/%{project_name}/releases/download/rel-%{versiontag}/%{project_name}-%{version}.tar.gz
 
 Requires:       httpd
 Requires:       dejavu-sans-fonts
@@ -180,11 +180,8 @@ cmake -DINSTALL_LIB_DIR=%{_libdir} \
       -DWITH_LIBXML2=TRUE \
       -DWITH_OGR=TRUE \
       -DWITH_MYSQL=TRUE \
-      -DWITH_PERL=TRUE \
-      -DCUSTOM_PERL_SITE_ARCH_DIR="%{perl_vendorarch}" \
-%if 0%{php_mapscript}
-      -DWITH_PHP=TRUE \
-%endif # end php_mapscript
+      -DWITH_PERL=FALSE \
+      -DWITH_PHP=FALSE \
       -DWITH_POSTGIS=TRUE \
       -DWITH_PROJ=TRUE \
 %if 0%{python_mapscript}
@@ -275,21 +272,6 @@ EOF
 %{_libdir}/libmapserver.so
 %{_includedir}/%{name}/
 
-%if 0%{php_mapscript}
-%files -n php-%{name}
-%doc mapscript/php/README
-%doc mapscript/php/examples
-%config(noreplace) %{php_inidir}/%{ini_name}
-%{php_extdir}/php_mapscript.so*
-%endif # end php_mapscript
-
-%files perl
-%doc README.rst
-%doc mapscript/perl/examples
-%dir %{perl_vendorarch}/auto/mapscript
-%{perl_vendorarch}/auto/mapscript/*
-%{perl_vendorarch}/mapscript.pm
-
 %if 0%{python_mapscript}
 %files -n python3-mapserver
 %doc mapscript/python/README
@@ -304,4 +286,3 @@ EOF
 %doc mapscript/java/tests
 %{_javadir}/*.jar
 %{_libdir}/libjavamapscript.so
-

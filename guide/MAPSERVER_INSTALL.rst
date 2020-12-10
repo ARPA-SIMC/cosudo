@@ -21,7 +21,7 @@ MapServer
 
     rpmdev-setuptree
 
-**copy spec file in rpmbuild/SPECS/**
+**copy spec file in rpmbuild/SPECS/ build dep and installrpm (change name)**
 
     sudo dnf builddep rpmbuild/SPECS/mapserver.spec
     spectool -g -R rpmbuild/SPECS/mapserver.spec
@@ -31,7 +31,7 @@ MapServer
 
 (optional) if need editor can install nano or use your favorite
 
-    dnf install nano -y
+    sudo dnf install nano -y
 
 
 ## 2 CONFIGURE APACHE CGI
@@ -40,13 +40,12 @@ MapServer
 
 **install apache and cgi module**
 
+    sudo su
     dnf install httpd -y
     systemctl start httpd
     systemctl enable httpd
-    systemctl status httpd
     dnf install mod_fcgid -y
     systemctl restart httpd
-    systemctl status httpd
 
 **copy or link mapserv file in  cgi dir**
 
