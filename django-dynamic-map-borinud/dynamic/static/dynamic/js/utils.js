@@ -147,6 +147,10 @@ function isMarkerInsidePolygon(marker, poly) {
     return inside;
 };
 
+function roundValue(value) {
+    return value.toPrecision(5).replace(/(\.\d*?[0-9])0+$/g, "$1" )
+}
+
 /*
     $("#sidebar").resizable({
         handles: 'e', stop: function (e, ui) {

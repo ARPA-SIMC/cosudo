@@ -329,9 +329,10 @@ MapView.prototype.initEvents = function () {
     }
 
     function getUrl(selectedObj, selectedValues) {
+        let url = ""
         switch (selectedObj) {
             case "data":
-                return (
+                url =
                     `${self.urlBorinud}/dbajson/${selectedValues.ident}/${selectedValues.lon_lat}/` +
                     `${selectedValues.network}/${selectedValues.timerange}/${selectedValues.level}/${selectedValues.vars}/` +
                     `spatialseries/${selectedValues.date.split("-")[0]}/${
@@ -340,18 +341,21 @@ MapView.prototype.initEvents = function () {
                     `${
                         selectedValues.hour !== "*" ? "/" + selectedValues.hour : ""
                     }?dsn=${selectedValues.dsn}&query=attr`
-                );
+                break
             case "stations":
-                return (
+                url =
                     `${self.urlBorinud}/geojson/${selectedValues.ident}/${selectedValues.lon_lat}/` +
                     `${selectedValues.network}/*/*/*/stations?dsn=${selectedValues.dsn}`
-                );
+                break;
             default:
-                return (
+                url =
                     `${self.urlBorinud}/geojson/${selectedValues.ident}/${selectedValues.lon_lat}/` +
                     `${selectedValues.network}/*/*/*/stationdata?dsn=${selectedValues.dsn}`
-                );
+                ;
+                break;
+
         }
+        return url
     }
 
     function getActiveFilters(filterList) {
@@ -590,7 +594,7 @@ MapView.prototype.initEvents = function () {
                                 bcode = borinud.config.B[selectedValues.vars];
                             } else {
                                 bcode = {
-                                    bcode: "B00001",
+                                    bcode: selectedValues.vars,
                                     description: "Undefined",
                                     unit: "Undefined",
                                     offset: 0,
@@ -598,7 +602,12 @@ MapView.prototype.initEvents = function () {
                                     userunit: "",
                                 };
                             }
-
+                            if (!("offset" in bcode)) {
+                                bcode = {...bcode, offset: 0}
+                            }
+                            if (!("scale" in bcode)) {
+                                bcode = {...bcode, scale: 1}
+                            }
                         }
                         collection.forEach((item, index) => {
                             item.indexCol = index;
@@ -723,6 +732,7 @@ MapView.prototype.render = function (
     self.legend.remove();
     self.pruneCluster.RemoveMarkers();
     self.pruneCluster.RedrawIcons();
+
     if (collection.length <= 0) {
         toastr.warning("No data");
     } else {
@@ -810,6 +820,8 @@ MapView.prototype.render = function (
                     })
                 );
             });
+            console.log(max,min)
+
             let pi2 = Math.PI * 2;
             self.pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
                 if (leafletMarker.getPopup()) {
@@ -817,9 +829,7 @@ MapView.prototype.render = function (
                 } else {
                     leafletMarker.bindPopup(setPopup(data, selectedValues));
                 }
-                let val = (data.value * bcode.scale + bcode.offset)
-                    .toPrecision(5)
-                    .replace(/\.?0+$/, "");
+                let val = roundValue(data.value * bcode.scale + bcode.offset);
 
                 let vallen = val.length * 6 + 6;
                 leafletMarker.setIcon(
@@ -862,7 +872,9 @@ MapView.prototype.render = function (
                     }
                 });
             };
+
             self.pruneCluster.Cluster.Size = 15;
+
             if ($("#vars").val() === "B11001") {
                 self.pruneCluster.BuildLeafletClusterIcon = function (cluster) {
                     let markersCluster = cluster.GetClusterMarkers();
@@ -1046,21 +1058,23 @@ MapView.prototype.render = function (
                     // loop through our density intervals and generate a label with a colored square for each interval
                     let halfdelta = (max - min) / (colors.length * 2);
                     let grades = [];
+
                     for (let i = 0; i < colors.length; i++) {
+
                         let grade = min + halfdelta * (i * 2 + 1);
                         div.innerHTML +=
                             '<div style="background:white">' +
                             '<b style="background:' +
                             getColor(grade, min, max) +
                             '">&nbsp;&nbsp;&nbsp;</b>&nbsp;' +
-                            (grade * bcode.scale + bcode.offset)
-                                .toPrecision(5)
-                                .replace(/\.?0+$/, "") +
+                            roundValue(grade * bcode.scale + bcode.offset)+
                             "<br>" +
                             "</div>";
                         grades.push(grade * bcode.scale + bcode.offset);
                     }
+
                     self.grades = grades;
+
                     if ($("#syncColors").is(":checked")) {
                         let activeLayers = self.controlLayer.getActiveOverlays();
                         activeLayers.forEach((layer) => {
@@ -1068,13 +1082,17 @@ MapView.prototype.render = function (
                             layer.setParams({dim_grades: self.grades, dim_colors: colors});
                         });
                     }
+
                     return div;
                 };
 
                 self.legend.addTo(self.map);
+
                 self.pruneCluster.BuildLeafletClusterIcon = function (cluster) {
                     let markersCluster = cluster.GetClusterMarkers();
-                    let bcodeKey = $("#vars").val();
+
+                    let bcodeKey = selectedValues.vars;
+
                     L.Icon.MarkerCluster = L.Icon.extend({
                         options: {
                             iconSize: new L.Point(100, 100),
@@ -1145,9 +1163,7 @@ MapView.prototype.render = function (
                             //canvas.fillText(this.population, 22, 22,28);
                             let halfdelta = (max - min) / (colors.length * 2);
                             let grade = min + halfdelta * (prevalentindex * 2 + 1);
-                            grade = (grade * bcode.scale + bcode.offset)
-                                .toPrecision(5)
-                                .replace(/\.?0+$/, "");
+                            grade = roundValue(grade * bcode.scale + bcode.offset);
                             canvas.fillText(grade, 50, 50, 28);
                         },
                     });

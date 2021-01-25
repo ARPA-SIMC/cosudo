@@ -132,18 +132,32 @@ GraphView.prototype.render = function () {
             let data_dict = {};
             collection.forEach((feature) => {
                 let bcode = Object.keys(feature.data[0].vars)[0];
+                let valBcode = {
+                        bcode: bcode,
+                        description: "Undefined",
+                        unit: "Undefined",
+                        offset: 0,
+                        scale: 1,
+                        userunit: "",
+                    };
+                if (bcode in borinud.config.B) {
+                    valBcode = borinud.config.B[bcode]
+                }
+                if (!("offset" in valBcode)) {
+                    valBcode = {...valBcode, offset: 0}
+                }
+                if (!("scale" in valBcode)) {
+                    valBcode = {...valBcode, scale: 1}
+                }
 
-                let val = (feature.data[0].vars[Object.keys(feature.data[0].vars)[0]].v * borinud.config.B[bcode].scale + borinud.config.B[bcode].offset)
+                let val = (feature.data[0].vars[Object.keys(feature.data[0].vars)[0]].v * valBcode.scale + valBcode.offset)
                     .toPrecision(5)
 
-                if (isNaN(val)) {
-                    val = feature.data[0].vars[Object.keys(feature.data[0].vars)[0]].v
-                }
                 if (borinud.config.B[bcode] !== undefined) {
                     bcode =
-                        borinud.config.B[bcode].description +
+                       valBcode.description +
                         " " +
-                        borinud.config.B[bcode].unit;
+                        valBcode.unit;
                 }
                 let trange = borinud.config.trange.describe(
                     ...feature.data[0].timerange
