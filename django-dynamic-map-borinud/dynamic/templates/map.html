@@ -246,7 +246,9 @@
                             <option value="sample_fixed">sample_fixed</option>
                         </select>
                     </div>
-                    <button data-url="" class="btn btn-outline-primary" id="url-borinud-data">Copia url</button>
+                    <button data-url="" class="btn btn-outline-primary get-borinud-url w-100" id="url-borinud-data">
+                        Copia url
+                    </button>
 
                 </div>
             </div>
@@ -1070,6 +1072,13 @@
                                 </div>
                             </button>
                         </div>
+                        <div class="col-12 mt-2">
+                            <button data-url="" class="btn btn-outline-primary get-borinud-url w-100"
+                                    id="url-borinud-graph">
+                                Copia url
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -1124,6 +1133,22 @@
     <script src="{% static 'dynamic/js/structure/invalidation-vars-form-view.js' %}"></script>
     <script>
         $(function () {
+            $(".get-borinud-url").on("click", function () {
+                const copyText = $(this).attr("data-url");
+                if (copyText === "") {
+                    alert("Nessuna ricerca effettuata")
+                } else {
+                    copyToClipBoard(copyText);
+                    alert("Fatto!")
+                }
+
+                // Or...
+                //var elems = document.getElementsByClassName("hl7MsgBox");
+                //var copyText = elems[0].textContent;
+
+
+            })
+
             const overlay = $("#overlay")
 
             const searchForm = new SearchForm();

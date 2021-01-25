@@ -355,6 +355,7 @@ MapView.prototype.initEvents = function () {
                 break;
 
         }
+        $("#url-borinud-data").attr("data-url", url)
         return url
     }
 
@@ -820,7 +821,7 @@ MapView.prototype.render = function (
                     })
                 );
             });
-            console.log(max,min)
+            console.log(max, min)
 
             let pi2 = Math.PI * 2;
             self.pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
@@ -1067,7 +1068,7 @@ MapView.prototype.render = function (
                             '<b style="background:' +
                             getColor(grade, min, max) +
                             '">&nbsp;&nbsp;&nbsp;</b>&nbsp;' +
-                            roundValue(grade * bcode.scale + bcode.offset)+
+                            roundValue(grade * bcode.scale + bcode.offset) +
                             "<br>" +
                             "</div>";
                         grades.push(grade * bcode.scale + bcode.offset);

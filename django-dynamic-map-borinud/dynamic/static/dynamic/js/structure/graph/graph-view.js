@@ -110,7 +110,7 @@ GraphView.prototype.render = function () {
     self.overlay.fadeIn(300);
 
     function getUrlGraph(data) {
-        return (
+        let url =
             `${self.urlBorinud}/dbajson/${null2_(data.ident)}/${data.lon_lat}/` +
             `${null2_(data.network)}/${data.timerange}/${null2_(data.level)}/${
                 data.vars
@@ -119,7 +119,9 @@ GraphView.prototype.render = function () {
                 data.date.split("-")[2]
             }` +
             `${data.hour !== "*" ? "/" + data.hour : ""}?dsn=${data.dsn}&query=attr`
-        );
+        ;
+        $("#url-borinud-graph").attr("data-url", url)
+        return url
     }
 
     async function getDataGraph() {
@@ -133,13 +135,13 @@ GraphView.prototype.render = function () {
             collection.forEach((feature) => {
                 let bcode = Object.keys(feature.data[0].vars)[0];
                 let valBcode = {
-                        bcode: bcode,
-                        description: "Undefined",
-                        unit: "Undefined",
-                        offset: 0,
-                        scale: 1,
-                        userunit: "",
-                    };
+                    bcode: bcode,
+                    description: "Undefined",
+                    unit: "Undefined",
+                    offset: 0,
+                    scale: 1,
+                    userunit: "",
+                };
                 if (bcode in borinud.config.B) {
                     valBcode = borinud.config.B[bcode]
                 }
@@ -155,7 +157,7 @@ GraphView.prototype.render = function () {
 
                 if (borinud.config.B[bcode] !== undefined) {
                     bcode =
-                       valBcode.description +
+                        valBcode.description +
                         " " +
                         valBcode.unit;
                 }
