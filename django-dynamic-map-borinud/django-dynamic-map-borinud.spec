@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global __python %{__python3}
 %define python3_vers python3
-%define version 1.7
+%define version 1.8
 
 Name: django-dynamic-map-borinud
 Version: %{version}
