@@ -147,6 +147,19 @@ function isMarkerInsidePolygon(marker, poly) {
     return inside;
 };
 
+function roundValue(value) {
+    return value.toPrecision(5).replace(/(\.\d*?[0-9])0+$/g, "$1")
+}
+
+function copyToClipBoard(str) {
+    const el = document.createElement('textarea');
+    el.value = str;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+}
+
 /*
     $("#sidebar").resizable({
         handles: 'e', stop: function (e, ui) {
