@@ -1206,11 +1206,7 @@ MapView.prototype.render = function (
             }
         }
         self.map.addLayer(self.pruneCluster);
-        try {
-            self.map.fitBounds(coords);
-        } catch (err) {
-            toastr.error("Error setting bounds...");
-        }
+        self.pruneCluster.ProcessView();
     }
     self.overlay.fadeOut(300);
 };

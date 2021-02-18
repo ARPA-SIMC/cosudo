@@ -160,6 +160,15 @@ function copyToClipBoard(str) {
     document.body.removeChild(el);
 }
 
+function printDiv(id) {
+    var container = document.getElementById(id);
+    html2canvas(container).then((canvas) => {
+        let canvasImg = canvas.toDataURL("image/jpg");
+        printJS({printable: canvasImg, type: 'image', imageStyle: 'width:100%', modal: true, documentTitle:""});
+
+    });
+}
+
 /*
     $("#sidebar").resizable({
         handles: 'e', stop: function (e, ui) {

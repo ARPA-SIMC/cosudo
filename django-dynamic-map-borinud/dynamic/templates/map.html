@@ -5,30 +5,17 @@
             <span class="spinner"></span>
         </div>
     </div>
-    <div
-            id="sidebarChart"
-            style="
-    position: absolute;
-    right: 0;
-    width: calc(100% - 490px);
-    margin-left: 10px;
-    margin-right: 10px;
-    background: white;
-    z-index: 10000;
-    margin-top: 10px;
-    border-radius: 4px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
-    height: auto;
-    display: none;
-    padding:10px;
-    overflow-x:auto
-  "
-    >
-        <!-- Nav tabs -->
-        <div id="chart-container">
-            <canvas id="chart"></canvas>
+    <div id="sidebarChart">
+        <div class="d-flex flex-row justify-content-end">
+            <button class="btn btn-primary btn-sm" onclick="printDiv('chart-page')">Stampa</button>
         </div>
-        <div id="tableChart"></div>
+        <div id="chart-page">
+            <div id="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+            <div id="tableChart"></div>
+        </div>
+
     </div>
     <div id="sidebar" class="sidebar">
         <!-- Nav tabs -->
@@ -1110,6 +1097,7 @@
             </div>
         </div>
     </div>
+    <div style="display: none" id="hiddenDiv"></div>
 {% endblock %} {% block javascript %}
     <script src="{% static 'dynamic/js/structure/publish-subscribe.js' %}"></script>
     <script src="{% static 'dynamic/js/structure/search-form.js' %}"></script>
@@ -1171,7 +1159,7 @@
                 //timeDimensionControl: true,
                 //timeDimensionControlOptions: {position: "bottomright"}
                 times: [$("#hours").val() ? $("#hours").val() !== "*" : new Date()]
-            }).setView([43, 11], 13);
+            }).setView([43, 11], 7);
             var legend = L.control({position: 'bottomright'});
 
             L.control.zoom({position: 'topright'}).addTo(map);
