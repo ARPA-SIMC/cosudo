@@ -203,6 +203,23 @@ html, body, #map {
     -webkit-transition-delay: 0ms, 0ms, 200ms;
     transition-delay: 0ms, 0ms, 200ms;
 }
+#sidebarChart{
+    position: absolute;
+    right: 0;
+    width: calc(100% - 490px);
+    margin-left: 10px;
+    margin-right: 10px;
+    background: white;
+    z-index: 10000;
+    margin-top: 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    height: auto;
+    display: none;
+    padding:10px;
+    overflow-x:auto;
+    font-size: 0.9rem
+}
 @-webkit-keyframes pulsate {
     0% {
         -webkit-transform: scale(0.1, 0.1);

@@ -209,9 +209,7 @@ GraphView.prototype.render = function () {
             '<canvas id="chart"></canvas>';
         var ctx = document.getElementById("chart").getContext("2d");
         self.chart = new Chart(ctx, {
-            legend: {
-                display: false,
-            },
+
             // The type of chart we want to create
             type: "line",
             // The data for our dataset
@@ -313,13 +311,13 @@ GraphView.prototype.render = function () {
             queryDict[key].forEach((dataset, index) => {
                 tooltipInfo = dataset.tooltip.split("|");
                 if (index == 0) {
-                    trs += `<tr data-id="${dataset.index}"><td rowspan="${queryDict[key].length}"><button data-id="${dataset.index}" class="btn btn-danger removeTrace">Remove search <i class="fa fa-trash"></i></button></td>`;
+                    trs += `<tr data-id="${dataset.index}"><td rowspan="${queryDict[key].length}"><button data-id="${dataset.index}" class="btn btn-danger removeTrace btn-sm"><i class="fa fa-trash"></i></button></td>`;
                 } else {
                     trs += `<tr data-id="${dataset.index}">`;
                 }
                 trs += `<td style="background-color:${
                     dataset.borderColor
-                }"></td><td>${popDescription(tooltipInfo[0])}</td><td>${popDescription(
+                };min-width: 40px;"></td><td>${popDescription(tooltipInfo[0])}</td><td>${popDescription(
                     tooltipInfo[1]
                 )}</td><td>${popDescription(tooltipInfo[2])}</td><td>${popDescription(
                     tooltipInfo[3]
