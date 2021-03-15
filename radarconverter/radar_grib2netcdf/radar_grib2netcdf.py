@@ -54,7 +54,6 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     ncid.createDimension("lon", codes_get(gid, "Ni"))
     ncid.createDimension("geo_dim", 4)
     ncid.createDimension("mesh_dim", 2)
-    ncid.createDimension("idl", 0)
 
     v = ncid.createVariable("lon", "f4", ("lon",))
     v.long_name = "longitude"
@@ -74,12 +73,12 @@ def radar_grib2netcdf(name_grib, name_nc=""):
     mesh_lat = (b - a) / (codes_get(gid, "Nj") - 1)
     v[:] = np.append(np.array(np.arange(a, b, (b - a) / (codes_get(gid, "Nj") - 1))), b)
 
-    v = ncid.createVariable("time", "f8", ("time",))
+    v = ncid.createVariable("time", "f4", ("time",))
     v.long_name = "time"
     v.units = tempo.strftime(date_format_netcdf)
     v[:] = np.array([0])
 
-    v = ncid.createVariable("idl", "S1", ("idl",))
+    v = ncid.createVariable("idl", "S1")
     v.projection_name = "lat-lon"
     v.projection_index = "0s"
     v.grid_mapping_name = "idl-lat-lon"

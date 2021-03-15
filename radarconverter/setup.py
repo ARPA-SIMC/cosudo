@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='radar_converter',
-    version='0.1.1',
+    version='0.1.2',
     packages=['radar_grib2netcdf', 'radar_netcdf2grib'],
     install_requires=[
         'attrs==20.3.0',
