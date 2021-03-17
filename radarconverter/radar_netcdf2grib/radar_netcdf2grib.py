@@ -31,11 +31,11 @@ component_flag = 0  # int CONSTANT
 
 def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
 
-    #  cattura errori
+    # cattura errori
     if not name_nc:
         raise Exception("Manca il file di input.")
 
-    #correzione eventuaale parametro errato
+    # correzione eventuaale parametro errato
     if grib_output_type != 1:
         grib_output_type = 2
 
@@ -45,6 +45,8 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
     # Estraggo le dimensioni delle variabili immagazzinate
     dim_lon = ncid.dimensions['lon'].size
     dim_lat = ncid.dimensions['lat'].size
+
+    mesh_xy = None
 
     # Estraggo l'istante di emissione del dato
     time = ncid.variables['time'].units
@@ -95,6 +97,9 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
             varid_mesh = ncid.variables['mesh_dim']
             mesh_xy = [varid_mesh[:]][0]
 
+    if mesh_xy is None:
+        raise Exception("Manca il mesh_xy.")
+
     '''
     ==============================================================================
     SCRITTURA DEL GRIB
@@ -129,10 +134,17 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
         'packingType': 'grid_simple',
         'bitmapPresent': 1,
 
+        'indicatorOfUnitOfTimeRange': 1,
+
         'resolutionAndComponentFlags': 0,
 
         'topLevel': 0,  # l1
         'bottomLevel': imiss,  # l2
+
+        'iDirectionIncrement': "MISSING",
+        'jDirectionIncrement': "MISSING",
+        'iDirectionIncrementInDegrees': mesh_xy[0],
+        'jDirectionIncrementInDegrees': mesh_xy[1],
 
         # istante di emissione del dato
         'dataDate': int(date_time.strftime(GRIB_DAY_FORMAT)),
@@ -145,7 +157,6 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
         key_map_grib['timeRangeIndicator'] = 13
         key_map_grib['P1'] = 0
         key_map_grib['P2'] = acc_t
-        key_map_grib['indicatorOfUnitOfTimeRange'] = 1
 
         # Variabile precipitazione
         key_map_grib['gribTablesVersionNo'] = 2  # category
@@ -153,12 +164,9 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
 
         # parametri copiati a mano
         key_map_grib['level'] = 0
-        key_map_grib['iDirectionIncrement'] = "MISSING"
-        key_map_grib['jDirectionIncrement'] = "MISSING"
 
     else:
         # Timerange
-        key_map_grib['indicatorOfUnitOfTimeRange'] = 1
         key_map_grib['forecastTime'] = 0
 
         # Variabile precipitazione
@@ -170,8 +178,7 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
         key_map_grib['shapeOfTheEarth'] = 1  # shapeOfTheEarth
         key_map_grib['scaleFactorOfRadiusOfSphericalEarth'] = 2  # scaleFactorOfRadiusOfSphericalEarth
         key_map_grib['scaledValueOfRadiusOfSphericalEarth'] = 637099700  # scaledValueOfRadiusOfSphericalEarth
-        key_map_grib['iDirectionIncrement'] = "MISSING"  # iDirectionIncrement
-        key_map_grib['jDirectionIncrement'] = "MISSING"  # jDirectionIncrement
+
 
         key_map_grib['productDefinitionTemplateNumber'] = 8
         key_map_grib['typeOfFirstFixedSurface'] = 1
@@ -208,13 +215,6 @@ def radar_netcdf2grib(name_nc, fileout=None, grib_output_type=2):
     ncid.close()
 
     print("OK")
-
-'''
-#radar_netcdf2grib("datasets/comp-ACRR_202003260000_001H.nc", grib_output_type=1)
-radar_netcdf2grib("/home/fabio/PycharmProjects/skinnywms-master/skinnywms/testdata/comp-ACRR_202003260015_001H.nc",
-                  fileout="/home/fabio/PycharmProjects/skinnywms-master/skinnywms/testdata/comp-ACRR_202003260015_001H.grib1", grib_output_type=1)
-                  
-'''
 
 
 def main():
