@@ -1,9 +1,10 @@
-let GraphView = function (queryCollection, urlBorinud, sidebar, overlay) {
+let GraphView = function (queryCollection, urlBorinud, sidebar, overlay, websiteDomainAndSchema) {
     this.queryData = queryCollection;
     this.urlBorinud = urlBorinud;
     this.sidebar = sidebar;
     this.chart = undefined;
     this.overlay = overlay;
+    this.websiteDomain = websiteDomainAndSchema
 };
 
 GraphView.prototype.initEvents = function () {
@@ -120,7 +121,8 @@ GraphView.prototype.render = function () {
             }` +
             `${data.hour !== "*" ? "/" + data.hour : ""}?dsn=${data.dsn}&query=attr`
         ;
-        $("#url-borinud-graph").attr("data-url", url)
+        const copyUrl = url.indexOf("http://") === 0 || url.indexOf("https://") === 0 ? url : `${self.websiteDomain}${url}`
+        $("#url-borinud-graph").attr("data-url", copyUrl)
         return url
     }
 
