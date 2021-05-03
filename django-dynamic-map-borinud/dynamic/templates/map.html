@@ -1136,7 +1136,8 @@
 
 
             })
-
+            const webSiteDomainAndScheme = "{{ request.scheme }}://{{ request.get_host }}"
+            console.log(webSiteDomainAndScheme)
             const overlay = $("#overlay")
 
             const searchForm = new SearchForm();
@@ -1167,7 +1168,7 @@
             sidebar.addTo(map);
             const queryCollection = new QueryCollection()
             queryCollection.subscribe()
-            const graphView = new GraphView(queryCollection, "{{url_borinud}}", sidebar, overlay);
+            const graphView = new GraphView(queryCollection, "{{url_borinud}}", sidebar, overlay, webSiteDomainAndScheme);
             graphView.initEvents()
             var sliderTimeControl = L.Control.extend({
                 options: {position: 'bottomleft'},
@@ -1180,7 +1181,7 @@
             map.addControl(new sliderTimeControl());
 
 
-            const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay, "{% url "wms" %}", "{% static 'dynamic/images/map-not-found.png' %}", "{% url "mapserver-wms"%}")
+            const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay, "{% url "wms" %}", "{% static 'dynamic/images/map-not-found.png' %}", "{% url "mapserver-wms"%}", webSiteDomainAndScheme)
             mapView.initEvents()
             {% if perms.dynamic.can_extract %}
 

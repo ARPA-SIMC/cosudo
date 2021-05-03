@@ -6,7 +6,8 @@ let MapView = function (
     overlay,
     urlWms,
     notFoundImage,
-    urlMapServer
+    urlMapServer,
+    websiteDomain
 ) {
     this.collection = [];
     this.urlBorinud = urlBorinud;
@@ -20,6 +21,7 @@ let MapView = function (
     this.notFoundImage = notFoundImage;
     this.urlMapServer = urlMapServer;
     this.grades = [];
+    this.websiteDomain = websiteDomain
 };
 
 MapView.prototype.initEvents = function () {
@@ -355,7 +357,8 @@ MapView.prototype.initEvents = function () {
                 break;
 
         }
-        $("#url-borinud-data").attr("data-url", url)
+        const copyUrl = url.indexOf("http://") === 0 || url.indexOf("https://") === 0 ? url : `${self.websiteDomain}${url}`
+        $("#url-borinud-data").attr("data-url", copyUrl)
         return url
     }
 
