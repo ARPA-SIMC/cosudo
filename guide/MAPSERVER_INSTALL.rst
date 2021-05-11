@@ -7,7 +7,7 @@ MapServer
 ***if repo with mapserver is available, install it**
 
 ### 1.2 build and install
-***if repo with mapserver is NOT available, you can manually build and install it**
+***if repo with mapserver is NOT available, you can manually build and install it**::
 
     sudo su
     dnf install -q -y epel-release
@@ -21,15 +21,14 @@ MapServer
 
     rpmdev-setuptree
 
-**copy spec file in rpmbuild/SPECS/ build dep and installrpm (change name)**
+**copy spec file in rpmbuild/SPECS/ build dep and installrpm (change name)**::
 
     sudo dnf builddep rpmbuild/SPECS/mapserver.spec
     spectool -g -R rpmbuild/SPECS/mapserver.spec
     rpmbuild -ba rpmbuild/SPECS/mapserver.spec
     sudo  dnf install rpmbuild/RPMS/x86_64/mapserver-7.6.1-2.git74ae370.el8.x86_64.rpm
 
-
-(optional) if need editor can install nano or use your favorite
+(optional) if need editor can install nano or use your favorite::
 
     sudo dnf install nano -y
 
@@ -38,7 +37,7 @@ MapServer
 
 **example config http://www.yolinux.com/TUTORIALS/GIS-Servers-MapServer.html**
 
-**install apache and cgi module**
+**install apache and cgi module**::
 
     sudo su
     dnf install httpd -y
@@ -47,15 +46,15 @@ MapServer
     dnf install mod_fcgid -y
     systemctl restart httpd
 
-**copy or link mapserv file in  cgi dir**
+**copy or link mapserv file in  cgi dir**::
 
     cp /usr/bin/mapserv /var/www/cgi-bin/mapserv
 
-or
+or::
 
     ln /usr/bin/mapserv /var/www/cgi-bin/mapserv
 
-configure permission
+configure permission::
 
     chcon -u system_u -r object_r -t httpd_sys_script_exec_t /var/www/cgi-bin/mapserv
 
@@ -64,11 +63,11 @@ configure permission
 
 mapfile guide `here <https://mapserver.org/ogc/wms_server.html#setting-up-a-wms-server-using-mapserver>`_
 
-**create file /etc/httpd/conf.d/MapServer.conf**
+**create file /etc/httpd/conf.d/MapServer.conf**::
 
     nano /etc/httpd/conf.d/MapServer.conf
 
-add on file (change MS_MAPFILE path):
+add on file (change MS_MAPFILE path)::
 
     <Directory "/var/www/cgi-bin">
         AllowOverride None
@@ -86,11 +85,11 @@ add on file (change MS_MAPFILE path):
         SetEnv MS_MAPFILE /data/config/map/map.map
     </location>
 
-configure permission
+configure permission::
 
     chcon -u system_u -r object_r -t httpd_config_t /etc/httpd/conf.d/MapServer.conf
 
-create mapfile and data  dir (change dir)
+create mapfile and data  dir (change dir)::
 
     mkdir /tmp/ms_tmp/
     mkdir /ms_tmp/
@@ -99,11 +98,11 @@ create mapfile and data  dir (change dir)
     mkdir /data/config/
     mkdir /data/config/map/
 
-**create map file (change path)**
+**create map file (change path)**::
 
     nano /data/config/map/map.map
 
-**add on file (change "test.flt" file name, layer name, add style ecc..)**
+**add on file (change "test.flt" file name, layer name, add style ecc..)**::
 
     MAP
 
@@ -171,9 +170,11 @@ create mapfile and data  dir (change dir)
 
 **copy .flt and .hdr file into dir (change dir)**
 
+configure permissions::
+
     chcon -R -h -u system_u -r object_r -t httpd_sys_content_t /data
 
-restart apache
+restart apache::
 
     systemctl restart httpd
 
