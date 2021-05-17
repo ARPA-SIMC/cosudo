@@ -1152,15 +1152,16 @@
 
             const pruneCluster = new PruneClusterForLeaflet();
             const pruneClusterStations = new PruneClusterForLeaflet();
-            const todayDateSummary = moment(new Date()).format("YYYY/MM")
             PruneCluster.Cluster.ENABLE_MARKERS_LIST = true
             const map = L.map('map', {
                 zoomControl: false,
                 timeDimension: true,
-                //timeDimensionControl: true,
-                //timeDimensionControlOptions: {position: "bottomright"}
                 times: [$("#hours").val() ? $("#hours").val() !== "*" : new Date()]
             }).setView([43, 11], 7);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(map);
             var legend = L.control({position: 'bottomright'});
 
             L.control.zoom({position: 'topright'}).addTo(map);
@@ -1170,16 +1171,46 @@
             queryCollection.subscribe()
             const graphView = new GraphView(queryCollection, "{{url_borinud}}", sidebar, overlay, webSiteDomainAndScheme);
             graphView.initEvents()
-            var sliderTimeControl = L.Control.extend({
+            const sliderTimeControl = L.Control.extend({
                 options: {position: 'bottomleft'},
                 onAdd: function (map) {
-                    var el = L.DomUtil.create('div', 'leaflet-bar slider-control');
-                    el.innerHTML = '<div id="sliderTime"></div>';
+                    let el = L.DomUtil.create('div', 'leaflet-bar slider-control');
+                    el.innerHTML = '<div style="padding-bottom:30px"><p>Layers</p><div id="sliderTimeLayers"  style="margin-bottom:2rem"></div>' +
+                        '<p>Data</p><div id="sliderTime" ></div></div>'
+                    ;
                     return el;
                 }
             });
-            map.addControl(new sliderTimeControl());
+            let customControl = L.Control.extend({
+                options: {
+                    position: "topright",
+                },
+                onAdd: function (map) {
+                    let el = L.DomUtil.create("div", "leaflet-bar ");
+                    el.innerHTML =
+                        '<a role="button" id="toggleMarkers" class="showing"><i class="fa fa-eye"></i> </a>';
+                    return el;
+                },
+            });
+            const command = L.control({position: "topright"});
+            command.onAdd = function (map) {
+                var div = L.DomUtil.create("div");
+                div.innerHTML = `
+            <div class="leaflet-control-layers leaflet-control-layers-expanded">
+              <form>
+                <input class="leaflet-control-layers-overlays" id="syncColors"
+                  type="checkbox">
+                  Sync colors
+                </input>
+              </form>
+            </div>`;
+                return div;
+            };
 
+
+            map.addControl(new customControl());
+            map.addControl(new sliderTimeControl());
+            command.addTo(map);
 
             const mapView = new MapView("{{url_borinud}}", map, pruneCluster, legend, overlay, "{% url "wms" %}", "{% static 'dynamic/images/map-not-found.png' %}", "{% url "mapserver-wms"%}", webSiteDomainAndScheme)
             mapView.initEvents()
@@ -1187,8 +1218,6 @@
 
                 const stationCollection = new DataCollection()
                 const varCollection = new DataCollection()
-                let networks = []
-                let vars = []
 
                 async function fetchVm2Table(url, responseKey, collection, itemKey) {
                     let response = await $.ajax({

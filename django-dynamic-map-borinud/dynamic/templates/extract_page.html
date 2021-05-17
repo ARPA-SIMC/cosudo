@@ -68,8 +68,9 @@
                 <div class="form-group">
                     <label for="dataset">Select dataset</label>
                     <select id="dataset" required class="form-control " name="dataset">
-                        <option value="lama5">lama5</option>
-                        <option value="cosmo_2I">cosmo_2I</option>
+                        {% for key,value in products.items %}
+                            <option value="{{ key }}">{{ key }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -81,17 +82,7 @@
                     </label>
                     <select multiple="true" data-multiple-separator="" id="product" required class="form-control "
                             name="product">
-                        <option value='GRIB1,200,2,2'>MSL Mean sea level pressure Pa</option>
-                        <option value='GRIB1,200,2,11'>T Temperature K</option>
-                        <option value='GRIB1,200,2,33'>U U-component of wind m s^-1</option>
-                        <option value='GRIB1,200,2,51'>Q Specific humidity kg kg^-1</option>
-                        <option value='GRIB1,200,2,61'>TP Total precipitation kg m^-2</option>
-                        <option value='GRIB1,200,2,71'>TCC Total cloud cover %</option>
-                        <option value='GRIB1,200,2,73'>LCC Low cloud cover %</option>
-                        <option value='GRIB1,200,2,74'>MCC Medium cloud cover %</option>
-                        <option value='GRIB1,200,2,75'>HCC High cloud cover %</option>
-                        <option value='GRIB1,200,2,111'>None Net short-wave radiation flux (surface) W m^-2</option>
-                        <option value='GRIB1,200,2,112'>None Net long-wave radiation flux (surface) W m^-2</option>
+
                     </select>
                 </div>
             </div>
@@ -137,42 +128,14 @@
         src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-
+{{ products|json_script:"productsScript" }}
 <script>
+    const products = JSON.parse(document.getElementById('productsScript').textContent);
     $(document.body).on("change", "#dataset", function () {
         let value = $(this).val()
-        console.log(value)
-        let html = "";
-        if (value === "lama5") {
-            html += "<option value='GRIB1,200,2,2'>MSL Mean sea level pressure Pa</option>"
-            html += "<option value='GRIB1,200,2,11'>T Temperature K</option>"
-            html += "<option value='GRIB1,200,2,33'>U U-component of wind m s^-1</option>"
-            html += "<option value='GRIB1,200,2,51'>Q Specific humidity kg kg^-1</option>"
-            html += "<option value='GRIB1,200,2,61'>TP Total precipitation kg m^-2</option>"
-            html += "<option value='GRIB1,200,2,71'>TCC Total cloud cover %</option>"
-            html += "<option value='GRIB1,200,2,73'>LCC Low cloud cover %</option>"
-            html += "<option value='GRIB1,200,2,74'>MCC Medium cloud cover %</option>"
-            html += "<option value='GRIB1,200,2,75'>HCC High cloud cover %</option>"
-            html += "<option value='GRIB1,200,2,111'>None Net short-wave radiation flux (surface) W m^-2</option>"
-            html += "<option value='GRIB1,200,2,112'>None Net long-wave radiation flux (surface) W m^-2</option>"
-        } else if (value === "cosmo_2I") {
-            html += "<option value='GRIB1,80,2,2'>MSL Mean sea level pressure Pa</option>"
-            html += "<option value='GRIB1,80,2,11'>T Temperature K</option>"
-            html += "<option value='GRIB1,80,2,33'>U U-component of wind m s^-1</option>"
-            html += "<option value='GRIB1,80,2,34'>V V-component of wind m s^-1</option>"
-            html += "<option value='GRIB1,80,2,51'>Q Specific humidity kg kg^-1</option>"
-            html += "<option value='GRIB1,80,2,52'>R Relative humidity %</option>"
-            html += "<option value='GRIB1,80,2,61'>TP Total precipitation kg m^-2</option>"
-            html += "<option value='GRIB1,80,2,65'>SF Water equivalentof accumulated snow depth kg m^-2</option>"
-            html += "<option value='GRIB1,80,2,71'>TCC Total cloud cover %</option>"
-            html += "<option value='GRIB1,80,2,73'>LCC Low cloud cover %</option>"
-            html += "<option value='GRIB1,80,2,74'>MCC Medium cloud cover %</option>"
-            html += "<option value='GRIB1,80,2,75'>HCC High cloud cover %</option>"
-            html += "<option value='GRIB1,80,201,22'>GRIB1(080, 201, 022)</option>"
-            html += "<option value='GRIB1,80,201,23'>GRIB1(080, 201, 023)</option>"
-        }
-        $("#product").html(html)
+        value in products && products[value].forEach((item) => {
+            $("#product").append(`<option value="${item.value}">${item.display_value}</option>`)
+        })
     })
     $('#selectAllLevels').click(function () {
         $('#level option').prop('selected', true);

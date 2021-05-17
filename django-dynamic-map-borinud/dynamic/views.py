@@ -1,30 +1,31 @@
-from django.shortcuts import render
-from dynamic import settings
-from http.client import HTTPSConnection
-from base64 import b64encode
-import requests
-from django.http import HttpResponse, JsonResponse
-import os
-from django.contrib.auth.decorators import login_required, permission_required
-from django.views.decorators.csrf import csrf_exempt
-import json
-import dballe
 import datetime
-from dynamic.models import StationEdit, DataEdit, Edit, Alarm
-from rest_framework import viewsets, mixins
-from rest_framework import permissions
-from dynamic.serializers import EditSerializer, AlarmSerializer, AlarmEditSerializer
-from django.http import HttpResponseNotFound
-from dynamic.compare_summaries import compare_summaries_data
-from dynamic.permissions import HasCanExtract
-from django.contrib.staticfiles import finders
-from django.views.generic import View
-from .proxy import Proxy
-from django.contrib.auth.mixins import PermissionRequiredMixin
+import json
+import os
 import shutil
 
-def render_map(request):
+import dballe
+import requests
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.staticfiles import finders
+from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponseNotFound
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
+from rest_framework import permissions
+from rest_framework import viewsets, mixins
 
+from dynamic import settings
+from dynamic.compare_summaries import compare_summaries_data
+from dynamic.models import StationEdit, DataEdit, Edit, Alarm
+from dynamic.permissions import HasCanExtract
+from dynamic.serializers import EditSerializer, AlarmSerializer, AlarmEditSerializer
+from .proxy import Proxy
+from .settings import EXTRACT_PRODUCTS
+
+
+def render_map(request):
     return render(
         request,
         "map.html",
@@ -58,12 +59,12 @@ def render_extract_page(request):
         url = settings.ARKIWEB_URL
 
         if not (
-            os.path.exists(repository)
-            and "startTime" in request.POST
-            and "product" in request.POST
-            and "level" in request.POST
-            and "endTime" in request.POST
-            and "dataset" in request.POST
+                os.path.exists(repository)
+                and "startTime" in request.POST
+                and "product" in request.POST
+                and "level" in request.POST
+                and "endTime" in request.POST
+                and "dataset" in request.POST
         ):
             return HttpResponse(status=500)
         username = settings.USERNAME_ARKIWEB
@@ -71,14 +72,14 @@ def render_extract_page(request):
         product = " or ".join(request.POST.getlist("product"))
         level = " or ".join(request.POST.getlist("level"))
         query = (
-            "reftime: >= "
-            + request.POST["startTime"]
-            + ",<="
-            + request.POST["endTime"]
-            + "; product:"
-            + product
-            + "; level:"
-            + level
+                "reftime: >= "
+                + request.POST["startTime"]
+                + ",<="
+                + request.POST["endTime"]
+                + "; product:"
+                + product
+                + "; level:"
+                + level
         )
 
         r = requests.get(
@@ -88,11 +89,11 @@ def render_extract_page(request):
             stream=True,
         )
         file_path = (
-            repository
-            + (request.POST["startTime"] + "_" + request.POST["endTime"]).replace(
-                " ", ""
-            )
-            + ".grib1"
+                repository
+                + (request.POST["startTime"] + "_" + request.POST["endTime"]).replace(
+            " ", ""
+        )
+                + ".grib1"
         )
 
         if r.status_code == 200:
@@ -112,7 +113,9 @@ def render_extract_page(request):
                 return HttpResponse(status=200)
             return HttpResponse(status=204)
         return HttpResponse(status=404)
-    return render(request, "extract_page.html")
+
+    context = {"products": EXTRACT_PRODUCTS}
+    return render(request, "extract_page.html", context)
 
 
 @csrf_exempt
@@ -273,10 +276,10 @@ def find_id_station(json_stations, ident, lon, lat, network):
     lat = int(lat)
     for key, value in json_stations.items():
         if (
-            value["ident"] == ident
-            and value["lon"] == lon
-            and value["lat"] == lat
-            and value["rep"] == network
+                value["ident"] == ident
+                and value["lon"] == lon
+                and value["lat"] == lat
+                and value["rep"] == network
         ):
             return key
     return False
@@ -300,14 +303,14 @@ def find_id_var(json_variables, bcode, trange, level):
     p2 = int(trange[2])
     for key, value in json_variables.items():
         if (
-            value["bcode"] == bcode
-            and value["tr"] == tr
-            and value["p1"] == p1
-            and value["p2"] == p2
-            and value["lt1"] == lt1
-            and value["lt2"] == lt2
-            and value["l2"] == l2
-            and value["l1"] == l1
+                value["bcode"] == bcode
+                and value["tr"] == tr
+                and value["p1"] == p1
+                and value["p2"] == p2
+                and value["lt1"] == lt1
+                and value["lt2"] == lt2
+                and value["l2"] == l2
+                and value["l1"] == l1
         ):
             return key
     return False

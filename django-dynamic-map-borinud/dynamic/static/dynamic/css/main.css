@@ -127,7 +127,7 @@ html, body, #map {
 }
 
 .slider-control {
-    width: 300px;
+    width: 400px;
     background: white;
     padding: 10px;
     font-size: 16px;
@@ -203,7 +203,19 @@ html, body, #map {
     -webkit-transition-delay: 0ms, 0ms, 200ms;
     transition-delay: 0ms, 0ms, 200ms;
 }
-#sidebarChart{
+
+#sliderTimeLayers.ui-slider-float .ui-slider-tip, #sliderTimeLayers.ui-slider-float .ui-slider-tip-label {
+    width: 125px;
+    margin-left: -46px
+}
+.ui-slider-pips .ui-slider-label {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    margin-left: -5.5em;
+    width: 11em;
+}
+#sidebarChart {
     position: absolute;
     right: 0;
     width: calc(100% - 490px);
@@ -216,10 +228,11 @@ html, body, #map {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
     height: auto;
     display: none;
-    padding:10px;
-    overflow-x:auto;
+    padding: 10px;
+    overflow-x: auto;
     font-size: 0.9rem
 }
+
 @-webkit-keyframes pulsate {
     0% {
         -webkit-transform: scale(0.1, 0.1);
