@@ -49,6 +49,15 @@ Add the string for the dballe db (standart is '"sqlite://test.sqlite"')::
 
     DBALLE_DB_DYNAMIC = "sqlite://example.sqlite"
 
+Edit your `settings.py` file to add the configuration for dataset and the relative products, to render in extract page. Use as key the name of the dataset and as value a list of dictionaries with two attributes :
+"value" and "display_value"::
+
+    EXTRACT_PRODUCTS = {"cosmo_2l": [
+                                        {"value": "GRIB1,80,2,2", "display_value": "MSL Mean sea level pressure Pa"},
+                                        {"value": "GRIB1,80,2,11", "display_value": "T Temperature K"},
+                                    ]
+                        }
+
 
 
 Edit your project `urls.py` file to import the URLs::
