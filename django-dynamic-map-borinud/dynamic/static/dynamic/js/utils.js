@@ -649,7 +649,67 @@ function getMarker(feature, selectedValues, coords) {
     return marker
 }
 
+function getSimpleMarker(feature, selectedValues, bcode, min, max) {
+    const data = feature;
+    data.value = 0;
+    feature.data.forEach((item) => {
+        if (selectedValues.vars in item.vars) {
+            data.value = item.vars[selectedValues.vars].v;
+            data.trange = item.timerange;
+            data.level = item.level;
+        }
+    });
+    const leafletMarker = L.marker([feature.lat / 100000,
+        feature.lon / 100000])
+    if (leafletMarker.getPopup()) {
+        leafletMarker.setPopupContent(setPopup(data, selectedValues));
+    } else {
+        leafletMarker.bindPopup(setPopup(data, selectedValues));
+    }
+    let val = roundValue(data.value * bcode.scale + bcode.offset);
+    let vallen = val.length * 6 + 6;
 
+    leafletMarker.setIcon(
+        L.extendedDivIcon({
+            iconSize: new L.Point(vallen, 14),
+            labelAnchor: [vallen / 2, 0],
+            html: val,
+            className: "myDivIcon",
+            style: {backgroundColor: getColor(data.value, min, max)},
+        })
+    );
+    let bcodeKey = $("#vars").val();
+    if (
+        bcodeKey in data.data[0].vars &&
+        "B33196" in data.data[0].vars[bcodeKey].a
+    ) {
+        vallen += 4;
+        leafletMarker.setIcon(
+            L.extendedDivIcon({
+                iconSize: new L.Point(vallen, 18),
+                labelAnchor: [vallen / 2, 0],
+                html: val,
+                className: "myDivIcon",
+                style: {
+                    backgroundColor: getColor(data.value, min, max),
+                    borderColor: "rgba(255, 51, 51, 1)",
+                    borderWidth: "2px",
+                },
+            })
+        );
+    }
+    leafletMarker.bindTooltip(data.date.toString());
+    let dataCopy = {...data};
+    delete dataCopy.indexCol;
+    leafletMarker.on("contextmenu", function () {
+        let r = confirm("Add to edit table?");
+        if (r) {
+            $.Topic("data-add").publish(dataCopy);
+            toastr.success("Done!");
+        }
+    });
+    return leafletMarker
+}
 
 /*
     $("#sidebar").resizable({

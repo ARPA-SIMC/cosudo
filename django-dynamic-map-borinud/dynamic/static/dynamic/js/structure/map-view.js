@@ -26,6 +26,7 @@ let MapView = function (
     this.websiteDomain = websiteDomain
     this.opacityControls = {}
     this.availableTimesLayer = {}
+    this.markersLayer = new L.LayerGroup();
 };
 
 MapView.prototype.initEvents = function () {
@@ -55,11 +56,9 @@ MapView.prototype.initEvents = function () {
     getWmsLayers(self.urlWms, 502)
     getWmsLayers(self.urlMapServer, 501)
     self.controlLayer.addTo(self.map)
-
-
+    self.markersLayer.addTo(self.map)
     self.map.on("layeradd", function (l) {
         const name = l.layer.options.layers
-        console.log(name)
         // if layer is a wms layer
         if (name) {
             updateTimesSliderLayers()
@@ -124,8 +123,28 @@ MapView.prototype.initEvents = function () {
         }
         let selectedValues = getSelectedValues();
         let selectedObject = $("input[name='objectToShow']:checked").val();
-        self.render(collection, bcode, selectedObject, selectedValues);
+        self.render(collection, bcode, selectedObject, selectedValues,toggleClusteringValue());
     });
+
+
+    $(document.body).on("click", "#toggleClustering", function () {
+        //shows or hides markers from map
+        if ($(this).hasClass("showing")) {
+            $(this).html("<i class='fa fa-toggle-off'></i>");
+            $(this).removeClass("showing");
+            $(this).addClass("hiding");
+        } else {
+            $(this).html("<i class='fa fa-toggle-on'></i>");
+            $(this).removeClass("hiding");
+            $(this).addClass("showing");
+        }
+        self.overlay.fadeIn(300);
+        let selectedValues = getSelectedValues();
+        let selectedObject = $("input[name='objectToShow']:checked").val();
+        self.render(filterData(), bcode, selectedObject, selectedValues, toggleClusteringValue());
+        self.overlay.fadeOut(300);
+    });
+
     $("#sliderTime").slider({
         value: 0,
         min: 0,
@@ -237,7 +256,7 @@ MapView.prototype.initEvents = function () {
         self.overlay.fadeIn(300);
         let selectedValues = getSelectedValues();
         let selectedObject = $("input[name='objectToShow']:checked").val();
-        self.render(filterData(), bcode, selectedObject, selectedValues);
+        self.render(filterData(), bcode, selectedObject, selectedValues,toggleClusteringValue());
         self.overlay.fadeOut(300);
     });
 
@@ -245,7 +264,7 @@ MapView.prototype.initEvents = function () {
         // on data time slider stop
         let selectedValues = getSelectedValues();
         let selectedObject = $("input[name='objectToShow']:checked").val();
-        self.render(filterData(), bcode, selectedObject, selectedValues);
+        self.render(filterData(), bcode, selectedObject, selectedValues,toggleClusteringValue());
     });
 
     $(document.body).on("slidestop", "#sliderTimeLayers", function (event, ui) {
@@ -264,8 +283,11 @@ MapView.prototype.initEvents = function () {
         update();
     });
 
+    function toggleClusteringValue() {
+        return !$("#toggleClustering").hasClass("showing")
+    }
+
     function updateTimesSliderLayers() {
-        console.log("qui")
         // get times of the active layers
         let activeLayers = self.controlLayer.getActiveOverlays();
         timesLayer = activeLayers.reduce((array, layer) => {
@@ -622,14 +644,16 @@ MapView.prototype.initEvents = function () {
                             filterData(),
                             bcode,
                             selectedObject,
-                            selectedValues
+                            selectedValues,
+                            toggleClusteringValue()
                         );
                     } else {
                         self.render(
                             collection,
                             bcode,
                             selectedObject,
-                            selectedValues
+                            selectedValues,
+                            toggleClusteringValue()
                         );
                     }
                 },
@@ -651,14 +675,15 @@ MapView.prototype.render = function (
     collection,
     bcode,
     selectedObj,
-    selectedValues
+    selectedValues,
+    noClustering = false
 ) {
     const self = this;
     self.overlay.fadeIn(300);
     self.legend.remove();
     self.pruneCluster.RemoveMarkers();
     self.pruneCluster.RedrawIcons();
-
+    self.markersLayer.clearLayers();
     if (collection.length <= 0) {
         toastr.warning("No data");
     } else {
@@ -691,52 +716,59 @@ MapView.prototype.render = function (
                     })
                 );
             });
-            let pi2 = Math.PI * 2;
-            prepareMarker(self.pruneCluster, selectedValues, bcode, min, max)
-            self.pruneCluster.Cluster.Size = 15;
-            if ($("#vars").val() === "B11001") {
-                preparePruneClusterWind(self.pruneCluster)
-            } else {
-                self.legend.onAdd = function (map) {
-                    let div = L.DomUtil.create("div", "info legend");
-                    // loop through our density intervals and generate a label with a colored square for each interval
-                    let halfdelta = (max - min) / (colors.length * 2);
-                    let grades = [];
-                    for (let i = 0; i < colors.length; i++) {
-                        let grade = min + halfdelta * (i * 2 + 1);
-                        div.innerHTML +=
-                            '<div style="background:white">' +
-                            '<b style="background:' +
-                            getColor(grade, min, max) +
-                            '">&nbsp;&nbsp;&nbsp;</b>&nbsp;' +
-                            roundValue(grade * bcode.scale + bcode.offset) +
-                            "<br>" +
-                            "</div>";
-                        grades.push(grade * bcode.scale + bcode.offset);
-                    }
-                    self.grades = grades;
-                    if ($("#syncColors").is(":checked")) {
-                        let activeLayers = self.controlLayer.getActiveOverlays();
-                        activeLayers.forEach((layer) => {
-                            layer.setParams({dim_grades: self.grades, dim_colors: colors});
-                        });
-                    }
-                    return div;
-                };
-                self.legend.addTo(self.map);
-                preparePruneClusterAllData(self.pruneCluster, max, min, pi2, bcode, selectedValues)
-            }
-            $.each(collection, function (i, feature) {
-                let marker = getMarker(feature, selectedValues)
+            if (!noClustering) {
+                let pi2 = Math.PI * 2;
+                prepareMarker(self.pruneCluster, selectedValues, bcode, min, max)
+                self.pruneCluster.Cluster.Size = 15;
                 if ($("#vars").val() === "B11001") {
-                    marker.category = getIndexCompass(marker.data.value);
+                    preparePruneClusterWind(self.pruneCluster)
                 } else {
-                    marker.category = getColorIndex(marker.data.value, min, max);
+                    self.legend.onAdd = function (map) {
+                        let div = L.DomUtil.create("div", "info legend");
+                        // loop through our density intervals and generate a label with a colored square for each interval
+                        let halfdelta = (max - min) / (colors.length * 2);
+                        let grades = [];
+                        for (let i = 0; i < colors.length; i++) {
+                            let grade = min + halfdelta * (i * 2 + 1);
+                            div.innerHTML +=
+                                '<div style="background:white">' +
+                                '<b style="background:' +
+                                getColor(grade, min, max) +
+                                '">&nbsp;&nbsp;&nbsp;</b>&nbsp;' +
+                                roundValue(grade * bcode.scale + bcode.offset) +
+                                "<br>" +
+                                "</div>";
+                            grades.push(grade * bcode.scale + bcode.offset);
+                        }
+                        self.grades = grades;
+                        if ($("#syncColors").is(":checked")) {
+                            let activeLayers = self.controlLayer.getActiveOverlays();
+                            activeLayers.forEach((layer) => {
+                                layer.setParams({dim_grades: self.grades, dim_colors: colors});
+                            });
+                        }
+                        return div;
+                    };
+                    self.legend.addTo(self.map);
+                    preparePruneClusterAllData(self.pruneCluster, max, min, pi2, bcode, selectedValues)
                 }
-                self.pruneCluster.RegisterMarker(marker);
-            });
+                $.each(collection, function (i, feature) {
+                    let marker = getMarker(feature, selectedValues)
+                    if ($("#vars").val() === "B11001") {
+                        marker.category = getIndexCompass(marker.data.value);
+                    } else {
+                        marker.category = getColorIndex(marker.data.value, min, max);
+                    }
+                    self.pruneCluster.RegisterMarker(marker);
+                });
+            } else {
+                $.each(collection, function (i, feature) {
+                    self.markersLayer.addLayer(getSimpleMarker(feature, selectedValues, bcode, min, max))
+                });
+            }
+
         }
-        self.map.addLayer(self.pruneCluster);
+        //self.map.addLayer(self.pruneCluster);
         self.pruneCluster.ProcessView();
     }
     self.overlay.fadeOut(300);
