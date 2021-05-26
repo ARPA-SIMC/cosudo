@@ -123,7 +123,7 @@ MapView.prototype.initEvents = function () {
         }
         let selectedValues = getSelectedValues();
         let selectedObject = $("input[name='objectToShow']:checked").val();
-        self.render(collection, bcode, selectedObject, selectedValues,toggleClusteringValue());
+        self.render(collection, bcode, selectedObject, selectedValues, toggleClusteringValue());
     });
 
 
@@ -256,7 +256,7 @@ MapView.prototype.initEvents = function () {
         self.overlay.fadeIn(300);
         let selectedValues = getSelectedValues();
         let selectedObject = $("input[name='objectToShow']:checked").val();
-        self.render(filterData(), bcode, selectedObject, selectedValues,toggleClusteringValue());
+        self.render(filterData(), bcode, selectedObject, selectedValues, toggleClusteringValue());
         self.overlay.fadeOut(300);
     });
 
@@ -264,7 +264,7 @@ MapView.prototype.initEvents = function () {
         // on data time slider stop
         let selectedValues = getSelectedValues();
         let selectedObject = $("input[name='objectToShow']:checked").val();
-        self.render(filterData(), bcode, selectedObject, selectedValues,toggleClusteringValue());
+        self.render(filterData(), bcode, selectedObject, selectedValues, toggleClusteringValue());
     });
 
     $(document.body).on("slidestop", "#sliderTimeLayers", function (event, ui) {
@@ -718,7 +718,9 @@ MapView.prototype.render = function (
             });
             if (!noClustering) {
                 let pi2 = Math.PI * 2;
-                prepareMarker(self.pruneCluster, selectedValues, bcode, min, max)
+                self.pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
+                    setSimpleIconMarker(selectedValues, bcode, min, max, leafletMarker, data)
+                }
                 self.pruneCluster.Cluster.Size = 15;
                 if ($("#vars").val() === "B11001") {
                     preparePruneClusterWind(self.pruneCluster)
