@@ -6,8 +6,41 @@
         </div>
     </div>
     <div id="sidebarChart">
-        <div class="d-flex flex-row justify-content-end">
-            <button class="btn btn-primary btn-sm" onclick="printDiv('chart-page')">Stampa</button>
+        <div class="d-flex flex-row justify-content-between align-items-center mb-3">
+            <div class="d-flex flex-row justify-content-start align-items-center">
+                <div class="input-group">
+
+                    <div class="input-group-prepend ">
+                        <span class="input-group-text" id="">FROM</span>
+                    </div>
+                    <input
+                            type="text"
+                            id="datetimepickerGraphFrom"
+                            class="form-control input-sm datetimepicker-input"
+                            data-target="#datetimepickerGraphFrom"
+                            data-toggle="datetimepicker"
+                            autocomplete="off"
+                    />
+                    <div class="input-group-prepend input-group-append">
+                        <span class="input-group-text" id="">TO</span>
+                    </div>
+                    <input
+                            type="text"
+                            id="datetimepickerGraphTo"
+                            class="form-control input-sm datetimepicker-input"
+                            data-target="#datetimepickerGraphTo"
+                            data-toggle="datetimepicker"
+                            autocomplete="off"
+                    />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary " id="createGraph"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+
+            </div>
+            <div>
+                <button class="btn btn-primary btn-sm" onclick="printDiv('chart-page')">Print</button>
+            </div>
         </div>
         <div id="chart-page">
             <div id="chart-container">
@@ -1045,7 +1078,7 @@
                             >
                                 <div class="d-flex flex-row justify-content-between">
                                     <i class="fa fa-line-chart"></i>
-                                    Add to graph
+                                    Add query
                                 </div>
                             </button>
                             <button
@@ -1059,13 +1092,37 @@
                                 </div>
                             </button>
                         </div>
-                        <div class="col-12 mt-2">
+                        <!--<div class="col-12 mt-2">
                             <button data-url="" class="btn btn-outline-primary get-borinud-url w-100"
                                     id="url-borinud-graph">
                                 Copia url
                             </button>
-                        </div>
+                        </div>-->
 
+                    </div>
+                    <hr>
+                    <h6>
+                        Selected queries:
+                    </h6>
+                    <div class="table-responsive mt-2">
+                        <table
+                                class="table table-sm table-bordered table-hover table-striped"
+                                id="selectedQueriesGraph"
+                        >
+
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Ident</th>
+                                <th>Lat lon</th>
+                                <th>Network</th>
+                                <th>Timerange</th>
+                                <th>Level</th>
+                                <th>Bcode</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>

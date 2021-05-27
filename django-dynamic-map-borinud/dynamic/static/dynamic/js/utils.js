@@ -580,87 +580,7 @@ function preparePruneClusterAllData(pruneCluster, max, min, pi2, bcode, selected
     };
 }
 
-function prepareMarker(pruneCluster, selectedValues, bcode, min, max) {
-    pruneCluster.PrepareLeafletMarker = function (leafletMarker, data) {
-        if (leafletMarker.getPopup()) {
-            leafletMarker.setPopupContent(setPopup(data, selectedValues));
-        } else {
-            leafletMarker.bindPopup(setPopup(data, selectedValues));
-        }
-        let val = roundValue(data.value * bcode.scale + bcode.offset);
-        let vallen = val.length * 6 + 6;
-
-        leafletMarker.setIcon(
-            L.extendedDivIcon({
-                iconSize: new L.Point(vallen, 14),
-                labelAnchor: [vallen / 2, 0],
-                html: val,
-                className: "myDivIcon",
-                style: {backgroundColor: getColor(data.value, min, max)},
-            })
-        );
-        let bcodeKey = $("#vars").val();
-        if (
-            bcodeKey in data.data[0].vars &&
-            "B33196" in data.data[0].vars[bcodeKey].a
-        ) {
-            vallen += 4;
-            leafletMarker.setIcon(
-                L.extendedDivIcon({
-                    iconSize: new L.Point(vallen, 18),
-                    labelAnchor: [vallen / 2, 0],
-                    html: val,
-                    className: "myDivIcon",
-                    style: {
-                        backgroundColor: getColor(data.value, min, max),
-                        borderColor: "rgba(255, 51, 51, 1)",
-                        borderWidth: "2px",
-                    },
-                })
-            );
-        }
-        leafletMarker.bindTooltip(data.date.toString());
-        let dataCopy = {...data};
-        delete dataCopy.indexCol;
-        leafletMarker.on("contextmenu", function () {
-            let r = confirm("Add to edit table?");
-            if (r) {
-                $.Topic("data-add").publish(dataCopy);
-                toastr.success("Done!");
-            }
-        });
-    };
-}
-
-function getMarker(feature, selectedValues, coords) {
-    let marker = new PruneCluster.Marker(
-        feature.lat / 100000,
-        feature.lon / 100000
-    );
-    marker.data = feature;
-    marker.data.value = 0;
-    feature.data.forEach((item) => {
-        if (selectedValues.vars in item.vars) {
-            marker.data.value = item.vars[selectedValues.vars].v;
-            marker.data.trange = item.timerange;
-            marker.data.level = item.level;
-        }
-    });
-    return marker
-}
-
-function getSimpleMarker(feature, selectedValues, bcode, min, max) {
-    const data = feature;
-    data.value = 0;
-    feature.data.forEach((item) => {
-        if (selectedValues.vars in item.vars) {
-            data.value = item.vars[selectedValues.vars].v;
-            data.trange = item.timerange;
-            data.level = item.level;
-        }
-    });
-    const leafletMarker = L.marker([feature.lat / 100000,
-        feature.lon / 100000])
+function setSimpleIconMarker(selectedValues, bcode, min, max, leafletMarker, data) {
     if (leafletMarker.getPopup()) {
         leafletMarker.setPopupContent(setPopup(data, selectedValues));
     } else {
@@ -698,7 +618,7 @@ function getSimpleMarker(feature, selectedValues, bcode, min, max) {
             })
         );
     }
-    leafletMarker.bindTooltip(data.date.toString());
+    leafletMarker.bindTooltip(`${data.date.toString()}<br> <b>Ident:</b> ${data.ident}`);
     let dataCopy = {...data};
     delete dataCopy.indexCol;
     leafletMarker.on("contextmenu", function () {
@@ -708,13 +628,81 @@ function getSimpleMarker(feature, selectedValues, bcode, min, max) {
             toastr.success("Done!");
         }
     });
+}
+
+
+function getMarker(feature, selectedValues, coords) {
+    let marker = new PruneCluster.Marker(
+        feature.lat / 100000,
+        feature.lon / 100000
+    );
+    marker.data = feature;
+    marker.data.value = 0;
+    feature.data.forEach((item) => {
+        if (selectedValues.vars in item.vars) {
+            marker.data.value = item.vars[selectedValues.vars].v;
+            marker.data.trange = item.timerange;
+            marker.data.level = item.level;
+        }
+    });
+    return marker
+}
+
+function getSimpleMarker(feature, selectedValues, bcode, min, max) {
+    const data = feature;
+    data.value = 0;
+    feature.data.forEach((item) => {
+        if (selectedValues.vars in item.vars) {
+            data.value = item.vars[selectedValues.vars].v;
+            data.trange = item.timerange;
+            data.level = item.level;
+        }
+    });
+    const leafletMarker = L.marker([feature.lat / 100000,
+        feature.lon / 100000])
+    setSimpleIconMarker(selectedValues, bcode, min, max, leafletMarker, data)
     return leafletMarker
 }
 
-/*
-    $("#sidebar").resizable({
-        handles: 'e', stop: function (e, ui) {
-            widthMenu = document.getElementById('sidebar').offsetWidth;
-        }
-    });
-*/
+function getBcode(bcode) {
+    return bcode in borinud.config.B ? `${borinud.config.B[bcode].description} ${borinud.config.B[bcode].unit}` : bcode
+
+
+}
+
+function getTrange(trange) {
+    return borinud.config.trange.describe(
+        trange
+    );
+}
+
+function getLevel(level) {
+    return borinud.config.level.describe(level);
+}
+
+function getDateComponents(date) {
+    date = moment(date)
+    return {
+        year: date.format("YYYY"),
+        month: date.format("MM"),
+        day: date.format("DD"),
+        hour: date.format("HH"),
+        minutes: date.format("mm"),
+    }
+}
+
+function getUrlGraph(url, data, minDate, maxDate) {
+    const formattedMinDate = getDateComponents(minDate)
+    const formattedMaxDate = getDateComponents(maxDate)
+    return `${url}/dbajson/${null2_(data.ident)}/${data.lon_lat}/` +
+        `${null2_(data.network)}/${data.timerange}/${null2_(data.level)}/${data.vars}/` +
+        `timeseries/${formattedMinDate.year}?dsn=${data.dsn}&query=attr` +
+        `&yearmin=${formattedMinDate.year}&yearmax=${formattedMaxDate.year}` +
+        `&monthmin=${formattedMinDate.month}&monthmax=${formattedMaxDate.month}` +
+        `&daymin=${formattedMinDate.day}&daymax=${formattedMaxDate.day}` +
+        `&hourmin=${formattedMinDate.hour}&hourmax=${formattedMaxDate.hour}` +
+        `&minumin=${formattedMinDate.minutes}&minumax=${formattedMaxDate.minutes}`
+        ;
+
+}
+
