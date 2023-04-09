@@ -390,10 +390,10 @@ MapView.prototype.initEvents = function () {
         element
             .slider({
                 disabled: true,
-                values: [0, 10],
+                values: [0, 100],
                 min: 0,
                 range: true,
-                max: 10,
+                max: 100,
                 step: 1,
             })
             .slider("pips")
