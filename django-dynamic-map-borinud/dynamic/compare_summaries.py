@@ -82,8 +82,8 @@ def compare_summaries_data(
     second_period_start_date,
     second_period_end_date,
 ):
-    first_url = "http://0.0.0.0:8888/borinud/api/v1/dbajson/*/*/*/*/*/*/summaries"
-    second_url = "https://test.rmap.cc/borinud/api/v1/dbajson/*/*/*/*/*/*/summaries"
+    first_url = "http://localhost/borinud/api/v1/dbajson/*/*/*/*/*/*/summaries"
+    second_url = "http://localhost/borinud/api/v1/dbajson/*/*/*/*/*/*/summaries"
     first_period_start_date = get_strings_time(first_period_start_date)
     first_period_end_date = get_strings_time(first_period_end_date)
     second_period_start_date = get_strings_time(second_period_start_date)
